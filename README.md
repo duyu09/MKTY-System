@@ -30,4 +30,21 @@
   - 校方老师：姜文峰 (英语：_JIANG Wenfeng_；越南语：_Khương Văn Phong_)，齐鲁工业大学（山东省科学院）计算机科学与技术学部 讲师
   - 企业方老师：李君 (英语：_LI Jun_；越南语：_Lý Quân_)，安博教育科技集团 山东师创软件实训学院
 
+## 友情链接
+
+- 齐鲁工业大学（山东省科学院）: [https://www.qlu.edu.cn/](https://www.qlu.edu.cn/)
+  
+- 山东省计算中心（国家超级计算济南中心）: [https://www.nsccjn.cn/](https://www.nsccjn.cn/)
+
+- 齐鲁工业大学（山东省科学院）计算机科学与技术学部: [http://jsxb.scsc.cn/](http://jsxb.scsc.cn/)
+
+- 杜宇的GitHub主页: [https://github.com/duyu09/](https://github.com/duyu09/)
+
+## 访客统计
+
+<div><b>Number of Total Visits (All of Duyu09's GitHub Projects): </b><br><img src="https://profile-counter.glitch.me/duyu09/count.svg" /></div> 
+
+<div><b>Number of Total Visits (MKTY): </b>
+<br><img src="https://profile-counter.glitch.me/duyu09-MKTY-SYSTEM/count.svg" /></div> 
+
 
