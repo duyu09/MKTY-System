@@ -32,7 +32,7 @@ This project serves as the graduation thesis for the 2025 batch of undergraduate
 
 - **Thesis Advisors:**
   - Academic Advisor: JIANG Wenfeng (Chinese: _姜文峰_; Vietnamese: _Khương Văn Phong_), Lecturer, Faculty of Computer Science and Technology, Qilu University of Technology (Shandong Academy of Sciences)
-  - Industry Advisor: LI Jun (Chinese: _李君_; Vietnamese: _Lý Quân_), Shandong Strong Software Training College, Ambow Education Technology Group
+  - Industry Advisor: LI Jun (Chinese: _李君_; Vietnamese: _Lý Quân_), Shandong Strong Software Training College, Ambow Education Group (NYSE: AMBO)
 
 ## Links
 
