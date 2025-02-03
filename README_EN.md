@@ -5,7 +5,7 @@
 </p>
 <br>
 
-# Minh Khoe Tue Y Smart Healthcare System
+# _Minh Khoe Tue Y_ Smart Healthcare System
 
 **Language of This Document**
 
