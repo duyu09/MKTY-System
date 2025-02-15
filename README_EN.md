@@ -26,14 +26,14 @@ In summary, this project explores the deep integration of AI and medicine, provi
 ## Project Authors
 
 ```
-██\      ██\     ██\   ██\  ████████\ ██\     ██\ 
-███\    ███ |    ██ | ██  | \__██  __|\██\   ██  |
-████\  ████ |    ██ |██  /     ██ |    \██\ ██  / 
-██\██\██ ██ |    █████  /      ██ |     \████  /  
-██ \███  ██ |    ██  ██<       ██ |      \██  /   
-██ |\█  /██ |    ██ |\██\      ██ |       ██ |    
-██ | \_/ ██ |██\ ██ | \██\ ██\ ██ |██\    ██ |██\ 
-\__|     \__|\__|\__|  \__|\__|\__|\__|   \__|\__|
+██\      ██\     ██\   ██\   ████████\  ██\     ██\
+███\    ███ |    ██ | ██  |  \__██  __| \██\   ██  |
+████\  ████ |    ██ |██  /      ██ |     \██\ ██  /
+██\██\██ ██ |    █████  /       ██ |      \████  /
+██ \███  ██ |    ██  ██<        ██ |       \██  /
+██ |\█  /██ |    ██ |\██\       ██ |        ██ |
+██ | \_/ ██ |██\ ██ | \██\ ██\  ██ |██\     ██ |██\
+\__|     \__|\__|\__|  \__|\__| \__|\__|    \__|\__|
 ```
 
 This project serves as the graduation thesis for the 2025 batch of undergraduate students in the Faculty of Computer Science and Technology, Qilu University of Technology (Shandong Academy of Sciences).
