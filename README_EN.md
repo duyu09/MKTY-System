@@ -39,17 +39,17 @@ In summary, this project explores the deep integration of AI and medicine, provi
 This project serves as the graduation thesis for the 2025 batch of undergraduate students in the Faculty of Computer Science and Technology, Qilu University of Technology (Shandong Academy of Sciences).
 
 - **Project Author:**  
-  - DU Yu (Chinese: _杜宇_; Vietnamese: _Đỗ Vũ_; Email: <202103180009@stu.qlu.edu.cn>), Graduate student, Faculty of Computer Science and Technology, Qilu University of Technology (Shandong Academy of Sciences)
+  - DU Yu (Chinese: _杜宇_; Vietnamese: _Đỗ Vũ_; Email: <202103180009@stu.qlu.edu.cn>), undergraduate student at Faculty of Computer Science and Technology, Qilu University of Technology (Shandong Academy of Sciences)
 
 - **Thesis Advisors:**
   - Academic Advisor: JIANG Wenfeng (Chinese: _姜文峰_; Vietnamese: _Khương Văn Phong_), Lecturer, Faculty of Computer Science and Technology, Qilu University of Technology (Shandong Academy of Sciences)
-  - Industry Advisor: LI Jun (Chinese: _李君_; Vietnamese: _Lý Quân_), Shandong Strong Software Training College, Ambow Education Group ([NYSE: AMBO](https://www.nyse.com/quote/XASE:AMBO))
+  - Industry Advisor: LI Jun (Chinese: _李君_; Vietnamese: _Lý Quân_), Shandong Strong (Shichuang) Software Training College, Ambow Education Group ([NYSE: AMBO](https://www.nyse.com/quote/XASE:AMBO))
 
 ## Links
 
 - Qilu University of Technology (Shandong Academy of Sciences): [https://www.qlu.edu.cn/](https://www.qlu.edu.cn/)
   
-- Shandong Computer Center (National Supercomputing Center in Jinan): [https://www.nsccjn.cn/](https://www.nsccjn.cn/)
+- Shandong Computer Center (National Supercomputing Center in Jinan, _NSCCJN_): [https://www.nsccjn.cn/](https://www.nsccjn.cn/)
 
 - Faculty of Computer Science and Technology, Qilu University of Technology (Shandong Academy of Sciences): [http://jsxb.scsc.cn/](http://jsxb.scsc.cn/)
 
