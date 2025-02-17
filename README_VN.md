@@ -32,22 +32,22 @@ Xin lưu ý rằng các phiên bản tiếng Anh và tiếng Việt của tài l
 \__|     \__|\__|\__|  \__|\__| \__|\__|    \__|\__|
 ```
 
-Dự án này là đồ án tốt nghiệp của tôi tại Đại học Công nghiệp Tề Lỗ (_Qilu_) (Học viện Khoa học tỉnh Sơn Đông) năm 2025.
+Dự án này là đồ án tốt nghiệp của tôi tại Đại học Công nghiệp Tề Lỗ (_Qilu_) (Viện Khoa học tỉnh Sơn Đông) năm 2025.
 
 - **Tác Giả Dự Án**
-  - **Đỗ Vũ** (Tiếng Trung: _杜宇_; Tiếng Anh: _DU Yu_; email: <202103180009@stu.qlu.edu.cn>), sinh viên tốt nghiệp năm 2025, Khoa Khoa học và Công nghệ Máy tính, Đại học Công nghiệp Tề Lỗ (_Qilu_) (Học viện Khoa học tỉnh Sơn Đông)
+  - **Đỗ Vũ** (Tiếng Trung: _杜宇_; Tiếng Anh: _DU Yu_; email: <202103180009@stu.qlu.edu.cn>), sinh viên tốt nghiệp năm 2025, Khoa Khoa học và Công nghệ Máy tính, Đại học Công nghiệp Tề Lỗ (_Qilu_) (Viện Khoa học tỉnh Sơn Đông)
 
 - **Giáo Viên Hướng Dẫn Đồ Án**
-  - Giáo viên trường: **Khương Văn Phong** (Tiếng Trung: _姜文峰_; Tiếng Anh: _JIANG Wenfeng_), giảng viên Khoa Khoa học và Công nghệ Máy tính, Đại học Công nghiệp Tề Lỗ (_Qilu_) (Học viện Khoa học tỉnh Sơn Đông).
+  - Giáo viên trường: **Khương Văn Phong** (Tiếng Trung: _姜文峰_; Tiếng Anh: _JIANG Wenfeng_), giảng viên Học viện Khoa học và Kỹ thuật Máy tính, Đại học Công nghiệp Tề Lỗ (_Qilu_) (Viện Khoa học tỉnh Sơn Đông).
   - Giáo viên công ty: **Lý Quân** (Tiếng Trung: _李君_; Tiếng Anh: _LI Jun_), Học viện Đào tạo Phần mềm Strong (_Sư Sáng_) Sơn Đông, Tập đoàn Giáo dục Công nghệ Ambow (_An Bác_, [NYSE: AMBO](https://www.nyse.com/quote/XASE:AMBO)).
 
 ## Liên Kết Tình Bạn
 
-- Đại học Công nghiệp Tề Lỗ (_Qilu_) (Học viện Khoa học tỉnh Sơn Đông): [https://www.qlu.edu.cn/](https://www.qlu.edu.cn/)
+- Đại học Công nghiệp Tề Lỗ (_Qilu_) (Viện Khoa học tỉnh Sơn Đông): [https://www.qlu.edu.cn/](https://www.qlu.edu.cn/)
   
 - Trung tâm Tính toán Sơn Đông (Trung tâm Tính toán Siêu máy tính Quốc gia Tế Nam, _NSCCJN_): [https://www.nsccjn.cn/](https://www.nsccjn.cn/)
 
-- Khoa Khoa học và Công nghệ Máy tính, Đại học Công nghiệp Tề Lỗ (_Qilu_) (Học viện Khoa học và Công nghệ tỉnh Sơn Đông): [http://jsxb.scsc.cn/](http://jsxb.scsc.cn/)
+- Khoa Khoa học và Công nghệ Máy tính, Đại học Công nghiệp Tề Lỗ (_Qilu_) (Viện Khoa học tỉnh Sơn Đông): [http://jsxb.scsc.cn/](http://jsxb.scsc.cn/)
 
 - Trang GitHub của Đỗ Vũ: [https://github.com/duyu09/](https://github.com/duyu09/)
 
