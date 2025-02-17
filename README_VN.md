@@ -45,7 +45,7 @@ Dự án này là đồ án tốt nghiệp của tôi tại Đại học Công n
 
 - Đại học Công nghiệp Tề Lỗ (_Qilu_) (Học viện Khoa học tỉnh Sơn Đông): [https://www.qlu.edu.cn/](https://www.qlu.edu.cn/)
   
-- Trung tâm Tính toán Sơn Đông (Trung tâm Tính toán Siêu máy tính Quốc gia Tế Nam): [https://www.nsccjn.cn/](https://www.nsccjn.cn/)
+- Trung tâm Tính toán Sơn Đông (Trung tâm Tính toán Siêu máy tính Quốc gia Tế Nam, _NSCCJN_): [https://www.nsccjn.cn/](https://www.nsccjn.cn/)
 
 - Khoa Khoa học và Công nghệ Máy tính, Đại học Công nghiệp Tề Lỗ (_Qilu_) (Học viện Khoa học và Công nghệ tỉnh Sơn Đông): [http://jsxb.scsc.cn/](http://jsxb.scsc.cn/)
 
