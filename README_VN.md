@@ -5,7 +5,7 @@
 </p>
 <br>
 
-# _Minh Khỏe Tuệ Y_ - Hệ Thống Y Tế Trí Tuệ
+# _Minh Khỏe Tuệ Y_ - Hệ Thống Y Liệu Trí Tuệ
 
 **Ngôn Ngữ Tài Liệu**
 
@@ -13,7 +13,7 @@
 
 Xin lưu ý rằng các phiên bản tiếng Anh và tiếng Việt của tài liệu này đều được dịch từ phiên bản tiếng Trung với sự hỗ trợ của LLM và có chỉnh sửa thủ công, tuy nhiên có thể có sai sót. Nếu có sự không nhất quán giữa các phiên bản tiếng Anh hoặc tiếng Việt và phiên bản tiếng Trung, phiên bản tiếng Trung sẽ được ưu tiên.
 
-**Tên dự án:** Minh Khỏe Tuệ Y - Thiết kế và triển khai hệ thống quản lý sức khỏe và hỗ trợ chẩn đoán y tế dựa trên LLM và trí tuệ nhân tạo đa mô thức ( **Tên viết tắt:** Minh Khỏe Tuệ Y Hệ Thống Y Tế Trí Tuệ, **Tiếng Trung:** 明康慧医 - 基于LLM与多模态人工智能的健康管理与辅助诊疗系统设计与实现 (明康慧医智慧医疗系统) **Tiếng Anh:** Design and Implementation of *Minh Khoe Tue Y* - a Health Management and Assisted Diagnosis System Based on LLM and Multimodal Artificial Intelligence **hoặc** Minh Khoe Tue Y Smart Healthcare System, _MKTY_)
+**Tên dự án:** Minh Khỏe Tuệ Y - Thiết kế và triển khai hệ thống quản lý sức khỏe và hỗ trợ chẩn đoán y tế dựa trên LLM và trí tuệ nhân tạo đa mô thức ( **Tên viết tắt:** Minh Khỏe Tuệ Y - Hệ Thống Y Liệu Trí Tuệ, **Tiếng Trung:** 明康慧医 - 基于LLM与多模态人工智能的健康管理与辅助诊疗系统设计与实现 (明康慧医智慧医疗系统) **Tiếng Anh:** Design and Implementation of *Minh Khoe Tue Y* - a Health Management and Assisted Diagnosis System Based on LLM and Multimodal Artificial Intelligence **hoặc** Minh Khoe Tue Y Smart Healthcare System, _MKTY_)
 
 ## Giới Thiệu Dự Án
 
