@@ -13,7 +13,7 @@
 
 请注意，本文档的英文与越南文版本均使用LLM翻译自中文版本，有人工校对但差错难免，若出现英文或越南文版本内容与中文版本的不一致时，以中文为准。
 
-**项目全称：** 明康慧医 - 基于LLM与多模态人工智能的健康管理与辅助诊疗系统设计与实现 ( **简称:** 明康慧医智慧医疗系统；**英语:** Design and Implementation of *Minh Khoe Tue Y* -  a Health Management and Assisted Diagnosis System Based on LLM and Multimodal Artificial Intelligence **或** Minh Khoe Tue Y Smart Healthcare System, **Abbr.** _MKTY_；**越南语:** *Minh Khỏe Tuệ Y* -  Thiết kế và triển khai hệ thống quản lý sức khỏe và hỗ trợ chẩn đoán y tế dựa trên LLM và trí tuệ nhân tạo đa mô thức **或** *Minh Khỏe Tuệ Y* - Hệ Thống Y Tế Trí Tuệ)
+**项目全称：** 明康慧医 - 基于LLM与多模态人工智能的健康管理与辅助诊疗系统设计与实现 ( **简称:** 明康慧医智慧医疗系统；**英语:** Design and Implementation of *Minh Khoe Tue Y* -  a Health Management and Assisted Diagnosis System Based on LLM and Multimodal Artificial Intelligence **或** Minh Khoe Tue Y Smart Healthcare System, **Abbr.** _MKTY_；**越南语:** *Minh Khỏe Tuệ Y* -  Thiết kế và triển khai hệ thống quản lý sức khỏe và hỗ trợ chẩn đoán y tế dựa trên LLM và trí tuệ nhân tạo đa mô thức **或** *Minh Khỏe Tuệ Y* - Hệ Thống Y Liệu Trí Tuệ)
 
 ## 项目介绍
 
