@@ -9,7 +9,7 @@
 
 ### 🌍 文档语言
 
-<img src="https://github.com/user-attachments/assets/bf080faa-6603-4254-8596-26a2e96f22ca" alt="PRC" style="height: 1em;"> [**简体中文**](./README.md) | <img src="https://github.com/user-attachments/assets/b40ed762-e7cc-497a-b37e-d7eefd72ce2b" alt="USA" style="height: 1em;"> [**英语 (English)**](./README_EN.md) | <img src="https://github.com/user-attachments/assets/e1fd6990-bd06-4c98-b593-ead83137527a" alt="SRV" style="height: 1em;"> [**越南语 (Tiếng Việt)**](./README_VN.md)
+<img src="./image/PRC_flag.svg" alt="PRC" style="height: 1em;"> [**简体中文**](./README.md) | <img src="./image/USA_flag.svg" alt="USA" style="height: 1em;"> [**英语 (English)**](./README_EN.md) | <img src="./image/SRV_flag.svg" alt="SRV" style="height: 1em;"> [**越南语 (Tiếng Việt)**](./README_VN.md)
 
 
 > 请注意，本文档的英文与越南文版本均使用LLM翻译自中文版本，有人工校对但差错难免，若出现英文或越南文版本内容与中文版本的不一致时，以中文为准。
