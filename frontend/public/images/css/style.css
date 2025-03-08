@@ -1,0 +1,16 @@
+body{
+  margin:0;
+  padding:0;
+}
+html {
+  background: #1E1423;
+}
+
+.hidden, #window {
+/*   display: none; */
+}
+
+
+.bird-body, .bird-wing {
+  fill:#2d113f;
+}
