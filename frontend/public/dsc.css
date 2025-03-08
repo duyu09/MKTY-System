@@ -1,0 +1,518 @@
+﻿/*
+    文件名：dsc.css (Duyu Standard Cascading Style Sheets, Duyu标准层叠样式表库文件, 版本v1.1).
+    作者（著作权所有者）：齐鲁工业大学（山东省科学院）计算机科学与技术学部 软件工程（软件开发）21-1班 杜宇（学号：No.202103180009）
+    此CSS已用于：
+      “我的青春不迷茫”——基于LLM与回归分析算法的大学生智能生涯指导与学习大平台（中国大学生计算机设计大赛4C2023参赛项目）
+      “明康慧医”——基于LLM与多模态人工智能的智慧医疗系统的设计与实现（齐鲁工业大学（山东省科学院）计算机科学与技术学部2025届本科生毕业设计项目）
+    
+    COPYRIGHT (C) 2022~2025,
+    QILU UNIVERSITY OF TECHNOLOGY (SHANDONG ACADEMY OF SCIENCES),
+    FACULTY OF COMPUTER SCIENCE AND TECHNOLOGY,
+    DUYU (NO.202103180009).
+  
+    DUYU STANDARD CASCADING STYLE SHEETS.
+
+    DSC.CSS (PART OF THE THIRD AND FORTH EXPERIMENT WORK OF WEB FRONT-END DESIGN AND DEVELOPMENT COURSE).
+    THIS CSS FILE IS FIRST USED TO BUILD UASP SYSTEM ON NOVEMBER 20TH, 2022. 
+    IT IS IMPORTANT PART OF INTELLIGENT LEARNING PLATFORM FOR CHINESE COLLEGE STUDENT COMPUTER DESIGN COMPETITION NOW(APRIL 4TH, 2023).
+    IT IS IMPORTANT PART OF DESIGN AND IMPLEMENTATION OF MINH KHOE TUE Y - A HEALTH MANAGEMENT AND ASSISTED DIAGNOSIS SYSTEM BASED ON LLM AND MULTIMODAL ARTIFICIAL INTELLIGENCE
+    UTC - NOV.20TH, 2022.
+ */
+
+/*
+    用法：添加类名称
+    1.body体 dsc-body
+    2.文本框(文本区) dsc-input
+    3.文件选择 dsc-file
+    4.单选按钮 dsc-radio
+    5.复选按钮 dsc-checkbox
+    6.普通按钮 dsc-button
+    7.大标题区块 dsc-head-div
+    8.尾部区块 dsc-foot-div
+    9.普通区块 dsc-common-div
+    10.静态卡片状区块 dsc-static-div
+    11.占位区块 dsc-placeholder-div
+    12.圆形头像图片框 dsc-circle-image
+    13.水平线 dsc-line-div
+    14.表格(修改页面上所有表格的风格)
+ */
+
+.dsc-body {
+    background-color: rgb(188, 188, 188);
+    background-size: cover;
+    /*background-repeat: no-repeat;*/
+    color: white;
+    font-family: "Microsoft YaHei", "微软雅黑", "Monaco", serif;
+    background-attachment: fixed;
+}
+
+.dsc-input {
+    background: rgba(106, 106, 106, 0.78);
+    color: white;
+    border-radius: 5px;
+    border-width: 0px;
+    border-style: solid;
+    border-color: rgb(0, 0, 160);
+    font-size: medium;
+    padding-left: 12px;
+    padding-right: 12px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    animation: fadebackground_ori_input 0.63s;
+    animation-fill-mode: forwards;
+}
+
+.dsc-input:focus {
+    outline-style: solid;
+    outline-color: rgb(0, 0, 160, 60%);
+    border-style: solid;
+    border-color: rgb(0, 0, 160);
+    box-shadow: 0px 0px 12px rgb(0, 0, 160);
+}
+
+.dsc-input:hover {
+    animation: fadebackground_input 0.63s;
+    animation-fill-mode: forwards;
+}
+
+.dsc-file {
+    background: rgba(106, 106, 106, 78%);
+    color: white;
+    border-radius: 5px;
+    border-width: 0px;
+    border-style: solid;
+    border-color: rgb(0, 0, 160);
+    font-size: medium;
+    padding-left: 12px;
+    padding-right: 12px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    animation: fadebackground_ori_file 0.63s;
+    animation-fill-mode: forwards;
+}
+
+.dsc-file:focus {
+    outline-style: solid;
+    outline-color: rgb(0, 0, 160, 60%);
+    border-style: solid;
+    border-color: rgb(0, 0, 160);
+    box-shadow: 0px 0px 12px rgb(0, 0, 160);
+}
+
+.dsc-file:hover {
+    animation: fadebackground_file 0.63s;
+    animation-fill-mode: forwards;
+}
+
+.dsc-radio {
+    appearance: none;
+    cursor: pointer;
+    outline: none;
+    background-color: rgba(106, 106, 106, 0.78);
+    border: 0px solid rgb(0, 0, 160);
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    transition: all 0.52s;
+}
+
+.dsc-radio:checked {
+    background-color: rgba(0, 0, 160, 68%);
+    box-shadow: 0px 0px 6px rgb(0, 0, 160);
+    transition: all 0.52s;
+}
+
+.dsc-radio:hover {
+    border-style: solid;
+    box-shadow: 0px 0px 6px rgb(0, 0, 160);
+}
+
+.dsc-checkbox {
+    appearance: none;
+    cursor: pointer;
+    outline: none;
+    background-color: rgba(106, 106, 106, 0.78);
+    border: 0px solid rgb(0, 0, 160);
+    border-radius: 2px;
+    width: 16px;
+    height: 16px;
+    transition: all 0.52s;
+}
+
+.dsc-checkbox:hover {
+    border-style: solid;
+    box-shadow: 0px 0px 6px rgb(0, 0, 160);
+}
+
+.dsc-checkbox:checked {
+    background-color: rgba(0, 0, 160, 68%);
+    box-shadow: 0px 0px 6px rgb(0, 0, 160);
+    transition: all 0.52s;
+}
+
+.dsc-button {
+    cursor: pointer;
+    background: rgba(88, 88, 88, 78%);
+    color: white;
+    border-radius: 10px;
+    border-width: 0px;
+    border-color: rgba(108, 108, 108, 78%);
+    text-align: center;
+    font-size: medium;
+    animation: fadebackground_ori_button 0.63s;
+    animation-fill-mode: forwards;
+    padding-left: 12px;
+    padding-right: 12px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+}
+
+.dsc-button:hover {
+    animation: fadebackground_button 0.63s;
+    animation-fill-mode: forwards;
+}
+
+.dsc-button:focus {
+    border-width: 0px;
+    border-color: rgb(0, 0, 160);
+}
+
+.dsc-button:active {
+    background-color: rgb(62, 62, 62);
+}
+
+.dsc-head-div {
+    left: 0%;
+    width: 100%;
+    top: 0%;
+    background: rgb(63, 63, 63, 92%);
+    color: white;
+    text-align: center;
+    font-size: x-large;
+    z-index: 999;
+    position: fixed;
+    animation: fadebackground_ori_head 0.63s;
+    animation-fill-mode: forwards;
+    padding-top: 13px;
+    padding-bottom: 13px;
+}
+
+.dsc-head-div:hover {
+    animation: fadebackground_head 0.63s;
+    animation-fill-mode: forwards;
+}
+
+.dsc-foot-div {
+    left: 0%;
+    width: 100%;
+    bottom: 2%;
+    background: rgba(26, 26, 26, 0.73);
+    color: white;
+    border-radius: 8px;
+    text-align: center;
+    font-size: medium;
+    animation: fadebackground_ori_foot 0.63s;
+    animation-fill-mode: forwards;
+    padding-top: 11px;
+    padding-bottom: 11px;
+}
+
+.dsc-foot-div:hover {
+    animation: fadebackground_foot 0.63s;
+    animation-fill-mode: forwards;
+}
+
+.dsc-common-div {
+    background-color: rgba(58, 58, 58, 48%);
+    border-radius: 11px;
+    color: white;
+    animation: fadebackground_ori 0.63s;
+    animation-fill-mode: forwards;
+    font-size: medium;
+    padding-top: 13px;
+    padding-bottom: 13px;
+    padding-left: 9px;
+    padding-right: 9px;
+}
+
+.dsc-common-div:hover {
+    animation: fadebackground 0.63s;
+    animation-fill-mode: forwards;
+}
+
+.dsc-placeholder-div {
+    background-color: transparent;
+    font-size: smaller;
+}
+
+.dsc-static-div {
+    background-color: rgba(108, 108, 108, 0.97);
+    border-radius: 9px;
+    font-size: medium;
+    color: white;
+    padding-top: 14px;
+    padding-bottom: 14px;
+    padding-left: 11px;
+    padding-right: 11px;
+    animation: changeborder_ori 0.68s;
+    animation-fill-mode: forwards;
+}
+
+.dsc-static-div:hover {
+    animation: changeborder 0.68s;
+    animation-fill-mode: forwards;
+}
+
+.dsc-circle-image {
+    margin-top: 50px;
+    width: 170px;
+    border-radius: 50%;
+    border: 3px solid rgb(31, 31, 31);
+    transition: all .5s;
+    cursor: pointer;
+}
+
+.dsc-circle-image:hover {
+    transform: scale(1.1) rotate(20deg);
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    text-align: center;
+    font-size: medium;
+    color: white;
+    animation: fadebackground_ori_table 0.63s;
+    animation-fill-mode: forwards;
+
+}
+
+table:hover {
+    animation: fadebackground_table 0.63s;
+    animation-fill-mode: forwards;
+}
+
+th, td {
+    border-bottom: 2px solid rgb(56, 56, 56);
+    border-top: 2px solid rgb(56, 56, 56);
+    text-align: center;
+    padding: 11px 0;
+}
+
+table thead tr {
+    color: white;
+    animation: tablebgc_ori 0.52s;
+    animation-fill-mode: forwards;
+}
+
+table tbody tr:nth-child(odd) {
+    background-color: rgb(106, 106, 106);
+    animation: tablebgc_ori 1.45s;
+    animation-fill-mode: forwards;
+}
+
+table tbody tr:nth-child(even) {
+    background-color: rgb(166, 166, 166);
+    animation: tablebgc_ori 0.52s;
+    animation-fill-mode: forwards;
+}
+
+table tbody tr:hover {
+    animation: tablebgc 0.52s;
+    animation-fill-mode: forwards;
+}
+
+table tbody tr td:first-child {
+    color: white;
+}
+
+table tfoot tr td {
+    text-align: right;
+    padding-right: 13px;
+}
+
+.dsc-line-div {
+    margin: 0 auto;
+    height: 2px;
+    background: radial-gradient(rgb(0, 0, 66) 30%, rgb(188, 188, 188) 100%);
+}
+
+@keyframes tablebgc {
+    from {
+    }
+    to {
+        background-color: rgb(106, 106, 136);
+    }
+}
+
+@keyframes tablebgc_ori {
+    from {
+        background-color: rgb(106, 106, 136);
+    }
+    to {
+    }
+}
+
+@keyframes changeborder {
+    from {
+        border-bottom: 5px solid rgb(36, 36, 36);
+    }
+    to {
+        border-bottom: 5px solid rgb(0, 0, 130);
+    }
+}
+
+@keyframes changeborder_ori {
+    from {
+        border-bottom: 5px solid rgb(0, 0, 130);
+    }
+    to {
+        border-bottom: 5px solid rgb(36, 36, 36);
+    }
+}
+
+@keyframes fadebackground {
+    from {
+        background-color: rgba(50, 50, 50, 48%);
+    }
+    to {
+        background-color: rgba(50, 50, 50, 89%);
+    }
+}
+
+@keyframes fadebackground_ori {
+    from {
+        background-color: rgba(50, 50, 50, 89%);
+    }
+    to {
+        background-color: rgba(50, 50, 50, 48%);
+    }
+}
+
+@keyframes fadebackground_foot {
+    from {
+        background-color: rgba(45, 45, 45, 0.73);
+        box-shadow: 0px 0px 0px rgb(107, 107, 107);
+    }
+    to {
+        background-color: rgba(45, 45, 45, 0.95);
+        box-shadow: 6px 6px 12px rgb(107, 107, 107);
+    }
+}
+
+@keyframes fadebackground_ori_foot {
+    from {
+        background-color: rgba(45, 45, 45, 0.95);
+        box-shadow: 6px 6px 12px rgb(107, 107, 107);
+    }
+    to {
+        background-color: rgba(45, 45, 45, 0.73);
+        box-shadow: 0px 0px 0px rgb(107, 107, 107);
+    }
+}
+
+@keyframes fadebackground_head {
+    from {
+        background-color: rgba(63, 63, 63, 92%);
+        box-shadow: 0px 0px 0px rgb(107, 107, 107);
+    }
+    to {
+        background-color: rgba(63, 63, 63, 100%);
+        box-shadow: 6px 6px 12px rgb(107, 107, 107);
+    }
+}
+
+@keyframes fadebackground_ori_head {
+    from {
+        background-color: rgba(63, 63, 63, 100%);
+        box-shadow: 6px 6px 12px rgb(107, 107, 107);
+    }
+    to {
+        background-color: rgba(63, 63, 63, 92%);
+        box-shadow: 0px 0px 0px rgb(107, 107, 107);
+    }
+}
+
+@keyframes fadebackground_button {
+    from {
+        /*background-color: rgba(108,108,108,78%);*/
+        box-shadow: 0px 0px 0px rgb(96, 96, 96);
+    }
+    to {
+        /*background-color: rgba(108,108,108,100%);*/
+        box-shadow: 0px 0px 13px rgb(96, 96, 96);
+    }
+}
+
+@keyframes fadebackground_ori_button {
+    from {
+        /*background-color: rgba(108,108,108,100%);*/
+        box-shadow: 0px 0px 13px rgb(96, 96, 96);
+    }
+    to {
+        /*background-color: rgba(108,108,108,78%);*/
+        box-shadow: 0px 0px 0px rgb(96, 96, 96);
+    }
+}
+
+@keyframes fadebackground_input {
+    from {
+        background-color: rgba(106, 106, 106, 0.78);
+    }
+    to {
+        background-color: rgba(106, 106, 106, 100%);
+    }
+}
+
+@keyframes fadebackground_ori_input {
+    from {
+        background-color: rgba(106, 106, 106, 100%);
+    }
+    to {
+        background-color: rgba(106, 106, 106, 0.78);;
+    }
+}
+
+@keyframes fadebackground_file {
+    from {
+        background-color: rgba(106, 106, 106, 0.78);
+        box-shadow: 0px 0px 0px rgb(67, 67, 67);
+    }
+    to {
+        background-color: rgba(106, 106, 106, 100%);
+        box-shadow: 0px 0px 12px rgb(67, 67, 67);
+    }
+}
+
+@keyframes fadebackground_ori_file {
+    from {
+        background-color: rgba(106, 106, 106, 100%);
+        box-shadow: 0px 0px 12px rgb(67, 67, 67);
+    }
+    to {
+        background-color: rgba(106, 106, 106, 0.78);
+        box-shadow: 0px 0px 0px rgb(67, 67, 67);
+    }
+}
+
+@keyframes fadebackground_table {
+    from {
+        background-color: rgba(63, 63, 63, 92%);
+        box-shadow: 0px 0px 9px rgb(107, 107, 107);
+    }
+    to {
+        background-color: rgba(63, 63, 63, 100%);
+        box-shadow: 3px 3px 17px rgb(107, 107, 107);
+    }
+}
+
+@keyframes fadebackground_ori_table {
+    from {
+        background-color: rgba(63, 63, 63, 100%);
+        box-shadow: 3px 3px 17px rgb(107, 107, 107);
+    }
+    to {
+        background-color: rgba(63, 63, 63, 92%);
+        box-shadow: 0px 0px 9px rgb(107, 107, 107);
+    }
+}
