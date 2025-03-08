@@ -1,0 +1,363 @@
+
+/*@import url('https://fonts.googleapis.com/css?family=Mukta');*/
+/* devanagari */
+@font-face {
+  font-family: 'Mukta';
+  font-style: normal;
+  font-weight: 400;
+  /*src: url(../fonts/iJWKBXyXfDDVXbnArXyi0A.woff2) format('woff2');*/
+  src: url('../../src/assets/fonts/ubuntu.woff2') format('woff2');
+  unicode-range: U+0900-097F, U+1CD0-1CF6, U+1CF8-1CF9, U+200C-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Mukta';
+  font-style: normal;
+  font-weight: 400;
+  /*src: url(../fonts/iJWKBXyXfDDVXbnPrXyi0A.woff2) format('woff2');*/
+  src: url('../../src/assets/fonts/ubuntu.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Mukta';
+  font-style: normal;
+  font-weight: 400;
+  /*src: url(../fonts/iJWKBXyXfDDVXbnBrXw.woff2) format('woff2');*/
+  src: url('../../src/assets/fonts/ubuntu.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+
+body
+{
+font-family: 'Mukta', sans-serif;
+height:100vh;
+min-height:550px;
+
+background-size: cover;
+background-position:center;
+position:relative;
+overflow-y: hidden;
+}
+a{
+text-decoration:none;
+color:#444444;
+}
+.login-reg-panel{
+ position: relative;
+ top: 50%;
+ transform: translateY(-50%);
+text-align:center;
+ width:70%;
+right:0;left:0;
+ margin:auto;
+ height:400px;
+ background-color: #A8E7E9;
+}
+.white-panel{
+ background-color: rgba(255,255, 255, 1);
+ height:500px;
+ position:absolute;
+ top:-50px;
+ width:50%;
+ right:calc(50% - 50px);
+ transition:.3s ease-in-out;
+ z-index:0;
+ box-shadow: 0 0 15px 9px #00000096;
+}
+.login-reg-panel input[type="radio"]{
+ position:relative;
+ display:none;
+}
+
+.login-reg-panel{
+ color: #4A403A;
+}
+.login-reg-panel #label-login,
+.login-reg-panel #label-register{
+ border:1px solid #9E9E9E;
+ padding:5px 5px;
+ width:150px;
+ display:block;
+ text-align:center;
+ border-radius:10px;
+ cursor:pointer;
+ font-weight: 600;
+ font-size: 18px;
+}
+.login-info-box{
+ width:30%;
+ padding:0 50px;
+ top:20%;
+ left:0;
+ position:absolute;
+ text-align:left;
+}
+.register-info-box{
+ width:30%;
+ padding:0 50px;
+ top:20%;
+ right:0;
+ position:absolute;
+ text-align:left;
+
+}
+.right-log{right:50px !important;}
+
+.login-show,
+.register-show{
+ z-index: 1;
+ display:none;
+ opacity:0;
+ transition:0.3s ease-in-out;
+ color:#242424;
+ text-align:left;
+ padding:50px;
+}
+.show-log-panel{
+ display:block;
+ opacity:0.9;
+}
+.login-show input[type="text"], .login-show input[type="password"]{
+ width: 100%;
+ display: block;
+ margin:20px 0;
+ padding: 15px;
+ border: 1px solid #b5b5b5;
+ outline: none;
+}
+.login-show input[type="button"] {
+ max-width: 150px;
+ width: 100%;
+ background: #444444;
+ color: #f9f9f9;
+ border: none;
+ padding: 10px;
+ text-transform: uppercase;
+ border-radius: 2px;
+ float:right;
+ cursor:pointer;
+}
+.login-show a{
+ display:inline-block;
+ padding:10px 0;
+}
+
+.register-show input[type="text"], .register-show input[type="password"]{
+ width: 100%;
+ display: block;
+ margin:20px 0;
+ padding: 15px;
+ border: 1px solid #b5b5b5;
+ outline: none;
+}
+.register-show input[type="button"] {
+ max-width: 150px;
+ width: 100%;
+ background: #444444;
+ color: #f9f9f9;
+ border: none;
+ padding: 10px;
+ text-transform: uppercase;
+ border-radius: 2px;
+ float:right;
+ cursor:pointer;
+}
+.credit {
+ position:absolute;
+ bottom:10px;
+ left:10px;
+ color: #3B3B25;
+ margin: 0;
+ padding: 0;
+ font-family: Arial,sans-serif;
+ text-transform: uppercase;
+ font-size: 12px;
+ font-weight: bold;
+ letter-spacing: 1px;
+ z-index: 99;
+}
+a{
+text-decoration:none;
+color:#2c7715;
+size: 30px;
+}
+
+
+.mobile-view{
+  display: none;
+}
+
+
+/**responsive**/
+
+@media (max-width:980px)
+{
+    h2{
+        font-size: 60px;
+    }
+
+    body
+    {
+        font-family: 'Mukta', sans-serif;
+        align-items: center;
+        display: flex;
+        
+        background-size: cover;
+        background-position:center;
+        position:relative;
+         overflow-y: hidden;
+    }
+ 
+
+
+.login-reg-panel{
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+   text-align:center;
+    width:70%;
+   right:0;left:0;
+    margin:auto;
+    height:400px;
+    display: none;
+    background-color: #A8E7E9;
+   }
+
+  
+   .mobile-view{
+       
+    display: flex;
+     top: 50px;
+     height:90%;
+     width: 90%;
+    margin-left:5%;
+    margin-right:5%;
+    position: absolute;
+    z-index:0;
+    box-shadow: 0 0 15px 9px #00000096;
+    justify-self: center;
+    align-self: center;
+                               
+   }
+
+
+
+   .login-show-2 input[type="text"], .login-show-2 input[type="password"]{
+    width: 80%;
+    display: block;
+    margin:20px 0;
+    padding: 15px;
+    border: 1px solid #b5b5b5;
+    outline: none;
+    font-size: 45px;
+   }
+
+   .login-show-2 {
+    display: block;
+    align-items: center;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255,255, 255, 1);
+   }
+
+   .login-show-2 input[type="button"] {
+    width: 80%;
+    display: block;
+    margin:20px 0;
+    padding: 15px;
+    background: #444444;
+ color: #f9f9f9;
+    border: 1px solid #b5b5b5;
+    outline: none;
+    font-size: 45px;
+   }
+
+    .bottom {
+display: flex;
+justify-content: center;
+align-items: center;
+  width: 100%;
+    }
+
+  .text {
+      font-size: 40px;
+      width:500px;
+      float:left;
+      display: block;
+  }
+
+  .reg a{
+      font-size: 40px;
+      float: right;
+      color: blue;
+      width: 300px;
+  }
+  .reg a{
+   
+    color: blue;
+  
+  }
+
+  .forget {
+    font-size: 40px;
+    align-self: center;
+    display: block;
+    width: 600px;
+  }
+   
+
+  .register-show-2 input[type="text"], .register-show-2 input[type="password"]{
+    width: 80%;
+    display: block;
+    margin:20px 0;
+    padding: 15px;
+    border: 1px solid #b5b5b5;
+    outline: none;
+    font-size: 45px;
+   }
+
+   .register-show-2 {
+    display: inline-block;
+    align-items: center;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255,255, 255, 1);
+   }
+
+   .register-show-2 input[type="button"] {
+    width: 80%;
+    display: block;
+    margin:20px 0;
+    padding: 15px;
+    background: #444444;
+ color: #f9f9f9;
+    border: 1px solid #b5b5b5;
+    outline: none;
+    font-size: 45px;
+   }
+
+
+
+   .log {
+    font-size: 40px;
+    float: right;
+    
+    width: 300px;
+   }
+
+   .log a{
+    
+    color: blue;
+   
+   }
+  
+
+
+}
+

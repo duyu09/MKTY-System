@@ -1,0 +1,36 @@
+/* 
+  Copyright (c) 2025 DuYu (No.202103180009), Faculty of Computer Science and Technology, Qilu University of Technology (Shandong Academy of Sciences)
+  用于“明康慧医MKTY”智慧医疗系统毕业设计项目
+  仅针对 <input type="file" class="file-input"> 添加样式 
+*/
+.file-input {
+    /* display: inline-block;
+    position: relative; */
+    width: 10rem;
+    height: 1rem;
+    padding: 10px;
+    background-color: #61aa63;
+    color: white;
+    border: 2px solid #61aa63;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: medium;
+    font-family: Arial, sans-serif;
+    outline: none;
+    transition: all 0.3s ease;
+  }
+  
+  .file-input:hover {
+    background-color: #45a049;
+    border-color: #45a049;
+  }
+  
+  .file-input:focus {
+    border-color: #388e3c;
+    box-shadow: 0 0 5px rgba(56, 142, 172, 0.5);
+  }
+  
+  .file-input::-webkit-file-upload-button {
+    display: none; /* 隐藏原生文件上传按钮 */
+  }
+  
