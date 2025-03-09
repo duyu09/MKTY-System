@@ -7,7 +7,7 @@
 
 # _Minh Khoe Tue Y_ Smart Healthcare System
 
-### 🌍 Language of This Document
+### 🌍 Documentation Language
 
 <img src="./image/PRC_flag.svg" alt="PRC" style="height: 1em;"> [**Chinese Simplified (简体中文)**](./README.md) | <img src="./image/USA_flag.svg" alt="USA" style="height: 1em;"> [**English**](./README_EN.md) | <img src="./image/SRV_flag.svg" alt="SRV" style="height: 1em;"> [**Vietnamese (Tiếng Việt)**](./README_VN.md)
 
