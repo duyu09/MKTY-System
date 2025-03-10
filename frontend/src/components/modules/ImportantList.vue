@@ -27,103 +27,18 @@ export default
   {
     return{
       userId:0,
-      addAimDialogTableVisible:false,
-      checkAimDialogTableVisible:false,
-      deleteAimDialogTableVisible:false,
-      comeTrueAimDialogTableVisible:false,
-      comeTrueAimDialogTableContext:'',
-      checkAimDialogTableContext:'',
-      deleteAimDialogTableContext:'',
-      deleteAimDialogTableId:0,
-      addAimContext:'',
       Aims_Arr:[
-        {"id":0,"context":"测试语句","time":"null"},
+        {"id":0,"context":"测试语句","startTime":123,"endTime":123},
       ],
-      loading:true,
+      loading:false,
     }
   },
   methods:
-      {
-        addAim(context)
-        {
-          if(context===''||context===undefined||context===null)
-          {
-            errHandle('您不能添加一个没有内容地目标哦！');
-            return;
-          }
-          addFlag(this.userId,context).then(res=>{
-            if(res.data.code===0)
-            {
-              successHandle('你已成功添加一个目标，祝你早日实现目标！');
-              this.addAimDialogTableVisible = false;
-              setTimeout(()=>{this.$router.go(0);},1234);
-            }
-            else { errHandle('添加目标失败。'); }
-          }).catch(res=>{
-            errHandle('添加目标失败：'+res);
-          });
-        },
-        deleteAim(id)
-        {
-          deleteFlag(this.userId,id).then(res=>{
-            if(res.data.code===0)
-            {
-              successHandle('移除目标项成功。');
-              this.deleteAimDialogTableVisible=false;
-              setTimeout(()=>{
-                this.$router.go(0);
-              },1234);
-            }
-            else
-            {
-              errHandle('移除目标项失败！');
-              return;
-            }
-          }).catch(res=>{
-            errHandle('移除目标项失败：'+res);
-            return;
-          });
-        },
-        comeTrueAim()
-        {
-          Cookies.set('AimContext',this.comeTrueAimDialogTableContext);
-          this.$router.push('/main/StartStudy');
-        }
-      },
+  {
+        
+  },
   mounted()
   {
-    const userId=Cookies.get('userId');
-    this.userId=userId;
-    if(this.userId===0||this.userId===undefined||this.userId===null)
-    {
-      errHandle('您尚未登录或您的登录状态已过期。');
-      return;
-    }
-    showFlag(userId,userId).then(res=>{
-      const rCode=res.data.code;
-      const rData=res.data.data;
-      if(rCode!==0)
-      {
-        errHandle('未能成功拉取你的目标清单。');
-        return;
-      }
-      let outArr=[];
-      for(const i in rData)
-      {
-        let item={"id":0,"context":"null","time":"null"};
-        item.id=rData[i].id;
-        item.context=rData[i].context;
-        item.time=convertTime(rData[i].time);
-        outArr.push(item);
-      }
-      this.Aims_Arr=outArr;
-      this.loading=false;
-
-    }).catch(res=>{
-      errHandle('拉取目标清单失败：'+res);
-      this.loading=false;
-      return;
-    });
 
   }
 }
@@ -156,7 +71,8 @@ export default
           <div id="Aims-Div10">
             <div class="Aims-Class-Div11" v-for="item in Aims_Arr">
               <div class="Aims-Class-Div16">
-                目标内容：
+                <!-- 排序方式：高优先级>一次性事项已到时间>周期性事项>一次性事项已超时>一次性事项未开始 -->
+                诊疗事项：
                 <span style="font-weight: bolder;" @click="this.checkAimDialogTableContext=item.context;checkAimDialogTableVisible=true;">
                   {{ item.context }}
                 </span>
@@ -171,68 +87,6 @@ export default
             </div>
           </div>
         </div>
-
-        <el-dialog v-model="checkAimDialogTableVisible" title="查看目标">
-          <el-form>
-            <el-form-item>
-              目标具体内容：<span style="font-weight: bolder;">
-              {{ this.checkAimDialogTableContext }}
-            </span>
-            </el-form-item>
-          </el-form>
-          <template #footer>
-                    <span class="dialog-footer">
-                      <el-button type="primary" @click="checkAimDialogTableVisible = false">
-                        确定
-                      </el-button>
-                    </span>
-          </template>
-        </el-dialog>
-
-        <el-dialog v-model="deleteAimDialogTableVisible" title="移除已实现的目标">
-          <el-form>
-            <el-form-item>
-              你选择的目标内容是：<span style="font-weight: bolder;">
-              {{ this.deleteAimDialogTableContext }}
-            </span>
-            </el-form-item>
-            <el-form-item>
-              你完成它了吗？如果已经完成，请从目标清单中去掉它吧！清单减少一项，知识增加十分！
-            </el-form-item>
-          </el-form>
-          <template #footer>
-            <span class="dialog-footer">
-              <el-button @click="deleteAimDialogTableVisible=false;">取消</el-button>
-              <el-button type="primary" @click="deleteAim(this.deleteAimDialogTableId)">
-                删除目标项
-              </el-button>
-            </span>
-          </template>
-        </el-dialog>
-
-
-        <el-dialog v-model="comeTrueAimDialogTableVisible" title="实现目标">
-          <el-form>
-            <el-form-item>
-              你选择的目标内容是：<span style="font-weight: bolder;">
-              {{ this.comeTrueAimDialogTableContext }}
-            </span>
-            </el-form-item>
-            <el-form-item>
-              你即将前往ILP专属云自习室去学习，以完成该项目标。
-            </el-form-item>
-          </el-form>
-          <template #footer>
-            <span class="dialog-footer">
-              <el-button @click="comeTrueAimDialogTableVisible=false;">取消</el-button>
-              <el-button type="primary" @click="comeTrueAim()">
-                去自习室学习
-              </el-button>
-            </span>
-          </template>
-        </el-dialog>
-
-
       </div>
 
       <div id="Aims-Div18">
@@ -245,24 +99,7 @@ export default
                   <el-icon><Aim /></el-icon>&nbsp;<span class="PsyChat-Span02">添加目标</span>
                 </div>
 
-                <el-dialog v-model="addAimDialogTableVisible" title="添加目标">
-                  <el-form>
-                    <el-form-item>
-                      添加一个目标，请坚定信心 坚持不懈地完成它！
-                    </el-form-item>
-                    <el-form-item>
-                      目标描述：<el-input v-model="addAimContext" placeholder="请写下待完成目标地具体内容" />
-                    </el-form-item>
-                  </el-form>
-                  <template #footer>
-                    <span class="dialog-footer">
-                      <el-button @click="addAimDialogTableVisible = false;">取消</el-button>
-                      <el-button type="primary" @click="addAim(this.addAimContext);">
-                        确定添加
-                      </el-button>
-                    </span>
-                  </template>
-                </el-dialog>
+                
 
               </div>
             </div>

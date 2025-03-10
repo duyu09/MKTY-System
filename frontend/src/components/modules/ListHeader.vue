@@ -7,8 +7,8 @@
     <div class="c">
       <div class="drop drop2"></div>
       <div class="text-c">
-        <h1 id="h101">My Aim List.</h1>
-        <h1 id="h102">Aim List</h1>
+        <h1 id="h101">Important Medical Matters List</h1>
+        <h1 id="h102">Matters List</h1>
       </div>
     </div>
   </div>

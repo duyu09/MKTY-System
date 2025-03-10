@@ -507,7 +507,96 @@ def multimodal_diagnosis_get_status(cursor):
     else:
         return jsonify({'code': 0, 'msg': '任务完成', 'taskStatus': 0, 'taskResult': result})
 
+
+@app.route('/api/addImportantItem', methods=['POST'])
+@jwt_required()
+@getCursor(conn_pool)
+def add_important_item(cursor):
+    '''
+    - API功能：向重要事项清单中添加一项诊疗事项
+    - 请求参数：
+      - `listItemContent`: 重要诊疗事项内容（`str`）
+      - `listItemTimeMode`: 事项时间模式（`int`，`0`=一次性事项，`1`=周期性事项，`2`=无时间要求）
+      - `listItemStartTime`: （一次性事项）治疗事项开始时间（`int`，以秒为单位的Unix时间戳）
+      - `listItemEndTime`: （一次性事项）治疗事项结束时间（`int`，以秒为单位的Unix时间戳）
+      - `listItemPriority`: 事项优先级（`int`，`0`=正常，`1`=非常重要（高优先级））
+      - `listItemTimeWeek`: （周期性事项）星期数（`int`，其中`1`=星期一；···；`7`=星期日）
+      - `listItemIsFinished`: 事项是否已完成（`int`，`0`=未完成，`1`=已完成）
+    - 响应参数：
+      - `code`: 执行状态（`int`，`0`=添加成功，`1`=添加失败）
+      - `msg`: 自然语言提示信息（`str`）
+    '''
+    user_id = get_jwt_identity()
+    important_item_data = request.json
+    list_item_content = important_item_data.get('importantItemContent')
+    list_item_time_mode = important_item_data.get('listItemTimeMode')
+    list_item_priority = important_item_data.get('listItemPriority')
+    list_item_time_week, list_item_start_time, list_item_end_time = 0, 0, 0
+    if list_item_time_mode == 0:
+        list_item_start_time = important_item_data.get('listItemStartTime')
+        list_item_end_time = important_item_data.get('listItemEndTime')
+    elif list_item_time_mode == 1:
+        list_item_time_week = important_item_data.get('listItemTimeWeek')
+
+    if list_item_content is None or list_item_content == "":
+        return jsonify({'code': 1, 'msg': '重要事项内容不可读取。'})
+    if list_item_time_mode is None or not (list_item_time_mode in {0, 1, 2}):
+        return jsonify({'code': 1, 'msg': '未知时间模式。'})
+    if list_item_priority is None or not (list_item_priority in {0, 1}):
+        return jsonify({'code': 1, 'msg': '未知优先级。'})
+
+    try:
+        cursor.execute(
+            f"INSERT INTO importantlist (userId, importantItemContent, listItemTimeMode, listItemStartTime, listItemEndTime, listItemPriority, listItemTimeWeek, listItemStatus) "
+            f"VALUES ({user_id}, '{list_item_content}', {list_item_time_mode}, {list_item_start_time}, {list_item_end_time}, {list_item_priority}, {list_item_time_week}, {0})"
+        )
+        return jsonify({'code': 0, 'msg': '添加成功！'})
+    except Exception as e:
+        return jsonify({'code': 1, 'msg': '后台数据库写入失败: ' + str(e)})
+
+
+@app.route('/api/deleteImportantItem', methods=['POST'])
+@jwt_required()
+@getCursor(conn_pool)
+def delete_important_item(cursor):
+    '''
+    - API功能：删除诊疗事项清单中的一项诊疗事项
+    - 请求参数：
+      - `listItemId`: 重要事项ID（`int`）
+    - 响应参数：
+      - `code`: 执行状态（`int`，`0`=删除成功，`1`=删除失败）
+      - `msg`: 自然语言提示信息（`str`）
+    '''
+    user_id = get_jwt_identity()
+    important_item_data = request.json
+    list_item_id = important_item_data.get('listItemId')
+    if list_item_id is None or list_item_id < 0:
+        return jsonify({'code': 1,'msg': '重要事项ID不可读取。'})
+    try:
+        cursor.execute(f"UPDATE importantlist SET listItemStatus=1 WHERE userId={user_id} AND listItemId={list_item_id}")
+        return jsonify({'code': 0,'msg': '删除成功！'})
+    except Exception as e:
+        return jsonify({'code': 1,'msg': '后台数据库写入失败:'+ str(e)})
     
+
+@app.route('/api/getImportantList', methods=['POST'])
+@jwt_required()
+@getCursor(conn_pool)
+def get_important_list(cursor):
+    '''
+    - API功能：获取指定用户的重要事项清单
+    - 请求参数：
+    - 响应参数：
+      - `code`: 执行状态（`int`，`0`=获取成功，`1`=获取失败）
+      - `msg`: 自然语言提示信息（`str`）
+      - `importantList`: 重要事项清单（`JSON`，返回JSON数组，每个元素是一个`JSON`对象，包含了重要事项的全部信息。被删除的事项不返回）
+    '''
+    user_id = get_jwt_identity()
+    cursor.execute(f"SELECT * FROM importantlist WHERE userId={user_id} AND listItemStatus=0")
+    result = cursor.fetchall()
+    return jsonify({'code': 0,'msg': '获取成功','importantList': result})
+
+
 
 if __name__ == '__main__':
     info_print(f"正在启动后端服务(Port:{PORT};Host:{HOST})")
