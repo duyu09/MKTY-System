@@ -82,6 +82,24 @@ create index postForumId
 create index postPosterId
 	on forumcontent (postPosterId);
 
+create table importantlist
+(
+	listItemId bigint auto_increment comment '清单项id'
+		primary key,
+	userId bigint not null comment '该项所属的userId',
+	listItemContent text not null comment '医疗事项内容',
+	listItemStartTime bigint not null comment '（一次性事项的）事项开始时间（秒为单位Unix时间戳）',
+	listItemEndTime bigint not null comment '（一次性事项的）事项结束时间（秒为单位Unix时间戳）',
+	listItemPriority tinyint not null comment '事项优先级（0=正常；1=非常重要）',
+	listItemStatus tinyint not null comment '事项状态（0=正常；1=删除；2=其他）',
+	listItemIsFinished tinyint not null comment '事项是否完成（0=未完成；1=已完成）',
+	listItemTimeMode tinyint not null comment '事项的时间模式（0=一次性事项；1=周期性事项【每周的某天】；2=不声明时间）',
+	listItemTimeWeek tinyint not null comment '（周期性事项的）星期【1=星期一；7=星期日】',
+	constraint importantlist_userinfo_userId_fk
+		foreign key (userId) references userinfo (userId)
+)
+comment '重要事项清单表';
+
 create table llmhistory
 (
 	sessionId bigint auto_increment comment '会话ID，唯一标识一个会话。'
@@ -193,5 +211,4 @@ create index keId
 
 create index userId
 	on usercollectionke (userId);
-
 
