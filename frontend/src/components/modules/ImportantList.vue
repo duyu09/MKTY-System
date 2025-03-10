@@ -1,7 +1,7 @@
 <!-- Copyright (c) 2023~2025 DuYu (202103180009@stu.qlu.edu.cn, https://github.com/duyu09/MKTY-System), Faculty of Computer Science and Technology, Qilu University of Technology (Shandong Academy of Sciences) -->
 <!-- 该文件为“明康慧医MKTY”智慧医疗系统重要事项清单页面Vue文件。该文件为MKTY系统的重要组成部分。 -->
 <!-- 创建日期：2025年03月10日 -->
-<!-- 修改日期：2025年03月10日 -->
+<!-- 修改日期：2025年03月11日 -->
 <script>
 import ListHeader from "./ListHeader.vue";
 import { ChatDotRound } from "@element-plus/icons-vue";
@@ -71,7 +71,7 @@ export default
           <div id="Aims-Div10">
             <div class="Aims-Class-Div11" v-for="item in Aims_Arr">
               <div class="Aims-Class-Div16">
-                <!-- 排序方式：高优先级>一次性事项已到时间>周期性事项>一次性事项已超时>一次性事项未开始 -->
+                <!-- 列表排序方式：最高优先级 > 一次性事项已到时间未完成 > 一次性事项已超时未完成 > 周期性事项未完成 > 周期性事项已完成  > 一次性事项未开始未完成 > 一次性事项已完成 -->
                 诊疗事项：
                 <span style="font-weight: bolder;" @click="this.checkAimDialogTableContext=item.context;checkAimDialogTableVisible=true;">
                   {{ item.context }}
@@ -94,7 +94,6 @@ export default
           <div id="Aims-Div20">
             <div id="PsyChat-Div06">
               <div id="PsyChat-Div07">
-<!--                <input id="PsyChat-InputBox01" placeholder="尽情提问吧" v-model="Aims_Context" @keyup.enter="PsyChat_Send()" />-->
                 <div id="PsyChat-SendButtonDiv" @click="()=>{this.addAimDialogTableVisible=true;}">
                   <el-icon><Aim /></el-icon>&nbsp;<span class="PsyChat-Span02">添加目标</span>
                 </div>

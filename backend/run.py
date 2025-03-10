@@ -528,9 +528,10 @@ def add_important_item(cursor):
     '''
     user_id = get_jwt_identity()
     important_item_data = request.json
-    list_item_content = important_item_data.get('importantItemContent')
+    list_item_content = important_item_data.get('listItemContent')
     list_item_time_mode = important_item_data.get('listItemTimeMode')
     list_item_priority = important_item_data.get('listItemPriority')
+    list_item_is_finished = important_item_data.get('listItemIsFinished')
     list_item_time_week, list_item_start_time, list_item_end_time = 0, 0, 0
     if list_item_time_mode == 0:
         list_item_start_time = important_item_data.get('listItemStartTime')
@@ -544,11 +545,13 @@ def add_important_item(cursor):
         return jsonify({'code': 1, 'msg': '未知时间模式。'})
     if list_item_priority is None or not (list_item_priority in {0, 1}):
         return jsonify({'code': 1, 'msg': '未知优先级。'})
+    if list_item_is_finished is None or not (list_item_is_finished in {0, 1}):
+        return jsonify({'code': 1,'msg': '未知完成状态。'})
 
     try:
         cursor.execute(
-            f"INSERT INTO importantlist (userId, importantItemContent, listItemTimeMode, listItemStartTime, listItemEndTime, listItemPriority, listItemTimeWeek, listItemStatus) "
-            f"VALUES ({user_id}, '{list_item_content}', {list_item_time_mode}, {list_item_start_time}, {list_item_end_time}, {list_item_priority}, {list_item_time_week}, {0})"
+            f"INSERT INTO importantlist (userId, listItemContent, listItemTimeMode, listItemStartTime, listItemEndTime, listItemPriority, listItemTimeWeek, listItemStatus, listItemIsFinished) "
+            f"VALUES ({user_id}, '{list_item_content}', {list_item_time_mode}, {list_item_start_time}, {list_item_end_time}, {list_item_priority}, {list_item_time_week}, {0}, {list_item_is_finished})"
         )
         return jsonify({'code': 0, 'msg': '添加成功！'})
     except Exception as e:
@@ -585,7 +588,7 @@ def delete_important_item(cursor):
 def get_important_list(cursor):
     '''
     - API功能：获取指定用户的重要事项清单
-    - 请求参数：
+    - 请求参数：无（userId通过token读取）
     - 响应参数：
       - `code`: 执行状态（`int`，`0`=获取成功，`1`=获取失败）
       - `msg`: 自然语言提示信息（`str`）
@@ -595,6 +598,35 @@ def get_important_list(cursor):
     cursor.execute(f"SELECT * FROM importantlist WHERE userId={user_id} AND listItemStatus=0")
     result = cursor.fetchall()
     return jsonify({'code': 0,'msg': '获取成功','importantList': result})
+
+
+@app.route('/api/finishImportantItem', methods=['POST'])
+@jwt_required()
+@getCursor(conn_pool)
+def finish_important_item(cursor):
+    '''
+    - API功能：标记完成（或未完成）重要事项清单中的一项诊疗事项
+    - 请求参数：
+      - `listItemId`: 诊疗事项ID（`int`）
+      - `listItemIsFinished`: 是否完成（`int`，`0`=未完成，`1`=已完成）
+    - 响应参数：
+      - `code`: 执行状态（`int`，`0`=标记成功，`1`=标记失败）
+      - `msg`: 自然语言提示信息（`str`）
+    '''
+    user_id = get_jwt_identity()
+    important_item_data = request.json
+    list_item_id = important_item_data.get('listItemId')
+    list_item_is_finished = important_item_data.get('listItemIsFinished')
+    if list_item_id is None or list_item_id < 0:
+        return jsonify({'code': 1,'msg': '重要事项ID不可读取。'})
+    if list_item_is_finished is None or not (list_item_is_finished in {0, 1}):
+        return jsonify({'code': 1,'msg': '未知完成状态。'})
+    try:
+        cursor.execute(f"UPDATE importantlist SET listItemIsFinished={list_item_is_finished} WHERE userId={user_id} AND listItemId={list_item_id}")
+        return jsonify({'code': 0,'msg': '标记成功！'})
+    except Exception as e:
+        return jsonify({'code': 1,'msg': '后台数据库写入失败:'+ str(e)})
+    
 
 
 
