@@ -11,12 +11,12 @@ const router = createRouter({
     {
       path: '/main',
       name: 'main',
-      component: () => import('../components/MainView.vue'),
+      component: () => import('@/components/MainView.vue'),
       children:[
         {
           path: 'MultimodalDiagnosis',
           name: 'MultimodalDiagnosis',
-          component: () => import('../components/modules/MultimodalDiagnosis.vue'),
+          component: () => import('@/components/modules/MultimodalDiagnosis.vue'),
           meta: {
             title: '智能多模态诊断 - 明康慧医智慧医疗系统'
           }
@@ -27,7 +27,7 @@ const router = createRouter({
           meta: {
             title: '明康慧医智慧医疗系统 - 用户信息'
           },
-          component: () => import('../components/modules/PersonalPage.vue'),
+          component: () => import('@/components/modules/PersonalPage.vue'),
         },
         {
           path: 'PsyChat',
@@ -35,7 +35,7 @@ const router = createRouter({
           meta: {
             title: '倾听你的心里话 - ILP心理疏导之家'
           },
-          component: () => import('../components/modules/PsyChat.vue'),
+          component: () => import('@/components/modules/PsyChat.vue'),
         },
         {
           path: 'Forum',
@@ -43,7 +43,7 @@ const router = createRouter({
           meta: {
             title: 'ILP学生组织纳新与校园大论坛'
           },
-          component: () => import('../components/modules/Forum.vue'),
+          component: () => import('@/components/modules/Forum.vue'),
         },
         {
           path: 'Resources',
@@ -51,7 +51,7 @@ const router = createRouter({
           meta: {
             title: 'ILP大平台资源中心'
           },
-          component: () => import('../components/modules/Resources.vue'),
+          component: () => import('@/components/modules/Resources.vue'),
         },
         {
           path: 'ForumInner',
@@ -59,15 +59,15 @@ const router = createRouter({
           meta: {
             title: 'ILP学生组织纳新与校园大论坛'
           },
-          component: () => import('../components/modules/ForumInner.vue'),
+          component: () => import('@/components/modules/ForumInner.vue'),
         },
         {
-          path: 'AimList',
-          name: 'AimList',
+          path: 'ImportantList',
+          name: 'ImportantList',
           meta: {
-            title: '我的大平台目标清单'
+            title: '重要事项清单 - 明康慧医系统'
           },
-          component: () => import('../components/modules/AimList.vue'),
+          component: () => import('@/components/modules/ImportantList.vue'),
         },
         {
           path: 'StartStudy',
@@ -75,7 +75,7 @@ const router = createRouter({
           meta: {
             title: '即将开始自习'
           },
-          component: () => import('../components/modules/StartStudy.vue'),
+          component: () => import('@/components/modules/StartStudy.vue'),
         },
         {
           path: 'HomePage',
@@ -83,7 +83,7 @@ const router = createRouter({
           meta: {
             title: 'ILP学生组织纳新与校园大论坛'
           },
-          component: () => import('../components/modules/HomePage.vue'),
+          component: () => import('@/components/modules/HomePage.vue'),
         },
 
       ]
@@ -94,7 +94,7 @@ const router = createRouter({
       meta: {
         title: '明康慧医智慧医疗系统 - 用户登录'
       },
-      component: () => import('../components/modules/Login.vue'),
+      component: () => import('@/components/modules/Login.vue'),
     },
     {
       path:'/LoginMobile',
@@ -102,7 +102,7 @@ const router = createRouter({
       meta: {
         title: '明康慧医智慧医疗系统 - 用户登录'
       },
-      component: () => import('../components/modules/LoginMobile.vue'),
+      component: () => import('@/components/modules/LoginMobile.vue'),
     },
     {
       path:'/Register',
@@ -110,15 +110,15 @@ const router = createRouter({
       meta: {
         title: '明康慧医智慧医疗系统 - 用户注册'
       },
-      component: () => import('../components/modules/Register.vue'),
+      component: () => import('@/components/modules/Register.vue'),
     },
     {
       path:'/:catchAll(.*)',
       name:'NotFound',
       meta: {
-        title: '404 ~ '
+        title: '404 - 明康慧医智慧医疗系统'
       },
-      component: ()=>import('../components/modules/NotFound.vue'),
+      component: ()=>import('@/components/modules/NotFound.vue'),
     }
   ]
 });

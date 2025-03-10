@@ -93,7 +93,7 @@ export default
             <el-icon><Management /></el-icon>
             云上自习
           </div>
-          <div class="MainView-MenuItem" @click="() => this.$router.push('/main/AimList')">
+          <div class="MainView-MenuItem" @click="() => this.$router.push('/main/ImportantList')">
             <el-icon><Flag /></el-icon>
             我的目标
           </div>
