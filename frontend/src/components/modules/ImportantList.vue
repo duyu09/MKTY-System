@@ -98,6 +98,7 @@ export default
                   <div style="margin-right: 1rem;">完成情况:【未完成】</div>
                   <div style="margin-right: 1rem;">时间状态:【已到时间】</div>
                   <div style="margin-right: 1rem;">事项类型:【一次性事项】</div>
+                  <div style="margin-right: 1rem;">优先级:【紧急事项】</div>
 
                 </div>
                 <span class="Aims-Class-Span03">
@@ -111,7 +112,6 @@ export default
           </div>
         </div>
       </div>
-
       <div id="Aims-Div18">
         <div id="Aims-Div19">
           <div id="Aims-Div20">
