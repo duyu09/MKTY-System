@@ -274,7 +274,6 @@ class RpcClient(object):
         - 输入参数：`corr_id`（`str`，任务ID）
         - 返回值：`response`（`Any`，可能是任何序列化后的Python对象，内容及类型取决于消费者发回的数据，若任务未结束，则返回`None`）
         """
-        print(self.responses)
         response = self.responses.get(corr_id)
         if response is None:
             self.connection.process_data_events()

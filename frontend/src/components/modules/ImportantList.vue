@@ -4,13 +4,10 @@
 <!-- 修改日期：2025年03月11日 -->
 <script>
 import ListHeader from "./ListHeader.vue";
-import { ChatDotRound } from "@element-plus/icons-vue";
-import { Clock } from "@element-plus/icons-vue";
-import { InfoFilled } from "@element-plus/icons-vue";
-import { Aim } from "@element-plus/icons-vue";
-
-import { addFlag, deleteFlag, getToken, showFlag } from "@/api/api";
+import { ChatDotRound, Opportunity, Clock, InfoFilled, Aim, Finished, Delete } from "@element-plus/icons-vue";
+import { getCurrentTime } from "@/api/api";
 import { convertTime, errHandle, successHandle } from "@/utils/tools";
+import "@/assets/css/colorful_div.css";
 
 export default
 {
@@ -22,24 +19,42 @@ export default
         "Clock":Clock,
         "InfoFilled":InfoFilled,
         "Aim":Aim,
+        "Opportunity":Opportunity,
+        "Finished":Finished,
+        "Delete":Delete,
       },
   data()
   {
     return{
-      userId:0,
-      Aims_Arr:[
+      il_currentTime:0,
+      il_userId:0,
+      il_itemsArr:[
         {"id":0,"context":"测试语句","startTime":123,"endTime":123},
       ],
-      loading:false,
+      il_loading:false,
+      il_timer01Id:0,
     }
   },
   methods:
   {
-        
+      updateCurrentTime(){
+        getCurrentTime().then((res) => {
+            this.il_currentTime = res.data.currentTime;
+        });
+        this.il_timer01Id = setInterval(() => {
+          getCurrentTime().then((res) => {
+            this.il_currentTime = res.data.currentTime;
+        });
+        }, 59000);
+      }
+  },
+  beforeUnmount()
+  {
+      clearInterval(this.il_timer01Id);  // 清除掉切换背景图片的定时器。
   },
   mounted()
   {
-
+    this.updateCurrentTime();
   }
 }
 </script>
@@ -56,7 +71,7 @@ export default
           <span id="Aims-Span01">
             <el-icon><InfoFilled /></el-icon>
             我的目标数量：
-            {{ Aims_Arr.length }}个目标有待完成。
+            {{ il_itemsArr.length }}个目标有待完成。
           </span>
             <span id="Aims-Span02">
 <!--            {{ Aims_Attrib }}-->
@@ -67,24 +82,32 @@ export default
 
       </div>
       <div id="Aims-Div03">
-        <div id="Aims-ItemsDiv" v-loading="loading" element-loading-text="加载中..." element-loading-background="rgba(0, 0, 0, 0.2)">
+        <div id="Aims-ItemsDiv" v-loading="il_loading" element-loading-text="加载中..." element-loading-background="rgba(0, 0, 0, 0.2)">
           <div id="Aims-Div10">
-            <div class="Aims-Class-Div11" v-for="item in Aims_Arr">
+
+            <div class="Aims-Class-Div11" v-for="item in il_itemsArr">
               <div class="Aims-Class-Div16">
                 <!-- 列表排序方式：最高优先级 > 一次性事项已到时间未完成 > 一次性事项已超时未完成 > 周期性事项未完成 > 周期性事项已完成  > 一次性事项未开始未完成 > 一次性事项已完成 -->
                 诊疗事项：
-                <span style="font-weight: bolder;" @click="this.checkAimDialogTableContext=item.context;checkAimDialogTableVisible=true;">
+                <span style="font-weight: bolder;" @click="">
                   {{ item.context }}
                 </span>
               </div>
               <div class="Aims-Class-Div17">
-                创建时间：{{ item.time }}
+                <div style="display: flex;">
+                  <div style="margin-right: 1rem;">完成情况:【未完成】</div>
+                  <div style="margin-right: 1rem;">时间状态:【已到时间】</div>
+                  <div style="margin-right: 1rem;">事项类型:【一次性事项】</div>
+
+                </div>
                 <span class="Aims-Class-Span03">
-                  <span class="Aims-Class-Span04" @click="comeTrueAimDialogTableContext=item.context;comeTrueAimDialogTableVisible=true;">去实现目标</span>&nbsp;
-                  <span class="Aims-Class-Span04" @click="deleteAimDialogTableId=item.id;deleteAimDialogTableContext=item.context;deleteAimDialogTableVisible=true;">已达成目标</span>&nbsp;
+                  <span class="Aims-Class-Span04" @click=""><el-icon><Finished /></el-icon>&nbsp;标记完成</span>&nbsp;
+                  <span class="Aims-Class-Span04" @click=""><el-icon><Delete /></el-icon>&nbsp;删除事项</span>&nbsp;
                 </span>
+                &nbsp;
               </div>
             </div>
+
           </div>
         </div>
       </div>
@@ -93,14 +116,17 @@ export default
         <div id="Aims-Div19">
           <div id="Aims-Div20">
             <div id="PsyChat-Div06">
-              <div id="PsyChat-Div07">
-                <div id="PsyChat-SendButtonDiv" @click="()=>{this.addAimDialogTableVisible=true;}">
+              <div id="PsyChat-Div07" style="margin-right: 1rem;">
+                <div id="PsyChat-SendButtonDiv" @click="">
                   <el-icon><Aim /></el-icon>&nbsp;<span class="PsyChat-Span02">添加目标</span>
                 </div>
-
-                
-
               </div>
+              <div id="PsyChat-Div07" class="colorful-div-common">
+                <div id="PsyChat-SendButtonDiv" @click="">
+                  <el-icon><Opportunity /></el-icon>&nbsp;<span class="PsyChat-Span02">AI辅助分析</span>
+                </div>
+              </div>
+
             </div>
           </div>
         </div>
@@ -277,6 +303,11 @@ export default
   position: sticky;
   cursor: pointer;
 }
+.Aims-Class-Span04
+{
+  cursor: pointer;
+  color:darkblue;
+}
 .Aims-Class-Span04:hover
 {
   color: darkblue;
@@ -340,7 +371,7 @@ export default
 }
 #PsyChat-SendButtonDiv
 {
-  background-color: rgba(255,165,0,0.2);
+  background-color: rgb(255, 237, 204);
   box-shadow: 0 0 0.35rem 0.05rem rgba(0,0,0,0.4);
   width: 95%;
   margin-top: 0.1rem;
@@ -354,11 +385,11 @@ export default
 }
 #PsyChat-SendButtonDiv:hover
 {
-  background-color: rgba(255,165,0,0.333);
+  background-color: rgb(255, 225, 170);
 }
 #PsyChat-SendButtonDiv:active
 {
-  background-color: rgba(255,165,0,0.45);
+  background-color: rgb(255, 225, 130);
 }
 .PsyChat-Span02
 {
@@ -375,11 +406,6 @@ export default
   {
     display: none;
   }
-
-
-  /*#PsyChat-Span02 {*/
-  /*  display: none;*/
-  /*}*/
 
   #PsyChat-SendButtonDiv {
     display: flex;

@@ -1,10 +1,11 @@
 <script>
-import { Star } from "@element-plus/icons-vue";
+import { Star, Opportunity, Promotion } from "@element-plus/icons-vue";
 import 'element-plus/dist/index.css';
 import { getUserInfo, getCookie } from '@/api/api';
 import "@/assets/css/file_input.css";
 import { multimodalDiagnosisGetStatus, multimodalDiagnosisSubmitTask } from '@/api/api';
 import { errHandle } from  "@/utils/tools";
+import "@/assets/css/colorful_div.css";
 
 
 import * as echarts from 'echarts/core';
@@ -36,6 +37,8 @@ export default
     components:
     {
       "Star":Star,
+      "Opportunity":Opportunity,
+      "Promotion":Promotion,
     },
     data()
     {
@@ -52,10 +55,7 @@ export default
         md_conclusion:'',
         md_el_avatar_01_src:'/images/null_avatar.jpg',
         md_text_language:'zh',
-        text_table: [
-          { text: '严重肺水肿引发的白肺' },
-          { text: '严重的肺气肿' }, 
-        ],
+        text_table: [],  // 元素格式：{ text: '严重的肺气肿' }, 
         md_analyzing: false,
       }
     },
@@ -284,7 +284,12 @@ export default
               <div style="width: 100%;">
                 <input type="file" class="file-input" id="imgSelect" @change="handleFileChange()" ref="md_imgShow" aria-label="Upload" accept=".jpg,.jpeg,.png,.webp,.bmp,.gif,.ico">
                 <div style="margin-top: 2rem;text-align: center;">
-                  <el-button type="primary" size="large" @click="getResult()">开始分析</el-button>
+                  <div style="width: 100%;" class="colorful-div">
+                    <el-button type="primary" size="large" @click="getResult()" style="width: 100%;">
+                      <el-icon><Promotion /></el-icon>&nbsp;
+                      <b>一键分析</b>
+                    </el-button>
+                  </div>
                 </div>
               </div>
             </div>

@@ -627,7 +627,20 @@ def finish_important_item(cursor):
     except Exception as e:
         return jsonify({'code': 1,'msg': '后台数据库写入失败:'+ str(e)})
     
-
+    
+@app.route('/api/getCurrentTime', methods=['GET', 'POST'])
+def get_current_time():
+    '''
+    - API功能：获取当前时间
+    - 请求参数：无
+    - 响应参数：
+      - `code`: 执行状态（`int`，`0`=获取成功，`1`=获取失败）
+      - `msg`: 自然语言提示信息（`str`）
+      - `currentTime`: 服务器当前时间（`int`，以秒为单位的Unix时间戳）
+    '''
+    current_time = util_current_time()
+    return jsonify({'code': 0,'msg': '获取成功','currentTime': current_time})
+    
 
 
 if __name__ == '__main__':

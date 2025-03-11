@@ -1,0 +1,38 @@
+/* 
+  Copyright (c) 2025 DuYu (No.202103180009), Faculty of Computer Science and Technology, Qilu University of Technology (Shandong Academy of Sciences)
+  用于“明康慧医MKTY”智慧医疗系统毕业设计项目
+  仅针对<div>元素添加样式，实现动效彩色、边界模糊的效果。可用于AI功能按钮的“背景”，增加视觉效果。
+*/
+.colorful-div {
+    position: relative;
+    border-radius: 8px;
+    isolation: isolate;
+}
+
+.colorful-div-common {
+  background: linear-gradient(45deg, 
+      red, orange, yellow, green, violet);
+    background-size: 400% 400%;
+    animation: gradientAnimation 10s ease infinite;
+}
+
+.colorful-div::before {
+    content: '';
+    position: absolute;
+    top: -2px; /* 进一步扩展范围 */
+    left: -2px; /* 进一步扩展范围 */
+    right: -2px; /* 进一步扩展范围 */
+    bottom: -2px; /* 进一步扩展范围 */
+    background: linear-gradient(45deg, 
+      red, orange, yellow, green, violet);
+    background-size: 400% 400%;
+    animation: gradientAnimation 10s ease infinite;
+    filter: blur(3px); /* 增加模糊强度 */
+    z-index: -1;
+}
+
+@keyframes gradientAnimation {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}

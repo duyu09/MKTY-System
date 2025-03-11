@@ -95,7 +95,7 @@ export default
           </div>
           <div class="MainView-MenuItem" @click="() => this.$router.push('/main/ImportantList')">
             <el-icon><Flag /></el-icon>
-            我的目标
+            诊疗事项
           </div>
           <div class="MainView-MenuItem" @click="() => this.$router.push('/main/Resources')">
             <el-icon><FolderOpened /></el-icon>
