@@ -29,11 +29,29 @@ export default
       il_currentTime:0,
       il_userId:0,
       il_itemsArr:[
-        {"id":0,"context":"测试语句","startTime":123,"endTime":123},
+        { "listItemId": 0, "listItemContent": "测试语句", "listItemIsFinished": "未完成", "listItemIsFinished_number": 0, "listItemStartTime": "2025年03月14日 02:43:20", "listItemEndTime": "2025年03月14日 02:43:20", "listItemTimeStatus":"已到时间", "listItemTimeMode": "一次性事项", "listItemPriority": "紧急事项", "listItemTimeWeek": "周一", "listItemPriority_number": 1  },
       ],
       il_loading:false,
       il_timer01Id:0,
+      il_addItemDialogVisible:false,
+      il_priorityRadio_char:"0",
+      il_listItemTimeMode_char:"0",
+      il_weekRadio_char:"1",
+      il_timeRange:"",
+      il_listItemContent:"",
     }
+  },
+  computed:
+  {
+    il_priorityRadio(){
+      return parseInt(this.il_priorityRadio_char);
+    },
+    il_listItemTimeMode(){
+      return parseInt(this.il_listItemTimeMode_char);
+    },
+    il_weekRadio(){
+      return parseInt(this.il_weekRadio_char);
+    },
   },
   methods:
   {
@@ -90,16 +108,22 @@ export default
                 <!-- 列表排序方式：最高优先级 > 一次性事项已到时间未完成 > 一次性事项已超时未完成 > 周期性事项未完成 > 周期性事项已完成  > 一次性事项未开始未完成 > 一次性事项已完成 -->
                 诊疗事项：
                 <span style="font-weight: bolder;" @click="">
-                  {{ item.context }}
+                  {{ item.listItemContent }}
                 </span>
               </div>
               <div class="Aims-Class-Div17">
                 <div style="display: flex;">
-                  <div style="margin-right: 1rem;">完成情况:【未完成】</div>
-                  <div style="margin-right: 1rem;">时间状态:【已到时间】</div>
-                  <div style="margin-right: 1rem;">事项类型:【一次性事项】</div>
-                  <div style="margin-right: 1rem;">优先级:【紧急事项】</div>
-
+                  <div style="margin-right: 1rem;">
+                    完成情况:【
+                    <span v-if="item.listItemIsFinished_number==0" style="color: red;">{{ item.listItemIsFinished }}</span>
+                    <span v-if="item.listItemIsFinished_number==1" style="color: green;">{{ item.listItemIsFinished }}</span>
+                    】
+                  </div>
+                  <div style="margin-right: 1rem;">时间状态:【{{ item.listItemTimeStatus }}】</div>
+                  <div style="margin-right: 1rem;">事项类型:【{{ item.listItemTimeMode }}】</div>
+                  <div style="margin-right: 1rem;" v-if="item.listItemPriority_number==0">优先级:【{{ item.listItemPriority }}】</div>
+                  <div style="margin-right: 1rem; font-weight: bold; color: red;" v-if="item.listItemPriority_number==1">优先级:【{{ item.listItemPriority }}】</div>
+                  <div style="margin-right: 1rem;">{{ item.listItemStartTime }} ~ {{ item.listItemEndTime }}</div>
                 </div>
                 <span class="Aims-Class-Span03">
                   <span class="Aims-Class-Span04" @click=""><el-icon><Finished /></el-icon>&nbsp;标记完成</span>&nbsp;
@@ -117,8 +141,8 @@ export default
           <div id="Aims-Div20">
             <div id="PsyChat-Div06">
               <div id="PsyChat-Div07" style="margin-right: 1rem;">
-                <div id="PsyChat-SendButtonDiv" @click="">
-                  <el-icon><Aim /></el-icon>&nbsp;<span class="PsyChat-Span02">添加目标</span>
+                <div id="PsyChat-SendButtonDiv" @click="il_addItemDialogVisible=true;">
+                  <el-icon><Aim /></el-icon>&nbsp;<span class="PsyChat-Span02">添加事项</span>
                 </div>
               </div>
               <div id="PsyChat-Div07" class="colorful-div-common">
@@ -132,10 +156,51 @@ export default
         </div>
       </div>
 
+
     </div>
   </div>
-</template>
 
+  <el-drawer title="添加诊疗事项" v-model="il_addItemDialogVisible" width="60%">
+    <el-form>
+      <el-form-item label="事项内容">
+        <el-input placeholder="请输入事项内容" v-model="il_listItemContent"></el-input>
+      </el-form-item>
+      <el-divider></el-divider>
+      <el-form-item label="事项类型">
+        <el-radio-group v-model="il_listItemTimeMode_char">
+          <el-radio value="0" size="large">一次性事项</el-radio>
+          <el-radio value="1" size="large">周期性事项</el-radio>
+          <el-radio value="2" size="large">无时间要求</el-radio>
+        </el-radio-group>
+      </el-form-item>
+      <el-form-item label="设定时间">
+        <el-date-picker type="datetimerange" start-placeholder="选择开始时间" end-placeholder="选择结束时间" :disabled="il_listItemTimeMode!=0" v-model="il_timeRange"></el-date-picker>
+      </el-form-item>
+      <el-form-item label="设定星期">
+        <el-select v-model="il_weekRadio_char" placeholder="Select" :disabled="il_listItemTimeMode!=1">
+          <el-option label="周一" value="1"></el-option>
+          <el-option label="周二" value="2"></el-option>
+          <el-option label="周三" value="3"></el-option>
+          <el-option label="周四" value="4"></el-option>
+          <el-option label="周五" value="5"></el-option>
+          <el-option label="周六" value="6"></el-option>
+          <el-option label="周日" value="7"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="设定优先级">
+        <el-radio-group v-model="il_priorityRadio_char">
+          <el-radio value="0" size="large">一般优先级</el-radio>
+          <el-radio value="1" size="large"><span style="color: brown;">非常紧急/重要</span></el-radio>
+        </el-radio-group>
+      </el-form-item>
+    </el-form>
+    <span style="display: flex;justify-content: center;">
+      <el-button @click="il_addItemDialogVisible=false">取消</el-button>
+      <el-button type="primary" @click="il_addItemDialogVisible=false">添加</el-button>
+    </span>
+  </el-drawer>
+  
+</template>
 <style scoped>
 @font-face
 {
