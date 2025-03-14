@@ -39,6 +39,16 @@ export default
       il_weekRadio_char:"1",
       il_timeRange:"",
       il_listItemContent:"",
+      il_itemDialogVisible:false,
+      il_itemDialogId:0,  // 事项id
+      il_itemDialogContent:"",  // 事项内容
+      il_itemDialogTimeMode:"",  // 事项类型（“一次性事项”、“周期性事项”）
+      il_itemDialogStartTime:"", // 开始时间（例：“2025年3月15日 01:07:42”）
+      il_itemDialogEndTime:"",  // 结束时间 （例：“2025年3月15日 01:07:42”）
+      il_itemDialogPriority:"",  // 优先级（“一般事项”、“紧急事项”）
+      il_itemDialogWeek:"", // 周（“星期一”）
+      il_itemIsFinished:"", // 完成情况（“已完成”、“未完成”）
+      il_itemTimeStatus:""  // 时间状态（“已到时间”、“未到时间”）
     }
   },
   computed:
@@ -64,6 +74,18 @@ export default
             this.il_currentTime = res.data.currentTime;
         });
         }, 59000);
+      },
+      changeItemDialogContent(il_itemDialogId, il_itemDialogContent, il_itemDialogTimeMode, il_itemDialogStartTime, il_itemDialogEndTime, il_itemDialogPriority, il_itemDialogWeek, il_itemIsFinished, il_itemTimeStatus){
+        this.il_itemDialogId = il_itemDialogId;
+        this.il_itemDialogContent = il_itemDialogContent;
+        this.il_itemDialogTimeMode = il_itemDialogTimeMode;
+        this.il_itemDialogStartTime = il_itemDialogStartTime;
+        this.il_itemDialogEndTime = il_itemDialogEndTime;
+        this.il_itemDialogPriority = il_itemDialogPriority;
+        this.il_itemDialogWeek = il_itemDialogWeek;
+        this.il_itemIsFinished = il_itemIsFinished;
+        this.il_itemTimeStatus = il_itemTimeStatus;
+        this.il_itemDialogVisible = true;
       }
   },
   beforeUnmount()
@@ -107,17 +129,15 @@ export default
               <div class="Aims-Class-Div16">
                 <!-- 列表排序方式：最高优先级 > 一次性事项已到时间未完成 > 一次性事项已超时未完成 > 周期性事项未完成 > 周期性事项已完成  > 一次性事项未开始未完成 > 一次性事项已完成 -->
                 诊疗事项：
-                <span style="font-weight: bolder;" @click="">
+                <span style="font-weight: bolder;" @click="changeItemDialogContent(item.listItemId, item.listItemContent, item.listItemTimeMode, item.listItemStartTime, item.listItemEndTime, item.listItemPriority, item.listItemTimeWeek, item.listItemIsFinished, item.listItemTimeStatus)">
                   {{ item.listItemContent }}
                 </span>
               </div>
               <div class="Aims-Class-Div17">
                 <div style="display: flex;">
                   <div style="margin-right: 1rem;">
-                    完成情况:【
-                    <span v-if="item.listItemIsFinished_number==0" style="color: red;">{{ item.listItemIsFinished }}</span>
-                    <span v-if="item.listItemIsFinished_number==1" style="color: green;">{{ item.listItemIsFinished }}</span>
-                    】
+                    完成情况:【<span v-if="item.listItemIsFinished_number==0" style="color: red;">{{ item.listItemIsFinished }}</span>
+                    <span v-if="item.listItemIsFinished_number==1" style="color: green;">{{ item.listItemIsFinished }}</span>】
                   </div>
                   <div style="margin-right: 1rem;">时间状态:【{{ item.listItemTimeStatus }}】</div>
                   <div style="margin-right: 1rem;">事项类型:【{{ item.listItemTimeMode }}】</div>
@@ -132,6 +152,38 @@ export default
                 &nbsp;
               </div>
             </div>
+            <el-dialog title="事项内容详细表" v-model="il_itemDialogVisible" width="60%">
+              <div>
+                <b>诊疗事项ID：</b>{{ il_itemDialogId }}
+              </div>
+              <div style="margin-top: 1rem;">
+                <b>诊疗事项内容：</b>{{ il_itemDialogContent }}
+              </div>
+              <div style="margin-top: 1rem;">
+                <b>诊疗事项类型：</b>{{ il_itemDialogTimeMode }}
+              </div>
+              <div style="margin-top: 1rem;">
+                <b>诊疗事项开始时间：</b>{{ il_itemDialogStartTime }}
+              </div>
+              <div style="margin-top: 1rem;">
+                <b>诊疗事项结束时间：</b>{{ il_itemDialogEndTime }}
+              </div>
+              <div style="margin-top: 1rem;">
+                <b>诊疗事项优先级：</b>{{ il_itemDialogPriority }}
+              </div>
+              <div style="margin-top: 1rem;">
+                <b>诊疗事项周：</b>{{ il_itemDialogWeek }}
+              </div>
+              <div style="margin-top: 1rem;">
+                <b>诊疗事项完成情况：</b>{{ il_itemIsFinished }}
+              </div>
+              <div style="margin-top: 1rem;">
+                <b>诊疗事项时间状态：</b>{{ il_itemTimeStatus }}
+              </div>
+              <div style="margin-top: 1rem; display: flex; justify-content: flex-end;">
+                <el-button @click="il_itemDialogVisible = false" type="primary">关闭</el-button>
+              </div>
+            </el-dialog>
 
           </div>
         </div>
