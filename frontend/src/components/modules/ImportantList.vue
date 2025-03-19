@@ -5,8 +5,8 @@
 <script>
 import ListHeader from "./ListHeader.vue";
 import { ChatDotRound, Opportunity, Clock, InfoFilled, Aim, Finished, Delete } from "@element-plus/icons-vue";
-import { getCurrentTime } from "@/api/api";
-import { convertTime, errHandle, successHandle } from "@/utils/tools";
+import { getCurrentTime, getImportantList } from "@/api/api";
+import { convertTime, errHandle, successHandle, convertTimeChinese } from "@/utils/tools";
 import "@/assets/css/colorful_div.css";
 
 export default
@@ -48,7 +48,7 @@ export default
       il_itemDialogPriority:"",  // 优先级（“一般事项”、“紧急事项”）
       il_itemDialogWeek:"", // 周（“星期一”）
       il_itemIsFinished:"", // 完成情况（“已完成”、“未完成”）
-      il_itemTimeStatus:""  // 时间状态（“已到时间”、“未到时间”）
+      il_itemTimeStatus:""  // 时间状态（“已到时间”、“未到时间”、“已超时”）
     }
   },
   computed:
@@ -64,7 +64,17 @@ export default
     },
   },
   methods:
-  {
+  {   
+    getDayOfWeek(unixTimestamp) {
+        // 将 Unix 时间戳转换为毫秒
+        const date = new Date(unixTimestamp * 1000);
+    
+        // 获取星期几 (0 表示星期日，1 表示星期一，..., 6 表示星期六)
+        const dayOfWeek = date.getDay();
+    
+        // 将星期日 (0) 转换为 7，其他保持不变
+        return dayOfWeek === 0 ? 7 : dayOfWeek;
+      },
       updateCurrentTime(){
         getCurrentTime().then((res) => {
             this.il_currentTime = res.data.currentTime;
@@ -86,6 +96,87 @@ export default
         this.il_itemIsFinished = il_itemIsFinished;
         this.il_itemTimeStatus = il_itemTimeStatus;
         this.il_itemDialogVisible = true;
+      },
+      il_pageload()
+      {
+        getImportantList().then((res) => {
+          if (res.data.code == 0) {
+            const il_itemsArr = res.data.importantList;
+            il_itemsArr.forEach((item) => {
+              var final_item = {};
+              final_item.listItemId = item.listItemId;
+              final_item.listItemContent = item.listItemContent;
+              final_item.listItemIsFinished_number = item.listItemIsFinished;
+              final_item.listItemIsFinished = item.listItemIsFinished == 1 ? "已完成" : "未完成";
+              final_item.listItemStartTime = convertTimeChinese(item.listItemStartTime * 1000);
+              final_item.listItemEndTime = convertTimeChinese(item.listItemEndTime * 1000);
+              if (item.listItemTimeMode == 0){
+                final_item.listItemTimeMode = "一次性事项";
+              }
+              else if (item.listItemTimeMode == 1){
+                final_item.listItemTimeMode = "周期性事项";
+              }
+              else if (item.listItemTimeMode == 2){
+                final_item.listItemTimeMode = "无时间要求"; 
+              }
+              final_item.listItemPriority = item.listItemPriority == 0 ? "一般事项" : "紧急事项";
+              final_item.listItemPriority_number = item.listItemPriority;
+              if (item.listItemTimeWeek == 1){
+                final_item.listItemTimeWeek = "周一";
+              }
+              else if (item.listItemTimeWeek == 2){
+                final_item.listItemTimeWeek = "周二";
+              }
+              else if (item.listItemTimeWeek == 3){
+                final_item.listItemTimeWeek = "周三";
+              }
+              else if (item.listItemTimeWeek == 4){
+                final_item.listItemTimeWeek = "周四";
+              }
+              else if (item.listItemTimeWeek == 5){
+                final_item.listItemTimeWeek = "周五";
+              }
+              else if (item.listItemTimeWeek == 6){
+                final_item.listItemTimeWeek = "周六";
+              }
+              else if (item.listItemTimeWeek == 7){
+                final_item.listItemTimeWeek = "周日"; 
+              }
+              else{
+                final_item.listItemTimeWeek = "-"; 
+              }
+              if (item.listItemTimeMode == 0)
+              {
+                if (item.listItemStartTime > this.il_currentTime){
+                  final_item.listItemTimeStatus = "未到时间";
+                }
+                else if (item.listItemStartTime <= this.il_currentTime && item.listItemEndTime > this.il_currentTime){
+                  final_item.listItemTimeStatus = "已到时间";
+                }
+                else if (item.listItemEndTime <= this.il_currentTime){
+                  final_item.listItemTimeStatus = "已超时"; 
+                }
+              }
+              else if (item.listItemTimeMode == 1)
+              {
+                const currentWeek = this.getDayOfWeek(this.il_currentTime);
+                if (item.listItemTimeWeek == currentWeek){
+                  final_item.listItemTimeStatus = "已到时间";
+                }
+                else{
+                  final_item.listItemTimeStatus = "未到时间";
+                }
+              }
+
+              
+
+
+
+              this.il_itemsArr.push(final_item);
+            })
+            
+          } 
+        })
       }
   },
   beforeUnmount()
@@ -95,6 +186,7 @@ export default
   mounted()
   {
     this.updateCurrentTime();
+    this.il_pageload();
   }
 }
 </script>

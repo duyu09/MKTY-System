@@ -17,7 +17,7 @@ MODE = 'dev'  # 运行模式（dev=开发模式，prod=生产模式）
 DATA_DIR = r'./data/'  # 数据文件夹
 AVATAR_FORMAT = '.webp'  # 头像文件格式
 VERSION = 'v1.1.0'  # 版本号
-PORT = 5000  # 后端服务端口
+PORT = 5555  # 后端服务端口
 HOST = '0.0.0.0'  # 后端服务主机地址
 STRONG_PASSWORD = 'DUYU09'  # 强密码，用于加密token
 MD_MQ_CONNECTION_PARAMETERS = {  # 多模态辅诊端MQ连接参数
