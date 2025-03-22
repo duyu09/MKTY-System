@@ -7,7 +7,8 @@ export
     loginVerification, register, setToken, getToken, removeToken, setCookie, getCookie, removeCookie, convertBlobToBase64,
     getUserAvatar, getUserInfo, modifyUserInfo, modifyUserAvatar, modifyUserPassword, getMailList, getMailList_Reverse, 
     deleteMailItem, addMailItem, multimodalDiagnosisSubmitTask, multimodalDiagnosisGetStatus, getCurrentTime,
-    getImportantList, 
+    getImportantList, addImportantItem, deleteImportantItem, finishImportantItem, 
+
     setUserInformation, updataInformation, setAvatar, addFlag, showFlag, deleteFlag, showOrg, deleteOrg, creatForum, createOrg, releaseItem, showForum, showItem, deleteItem, showPsy, signIn, readSignInContext, readStudyRoom, startStudy, readStudyStatus, dredgePsy, skillTest, upvote, upload, showFile, downloadFile, getMusicList
 }
 
@@ -215,8 +216,46 @@ function getCurrentTime()
 function getImportantList()
 {
     return axios.post(baseURL+'/getImportantList',{
-    },{headers: {'Authorization': getToken()}})
+    },{headers: {'Authorization': getToken()}});
 }
+
+// 18. 添加诊疗事项
+function addImportantItem(listItemContent, listItemTimeMode, listItemTimeWeek, listItemStartTime, listItemEndTime, listItemPriority, listItemIsFinished)
+{
+    return axios.post(baseURL+'/addImportantItem',{
+        'listItemContent': listItemContent,
+        'listItemTimeMode': listItemTimeMode,
+        'listItemTimeWeek': listItemTimeWeek,
+        'listItemStartTime': listItemStartTime,
+        'listItemEndTime': listItemEndTime,
+        'listItemPriority': listItemPriority,
+        'listItemIsFinished': listItemIsFinished
+    },{headers: {'Authorization': getToken()}});
+}
+
+// 19. 删除诊疗事项
+function deleteImportantItem(listItemId)
+{
+    return axios.post(baseURL+'/deleteImportantItem',{
+        'listItemId': listItemId
+    },{headers: {'Authorization': getToken()}});
+}
+
+// 20. 标记医疗事项是否完成
+function finishImportantItem(listItemId, listItemIsFinished)
+{
+    return axios.post(baseURL+'/finishImportantItem',{
+        'listItemId': listItemId,
+        'listItemIsFinished': listItemIsFinished
+    },{headers: {'Authorization': getToken()}});
+}
+
+
+
+
+
+
+
 
 
 
@@ -263,15 +302,6 @@ function setAvatar(userId,imgData) {
     },{headers:{'Authorization':getToken()}})
 }
 
-//06.联系客服
-// function f() {
-//
-// }
-
-//07.技术能力检测模块
-// function f() {
-//
-// }
 
 //08.添加目标
 function addFlag(userId,context) {

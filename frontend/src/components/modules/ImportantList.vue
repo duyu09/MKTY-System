@@ -4,8 +4,8 @@
 <!-- 修改日期：2025年03月11日 -->
 <script>
 import ListHeader from "./ListHeader.vue";
-import { ChatDotRound, Opportunity, Clock, InfoFilled, Aim, Finished, Delete } from "@element-plus/icons-vue";
-import { getCurrentTime, getImportantList } from "@/api/api";
+import { ChatDotRound, Opportunity, Clock, InfoFilled, Aim, Finished, Delete, Flag } from "@element-plus/icons-vue";
+import { getCurrentTime, getImportantList, addImportantItem } from "@/api/api";
 import { convertTime, errHandle, successHandle, convertTimeChinese } from "@/utils/tools";
 import "@/assets/css/colorful_div.css";
 
@@ -22,15 +22,14 @@ export default
         "Opportunity":Opportunity,
         "Finished":Finished,
         "Delete":Delete,
+        "Flag": Flag,
       },
   data()
   {
     return{
       il_currentTime:0,
       il_userId:0,
-      il_itemsArr:[
-        { "listItemId": 0, "listItemContent": "测试语句", "listItemIsFinished": "未完成", "listItemIsFinished_number": 0, "listItemStartTime": "2025年03月14日 02:43:20", "listItemEndTime": "2025年03月14日 02:43:20", "listItemTimeStatus":"已到时间", "listItemTimeMode": "一次性事项", "listItemPriority": "紧急事项", "listItemTimeWeek": "周一", "listItemPriority_number": 1  },
-      ],
+      il_itemsArr:[],
       il_loading:false,
       il_timer01Id:0,
       il_addItemDialogVisible:false,
@@ -115,10 +114,13 @@ export default
               }
               else if (item.listItemTimeMode == 1){
                 final_item.listItemTimeMode = "周期性事项";
+                final_item.listItemStartTime = "-";
+                final_item.listItemEndTime = "-";
               }
               else if (item.listItemTimeMode == 2){
                 final_item.listItemTimeMode = "无时间要求"; 
               }
+              final_item.listItemTimeMode_number = item.listItemTimeMode;
               final_item.listItemPriority = item.listItemPriority == 0 ? "一般事项" : "紧急事项";
               final_item.listItemPriority_number = item.listItemPriority;
               if (item.listItemTimeWeek == 1){
@@ -168,15 +170,37 @@ export default
                 }
               }
 
-              
-
-
-
               this.il_itemsArr.push(final_item);
             })
             
           } 
         })
+      },
+      il_addItem()
+      {
+        // addImportantItem
+        const itemDialogContent = this.il_listItemContent;
+        const itemDialogTimeMode = this.il_listItemTimeMode;
+        var itemDialogStartTime = 0;
+        var itemDialogEndTime = 0;
+        const itemDialogPriority = this.il_priorityRadio;
+        var itemDialogWeek = 1;
+        if(itemDialogTimeMode == 0){
+          itemDialogStartTime = Math.floor(this.il_timeRange[0].getTime() / 1000);
+          itemDialogEndTime = Math.floor(this.il_timeRange[1].getTime() / 1000);
+        }
+        else if(itemDialogTimeMode == 1){
+          itemDialogWeek = this.il_weekRadio;
+        }
+        addImportantItem(itemDialogContent, itemDialogTimeMode, itemDialogWeek, itemDialogStartTime, itemDialogEndTime, itemDialogPriority, 0).then((res) => {
+          if (res.data.code == 0) {
+            successHandle("添加成功！");
+            this.il_addItemDialogVisible = false;
+            this.il_itemsArr = [];
+            this.il_pageload();
+          } 
+        })
+
       }
   },
   beforeUnmount()
@@ -202,8 +226,8 @@ export default
           <div id="Aims-Div07">
           <span id="Aims-Span01">
             <el-icon><InfoFilled /></el-icon>
-            我的目标数量：
-            {{ il_itemsArr.length }}个目标有待完成。
+            诊疗事项数量：
+            共计{{ il_itemsArr.length }}个事项。
           </span>
             <span id="Aims-Span02">
 <!--            {{ Aims_Attrib }}-->
@@ -220,22 +244,22 @@ export default
             <div class="Aims-Class-Div11" v-for="item in il_itemsArr">
               <div class="Aims-Class-Div16">
                 <!-- 列表排序方式：最高优先级 > 一次性事项已到时间未完成 > 一次性事项已超时未完成 > 周期性事项未完成 > 周期性事项已完成  > 一次性事项未开始未完成 > 一次性事项已完成 -->
-                诊疗事项：
                 <span style="font-weight: bolder;" @click="changeItemDialogContent(item.listItemId, item.listItemContent, item.listItemTimeMode, item.listItemStartTime, item.listItemEndTime, item.listItemPriority, item.listItemTimeWeek, item.listItemIsFinished, item.listItemTimeStatus)">
-                  {{ item.listItemContent }}
+                <el-icon><Flag /></el-icon>诊疗事项： {{ item.listItemContent }}
                 </span>
               </div>
               <div class="Aims-Class-Div17">
                 <div style="display: flex;">
-                  <div style="margin-right: 1rem;">
-                    完成情况:【<span v-if="item.listItemIsFinished_number==0" style="color: red;">{{ item.listItemIsFinished }}</span>
+                  <div class="Medical-ItemDiv">
+                    完成情况:<br>【<span v-if="item.listItemIsFinished_number==0" style="color: red;">{{ item.listItemIsFinished }}</span>
                     <span v-if="item.listItemIsFinished_number==1" style="color: green;">{{ item.listItemIsFinished }}</span>】
                   </div>
-                  <div style="margin-right: 1rem;">时间状态:【{{ item.listItemTimeStatus }}】</div>
-                  <div style="margin-right: 1rem;">事项类型:【{{ item.listItemTimeMode }}】</div>
-                  <div style="margin-right: 1rem;" v-if="item.listItemPriority_number==0">优先级:【{{ item.listItemPriority }}】</div>
-                  <div style="margin-right: 1rem; font-weight: bold; color: red;" v-if="item.listItemPriority_number==1">优先级:【{{ item.listItemPriority }}】</div>
-                  <div style="margin-right: 1rem;">{{ item.listItemStartTime }} ~ {{ item.listItemEndTime }}</div>
+                  <div class="Medical-ItemDiv">时间状态:<br>【{{ item.listItemTimeStatus }}】</div>
+                  <div class="Medical-ItemDiv">事项类型:<br>【{{ item.listItemTimeMode }}】</div>
+                  <div class="Medical-ItemDiv" v-if="item.listItemPriority_number==0">优先级:<br>【{{ item.listItemPriority }}】</div>
+                  <div class="Medical-ItemDiv" style="font-weight: bold; color: red;" v-if="item.listItemPriority_number==1">优先级:<br>【{{ item.listItemPriority }}】</div>
+                  <div class="Medical-ItemDiv" v-if="item.listItemTimeMode_number == 0">{{ item.listItemStartTime }} ~ {{ item.listItemEndTime }}</div>
+                  <div class="Medical-ItemDiv" v-else-if="item.listItemTimeMode_number == 1">时间：每周<b>{{ item.listItemTimeWeek }}</b></div>
                 </div>
                 <span class="Aims-Class-Span03">
                   <span class="Aims-Class-Span04" @click=""><el-icon><Finished /></el-icon>&nbsp;标记完成</span>&nbsp;
@@ -340,7 +364,7 @@ export default
     </el-form>
     <span style="display: flex;justify-content: center;">
       <el-button @click="il_addItemDialogVisible=false">取消</el-button>
-      <el-button type="primary" @click="il_addItemDialogVisible=false">添加</el-button>
+      <el-button type="primary" @click="il_addItem();il_addItemDialogVisible=false">添加</el-button>
     </span>
   </el-drawer>
   
@@ -529,6 +553,14 @@ export default
   margin-top: 1.25rem;
   border-radius: 20px 20px 0 0;
   overflow: auto;
+}
+.Medical-ItemDiv
+{
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  border-left: double 3px #000;
+
+  
 }
 #PsyChat-Div06
 {
