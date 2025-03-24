@@ -39,7 +39,7 @@ Dự án này là đồ án tốt nghiệp của tôi tại Đại học Công n
 
 - 🏫 **Giáo Viên Hướng Dẫn Đồ Án**
   - Giáo viên trường: **Khương Văn Phong** (Tiếng Trung: _姜文峰_; Tiếng Anh: _JIANG Wenfeng_), giảng viên Học bộ Khoa học và Kỹ thuật Máy tính, Đại học Công nghiệp Tề Lỗ (_Qilu_) (Viện Khoa học tỉnh Sơn Đông).
-  - Giáo viên công ty: **Lý Quân** (Tiếng Trung: _李君_; Tiếng Anh: _LI Jun_), Học viện Đào tạo Phần mềm Strong (_Sư Sáng_) Sơn Đông, Tập đoàn Khoa kỹ Giáo dục Ambow (_An Bác_, [NYSE: AMBO](https://www.nyse.com/quote/XASE:AMBO)).
+  - Giáo viên doanh nghiệp: **Lý Quân** (Tiếng Trung: _李君_; Tiếng Anh: _LI Jun_), Học viện Thực huấn Phần mềm Strong (_Sư Sáng_) Sơn Đông, Tập đoàn Khoa kỹ Giáo dục Ambow (_An Bác_, [NYSE: AMBO](https://www.nyse.com/quote/XASE:AMBO)).
 
 ## 🔗 Liên Kết Đối Tác
 

@@ -5,7 +5,7 @@
 <script>
 import ListHeader from "./ListHeader.vue";
 import { ChatDotRound, Opportunity, Clock, InfoFilled, Aim, Finished, Delete, Flag } from "@element-plus/icons-vue";
-import { getCurrentTime, getImportantList, addImportantItem } from "@/api/api";
+import { getCurrentTime, getImportantList, addImportantItem, deleteImportantItem, finishImportantItem } from "@/api/api";
 import { convertTime, errHandle, successHandle, convertTimeChinese } from "@/utils/tools";
 import "@/assets/css/colorful_div.css";
 
@@ -201,6 +201,26 @@ export default
           } 
         })
 
+      },
+      il_deleteItem(listItemId)
+      {
+        deleteImportantItem(listItemId).then((res) => {
+          if (res.data.code == 0) {
+            successHandle("删除成功！");
+            this.il_itemsArr = [];
+            this.il_pageload();
+          }
+        });
+      },
+      il_finishItem(listItemId)
+      {
+        finishImportantItem(listItemId, 1).then((res) => {
+          if (res.data.code == 0) {
+            successHandle("已将该项标记完成。");
+            this.il_itemsArr = [];
+            this.il_pageload();
+          }
+        });
       }
   },
   beforeUnmount()
@@ -262,8 +282,8 @@ export default
                   <div class="Medical-ItemDiv" v-else-if="item.listItemTimeMode_number == 1">时间：每周<b>{{ item.listItemTimeWeek }}</b></div>
                 </div>
                 <span class="Aims-Class-Span03">
-                  <span class="Aims-Class-Span04" @click=""><el-icon><Finished /></el-icon>&nbsp;标记完成</span>&nbsp;
-                  <span class="Aims-Class-Span04" @click=""><el-icon><Delete /></el-icon>&nbsp;删除事项</span>&nbsp;
+                  <span class="Aims-Class-Span04" @click="il_finishItem(item.listItemId)"><el-icon><Finished /></el-icon>&nbsp;标记完成</span>&nbsp;
+                  <span class="Aims-Class-Span04" @click="il_deleteItem(item.listItemId)"><el-icon><Delete /></el-icon>&nbsp;删除事项</span>&nbsp;
                 </span>
                 &nbsp;
               </div>
