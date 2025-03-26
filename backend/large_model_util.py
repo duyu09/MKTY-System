@@ -7,8 +7,6 @@
 import os
 os.environ['HF_ENDPOINT'] = 'https://hf-mirror.com'  # 修改为中国国内镜像源（首次使用，必须要联网下载“缓存文件”，另外，翻译模型首次使用也依赖联网。）
 
-import json
-import torch
 import pika
 import ast
 from rich.console import Console
