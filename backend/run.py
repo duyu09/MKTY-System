@@ -26,6 +26,12 @@ MD_MQ_CONNECTION_PARAMETERS = {  # 多模态辅诊端MQ连接参数
     'heartbeat': 0
 }
 MD_QUEUE_NAME = 'modest_model_inference'  # 多模态辅诊端MQ队列名称
+LLM_MQ_CONNECTION_PARAMETERS = {  # 大规模模型推理端MQ连接参数
+    'host': 'localhost',
+    'port': 5672,
+    'heartbeat': 0
+}
+LLM_QUEUE_NAME = 'large_model_inference'  # 大规模模型推理端MQ队列名称
 
 # 程序启动，首先打印必要信息
 start_print(VERSION)
@@ -34,9 +40,9 @@ info_print("正在初始化后端服务")
 # 建立数据库连接池
 conn_pool = getDataBaseConnectionPool(host='localhost', user='root', password='', database='mkty_02', pool_size=5, pool_name="mkty")
 
-# 通过MQ与多模态智能辅诊端建立连接
+# 通过MQ分别与MKTY-3B-Chat大语言模型推理端以及多模态智能辅诊端建立连接
+llm_rpc_client = RpcClient(LLM_MQ_CONNECTION_PARAMETERS, LLM_QUEUE_NAME)
 md_rpc_client = RpcClient(MD_MQ_CONNECTION_PARAMETERS, MD_QUEUE_NAME)
-
 
 # 初始化Flask后台服务应用
 app = Flask(__name__)
@@ -456,7 +462,10 @@ def delete_mail_item(cursor):
 def multimodal_diagnosis_submit_task(cursor):
     '''
     - API功能：提交多模态诊断任务
-    - 请求参数：
+    - 请求参数：language, texts, imageBase64
+      - `language`: 语言类型（`str`，`zh`=中文，`en`=英文）
+      - `texts`: 文本数组（`list`，里面元素均为字符串）
+      - `imageBase64`: 图像Base64字符串（`str`，带头部）
     - 响应参数：code, msg, taskId
       - `code`: 执行状态（`int`，`0`=提交成功，`1`=提交失败）
       - `msg`: 自然语言提示信息（`str`）
@@ -640,6 +649,60 @@ def get_current_time():
     '''
     current_time = util_current_time()
     return jsonify({'code': 0,'msg': '获取成功','currentTime': current_time})
+
+
+@app.route('/api/llmInferenceSubmitTask', methods=['POST'])
+@jwt_required()
+@getCursor(conn_pool)
+def llm_inference_submit_task(cursor):
+    '''
+    - API功能：提交大语言模型(MKTY-3B-Chat)推理任务
+    - 请求参数：prompt, context
+      - `prompt`: 提示词（`str`）
+      - `context`: 会话历史（`list`，里面元素均为字典，字典包含`role`和`content`两个键，`role`为`user`或`assistant`，`content`为对话内容）
+    - 响应参数：code, msg, taskId
+      - `code`: 执行状态（`int`，`0`=提交成功，`1`=提交失败）
+      - `msg`: 自然语言提示信息（`str`）
+      - `taskId`: 任务ID（`str`，提交成功后消费者端生成的任务ID，是一个GUID字符串）
+    '''
+    task_data = request.json
+    prompt = task_data.get('prompt')
+    context = task_data.get('context')
+    if prompt is None or len(prompt) == 0:
+        return jsonify({'code': 1, 'msg': '提示词不可读取。'})
+    if context is None or type(context) != type([]):
+        return jsonify({'code': 1, 'msg': '会话历史不可读取。'})
+    task_data = dict()
+    task_data['prompt'] = prompt
+    task_data['context'] = context
+    task_id = llm_rpc_client.call(task_data)  # 通过MQ向大语言模型(MKTY-3B-Chat)推理端提交任务
+    return jsonify({'code': 0,'msg': '提交成功！', 'taskId': task_id})
+
+
+@app.route('/api/llmInferenceGetStatus', methods=['POST'])
+@jwt_required()
+@getCursor(conn_pool)
+def llm_inference_get_status(cursor):
+    '''
+    - API功能：获取大语言模型推理任务状态
+    - 请求参数：taskId
+      - `taskId`: 任务ID（`str`）
+    - 响应参数：code, msg, taskStatus，taskResult
+      - `code`: 执行状态（`int`，`0`=获取成功，`1`=获取失败）
+      - `msg`: 自然语言提示信息（`str`）
+      - `taskStatus`: 任务状态（`int`，`0`=任务完成，`1`=任务进行中，`2`=任务失败）
+      - `taskResult`: 任务结果（子`JSON`，任务完成后返回）
+    '''
+    task_data = request.json
+    task_id = task_data.get('taskId')
+    if task_id is None or task_id == "":
+        return jsonify({'code': 1, 'msg': '任务ID不可读取。'})
+    result = llm_rpc_client.get_response(task_id)  # 通过MQ获取多模态辅诊端的任务状态
+    if result is None:
+        return jsonify({'code': 0, 'msg': '任务进行中。', 'taskStatus': 1})
+    else:
+        return jsonify({'code': 0, 'msg': '任务完成', 'taskStatus': 0, 'taskResult': result})
+
     
 
 
