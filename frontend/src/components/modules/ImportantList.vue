@@ -4,10 +4,13 @@
 <!-- 修改日期：2025年03月11日 -->
 <script>
 import ListHeader from "./ListHeader.vue";
-import { ChatDotRound, Opportunity, Clock, InfoFilled, Aim, Finished, Delete, Flag } from "@element-plus/icons-vue";
-import { getCurrentTime, getImportantList, addImportantItem, deleteImportantItem, finishImportantItem } from "@/api/api";
+import { ChatDotRound, Opportunity, Clock, InfoFilled, Aim, Finished, Delete, Flag, Refresh } from "@element-plus/icons-vue";
+import { getCurrentTime, getImportantList, addImportantItem, deleteImportantItem, finishImportantItem,
+  llmInferenceGetStatus, llmInferenceSubmitTask
+ } from "@/api/api";
 import { convertTime, errHandle, successHandle, convertTimeChinese } from "@/utils/tools";
 import "@/assets/css/colorful_div.css";
+import "@/assets/css/rainbow_text.css";
 
 export default
 {
@@ -23,6 +26,7 @@ export default
         "Finished":Finished,
         "Delete":Delete,
         "Flag": Flag,
+        "Refresh":Refresh
       },
   data()
   {
@@ -33,6 +37,11 @@ export default
       il_loading:false,
       il_timer01Id:0,
       il_addItemDialogVisible:false,
+      il_aiAncillaryAnalysisDialogVisible:false,
+      il_aiAncillaryAnalysisResult:"AI正在思考...",
+      il_aiAncillaryAnalysisIntervalId:0,
+      il_aiAncillaryAnalysisLoading:false,
+      il_addItemContent:"",
       il_priorityRadio_char:"0",
       il_listItemTimeMode_char:"0",
       il_weekRadio_char:"1",
@@ -221,6 +230,56 @@ export default
             this.il_pageload();
           }
         });
+      },
+      il_aiAncillaryAnalysis()
+      {
+        this.il_aiAncillaryAnalysisDialogVisible = true;
+        this.il_aiAncillaryAnalysisLoading = true;
+        const history_context = [];
+        var prompt = "以下内容是用户的医疗事项清单，请你从时间安排、药物作用、诊疗时间等医学专业角度和逻辑方面，评判该用户的事项清单。";
+        for (var i = 0; i < this.il_itemsArr.length; i++){
+          const item = this.il_itemsArr[i];
+          prompt = prompt + "\n" + (i+1) + ". 诊疗事项内容：" + item.listItemContent;
+          prompt = prompt + "; 完成情况：" + item.listItemIsFinished;
+          prompt = prompt + "; 时间状态：" + item.listItemTimeStatus;
+          prompt = prompt + "; 事项类型：" + item.listItemTimeMode;
+          prompt = prompt + "; 优先级：" + item.listItemPriority;
+          if(item.listItemTimeMode_number == 0){
+            prompt = prompt + "; 时间：" + item.listItemStartTime + " ~ " + item.listItemEndTime;
+          }
+          else if(item.listItemTimeMode_number == 1){
+            prompt = prompt + "; 星期：" + item.listItemTimeWeek;
+          }
+          prompt = prompt + "\n";
+        }
+        llmInferenceSubmitTask(history_context, prompt).then((res) => {
+          if(res.data.code != 0) { 
+            errHandle("未成功发送数据：" + res.data.msg);
+            this.il_aiAncillaryAnalysisLoading = false;
+            this.il_aiAncillaryAnalysisDialogVisible = false;
+            return;
+          }
+          const task_id = res.data.taskId;
+          const il_aiIntervalId = setInterval(() => {
+            llmInferenceGetStatus(task_id).then((res2) => {
+              if(res2.data.code != 0) { 
+                clearInterval(il_aiIntervalId);
+                errHandle("未成功获取响应：" + res2.data.msg);
+                this.il_aiAncillaryAnalysisLoading = false;
+                this.il_aiAncillaryAnalysisDialogVisible = false;
+                return;
+              }
+              if (res2.data.taskStatus == 0){
+                clearInterval(il_aiIntervalId);
+                const task_result = res2.data.taskResult;
+                this.il_aiAncillaryAnalysisResult = task_result;
+                this.il_aiAncillaryAnalysisLoading = false;
+              }
+            });
+          }, 3500)
+        })
+
+
       }
   },
   beforeUnmount()
@@ -334,19 +393,44 @@ export default
                 </div>
               </div>
               <div id="PsyChat-Div07" class="colorful-div-common">
-                <div id="PsyChat-SendButtonDiv" @click="">
+                <div id="PsyChat-SendButtonDiv" @click="il_aiAncillaryAnalysis()">
                   <el-icon><Opportunity /></el-icon>&nbsp;<span class="PsyChat-Span02">AI辅助分析</span>
                 </div>
               </div>
-
             </div>
           </div>
         </div>
       </div>
-
-
     </div>
   </div>
+
+  <el-dialog title="AI辅助分析" v-model="il_aiAncillaryAnalysisDialogVisible" width="60%" style="height: 66vh;">
+    <el-scrollbar max-height="50vh">
+    <el-card style="background-color: rgb(230, 230, 230);">
+    <div style="color: black; font-size: 1.05rem; font-weight: bold;">
+      基于<span class="rainbow_text" style="font-weight: 900;">MKTY-3B-Chat</span>大模型，
+      系统可针对您的诊疗事项计划作分析，向您提供建议。
+    </div>
+    </el-card>
+    <div v-loading="il_aiAncillaryAnalysisLoading" element-loading-text="AI正在思考中..." element-loading-background="rgba(0, 0, 0, 0.75)">
+    <el-card style="margin-top: 0.75rem; height: 100%;">
+    <template #header>
+      <div class="card-header" style="color: black;">
+        <span>分析结果</span>
+      </div>
+    </template>
+    <div>
+      <span>{{ il_aiAncillaryAnalysisResult }}</span>
+    </div>
+    </el-card>
+    <div style="margin-top: 0.75rem; display: flex; justify-content: flex-end;">
+      <el-button type="primary" @click="il_aiAncillaryAnalysis()">
+        <el-icon><Refresh /></el-icon> 重新生成
+      </el-button>
+    </div>
+    </div>
+    </el-scrollbar>
+  </el-dialog>
 
   <el-drawer title="添加诊疗事项" v-model="il_addItemDialogVisible" width="60%">
     <el-form>

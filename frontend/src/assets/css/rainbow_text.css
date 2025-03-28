@@ -1,0 +1,9 @@
+.rainbow_text {
+    background: linear-gradient(to right, 
+      red, orange, green, blue, violet);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    display: inline;
+    font-size: inherit; /* 保持原有字体大小 */
+  }

@@ -7,7 +7,7 @@ export
     loginVerification, register, setToken, getToken, removeToken, setCookie, getCookie, removeCookie, convertBlobToBase64,
     getUserAvatar, getUserInfo, modifyUserInfo, modifyUserAvatar, modifyUserPassword, getMailList, getMailList_Reverse, 
     deleteMailItem, addMailItem, multimodalDiagnosisSubmitTask, multimodalDiagnosisGetStatus, getCurrentTime,
-    getImportantList, addImportantItem, deleteImportantItem, finishImportantItem, 
+    getImportantList, addImportantItem, deleteImportantItem, finishImportantItem, llmInferenceGetStatus, llmInferenceSubmitTask, 
 
     setUserInformation, updataInformation, setAvatar, addFlag, showFlag, deleteFlag, showOrg, deleteOrg, creatForum, createOrg, releaseItem, showForum, showItem, deleteItem, showPsy, signIn, readSignInContext, readStudyRoom, startStudy, readStudyStatus, dredgePsy, skillTest, upvote, upload, showFile, downloadFile, getMusicList
 }
@@ -250,6 +250,22 @@ function finishImportantItem(listItemId, listItemIsFinished)
     },{headers: {'Authorization': getToken()}});
 }
 
+// 21. 提交大语言模型(MKTY-3B-Chat)推理任务
+function llmInferenceSubmitTask(context, prompt)
+{
+    return axios.post(baseURL+'/llmInferenceSubmitTask',{
+        'context': context,
+        'prompt': prompt
+    },{headers: {'Authorization': getToken()}});
+}
+
+// 22. 获取大语言模型推理任务状态
+function llmInferenceGetStatus(taskId)
+{
+    return axios.post(baseURL+'/llmInferenceGetStatus',{
+        'taskId': taskId
+    },{headers: {'Authorization': getToken()}});
+}
 
 
 

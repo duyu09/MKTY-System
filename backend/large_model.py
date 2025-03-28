@@ -55,5 +55,5 @@ def predict(message: dict, model, tokenizer, max_new_tokens=2000):
     return response
     
 channel = get_mq_channel(mq_connection_parameters, predict, params, queue_name=MQ_NAME)
-info_print("已启动小规模模型推理端")
+info_print("已启动MKTY-3B-Chat大规模语言模型推理端")
 channel.start_consuming()
