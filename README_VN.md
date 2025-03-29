@@ -41,6 +41,10 @@ Dự án này là đồ án tốt nghiệp của tôi tại Đại học Công n
   - Giáo viên trường: **Khương Văn Phong** (Tiếng Trung: _姜文峰_; Tiếng Anh: _JIANG Wenfeng_), giảng viên Học bộ Khoa học và Kỹ thuật Máy tính, Đại học Công nghiệp Tề Lỗ (_Qilu_) (Viện Khoa học tỉnh Sơn Đông).
   - Giáo viên xí nghiệp: **Lý Quân** (Tiếng Trung: _李君_; Tiếng Anh: _LI Jun_), Học viện Thực huấn Phần mềm Strong (_Sư Sáng_) Sơn Đông, Tập đoàn Khoa kỹ Giáo dục Ambow (_An Bác_, [NYSE: AMBO](https://www.nyse.com/quote/XASE:AMBO)).
 
+Hệ thống này được phát hành theo giấy phép nguồn mở `AGPLv3` đã được chỉnh sửa. Trước khi tải xuống, sử dụng, chỉnh sửa hoặc phát hành dự án phần mềm này và mã nguồn của nó, vui lòng đọc kỹ và hiểu rõ nội dung trong tệp [LICENSE](./LICENSE).
+
+Nếu không có sự đồng ý bằng văn bản của tác giả, hệ thống này nghiêm cấm sử dụng cho mục đích thương mại. Mọi tổ chức và cá nhân (bao gồm nhưng không giới hạn ở giảng viên hướng dẫn) không được phép sử dụng một phần hoặc toàn bộ hệ thống này dưới bất kỳ hình thức nào để thực hiện các hoạt động thương mại hoặc sinh lợi, bao gồm nhưng không giới hạn ở việc bán dự án này như một “đồ án tốt nghiệp” hoặc “bài tập môn học” hay thực hiện bất kỳ hành vi nào mang tính chất lợi nhuận khác.
+
 ## 🔗 Liên Kết Đối Tác
 
 - Đại học Công nghiệp Tề Lỗ (_Qilu_) (Viện Khoa học tỉnh Sơn Đông): [https://www.qlu.edu.cn/](https://www.qlu.edu.cn/)

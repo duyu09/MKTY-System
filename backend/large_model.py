@@ -11,7 +11,7 @@ from large_model_util import info_print, get_mq_channel, start_print, load_model
 mq_connection_parameters = {  # MQ连接参数
     'host': 'localhost',
     'port': 5672,
-    "heartbeat": 40
+    "heartbeat": 0
 }
 MQ_NAME = 'large_model_inference'  # MQ队列名称
 VERSION = 'v1.0.0'  # 版本号

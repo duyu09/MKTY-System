@@ -233,7 +233,7 @@ class RpcClient(object):
         self.channel = self.connection.channel()
         self.queue_name = queue_name
 
-        result = self.channel.queue_declare(queue='', exclusive=True)
+        result = self.channel.queue_declare(queue='', exclusive=False, durable=True)
         self.callback_queue = result.method.queue
 
         self.channel.basic_consume(
@@ -244,6 +244,7 @@ class RpcClient(object):
         self.responses = {}  # 存储任务ID和对应的响应
 
     def on_response(self, ch, method, props, body):
+        info_print("收到来自RabbitMQ的响应")
         if props.correlation_id in self.responses:
             self.responses[props.correlation_id] = body
 

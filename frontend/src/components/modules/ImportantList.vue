@@ -1,7 +1,7 @@
 <!-- Copyright (c) 2023~2025 DuYu (202103180009@stu.qlu.edu.cn, https://github.com/duyu09/MKTY-System), Faculty of Computer Science and Technology, Qilu University of Technology (Shandong Academy of Sciences) -->
 <!-- 该文件为“明康慧医MKTY”智慧医疗系统重要事项清单页面Vue文件。该文件为MKTY系统的重要组成部分。 -->
 <!-- 创建日期：2025年03月10日 -->
-<!-- 修改日期：2025年03月11日 -->
+<!-- 修改日期：2025年03月29日 -->
 <script>
 import ListHeader from "./ListHeader.vue";
 import { ChatDotRound, Opportunity, Clock, InfoFilled, Aim, Finished, Delete, Flag, Refresh } from "@element-plus/icons-vue";
@@ -11,6 +11,7 @@ import { getCurrentTime, getImportantList, addImportantItem, deleteImportantItem
 import { convertTime, errHandle, successHandle, convertTimeChinese } from "@/utils/tools";
 import "@/assets/css/colorful_div.css";
 import "@/assets/css/rainbow_text.css";
+import { marked } from 'marked';
 
 export default
 {
@@ -38,7 +39,7 @@ export default
       il_timer01Id:0,
       il_addItemDialogVisible:false,
       il_aiAncillaryAnalysisDialogVisible:false,
-      il_aiAncillaryAnalysisResult:"AI正在思考...",
+      il_aiAncillaryAnalysisResult:"## AI正在思考...",
       il_aiAncillaryAnalysisIntervalId:0,
       il_aiAncillaryAnalysisLoading:false,
       il_addItemContent:"",
@@ -70,6 +71,9 @@ export default
     il_weekRadio(){
       return parseInt(this.il_weekRadio_char);
     },
+    il_aiAncillaryAnalysisResultRendered(){
+      return marked.parse(this.il_aiAncillaryAnalysisResult);
+    }
   },
   methods:
   {   
@@ -420,7 +424,7 @@ export default
       </div>
     </template>
     <div>
-      <span>{{ il_aiAncillaryAnalysisResult }}</span>
+      <div v-html="il_aiAncillaryAnalysisResultRendered"></div>
     </div>
     </el-card>
     <div style="margin-top: 0.75rem; display: flex; justify-content: flex-end;">

@@ -20,7 +20,7 @@ import base64
 mq_connection_parameters = {  # MQ连接参数
     'host': 'localhost',
     'port': 5672,
-    "heartbeat": 40
+    "heartbeat": 0
 }
 MQ_NAME = 'modest_model_inference'  # MQ队列名称
 VERSION = 'v1.0.0'  # 版本号

@@ -44,6 +44,10 @@ This project serves as the graduation thesis for the 2025 batch of undergraduate
 - **🏫 Thesis Advisors:**
   - Academic Mentor: **JIANG Wenfeng** (Chinese: _姜文峰_; Vietnamese: _Khương Văn Phong_), Lecturer, Faculty of Computer Science and Technology, Qilu University of Technology (Shandong Academy of Sciences)
   - Enterprise Mentor: **LI Jun** (Chinese: _李君_; Vietnamese: _Lý Quân_), Shandong Strong (Shichuang) Software Training College, Ambow Education Group ([NYSE: AMBO](https://www.nyse.com/quote/XASE:AMBO))
+  
+This system is released under a modified `AGPLv3` open-source license. Before downloading, using, modifying, or distributing this software system project and its source code, please carefully read and fully understand the contents of the [LICENSE](./LICENSE) file.
+
+Commercial use of this system is strictly prohibited without the author's written consent. No organization or individual (including but not limited to advisors or mentors) may use any part or the entirety of this system for any commercial or profit-making activities in any form. This includes, but is not limited to, selling this system project as a "graduation project" or "course project" or engaging in any other profit-oriented activities.
 
 ## 🔗 Links
 

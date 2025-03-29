@@ -1,10 +1,13 @@
+<!-- Copyright (c) 2023~2025 DuYu (202103180009@stu.qlu.edu.cn, https://github.com/duyu09/MKTY-System), Faculty of Computer Science and Technology, Qilu University of Technology (Shandong Academy of Sciences) -->
+<!-- 该文件为“明康慧医MKTY”智慧医疗系统登录欢迎页面Vue文件。该文件为MKTY系统的重要组成部分。 -->
+<!-- 创建日期：2025年03月29日 -->
+<!-- 修改日期：2025年03月30日 -->
 <script>
-import { RouterLink, RouterView } from 'vue-router';
 import { Star } from "@element-plus/icons-vue";
 import 'element-plus/dist/index.css';
-import Cookies from "js-cookie";
-import {getUserInfo, readSignInContext, setToken, signIn} from "../../api/api";
-import {errHandle, msgHandle} from "../../utils/tools";
+import { getCookie, getUserInfo, getImportantList } from "@/api/api";
+import { errHandle, msgHandle, convertTimeChinese, openNewTab } from "@/utils/tools";
+import "@/assets/css/rainbow_text.css";
 export default
 {
   name:'HomePage',
@@ -20,75 +23,122 @@ export default
     else if(currentHour>13 && currentHour<=18) greetContext='下午好';
     else if(currentHour>=5 && currentHour<11) greetContext='早上好';
     else greetContext='晚上好';
-    return{
-        HomePage_Name:'',
+    return {
+        hp_userId:-1,
+        hp_userName:"",
         GreetContext:greetContext,
-        SignContext:'',
-        SignState:0, //0=已打卡，1=未打卡
-        HomePage_Div08_Style:'display:flex;',
-        HomePage_Div08_Vice_Style:'display:none;',
-        dialogFormVisible:false,
+        hp_importantItemArray:[],
+        hp_dialogFormVisible:false,
     }
   },
   methods:
   {
-    isSigned:function ()
-    {
-        //假设已打卡(=0),别忘设置自我鼓励的文本。
-        this.SignState=0;
+    getDayOfWeek(unixTimestamp) {
+      // 将 Unix 时间戳转换为毫秒
+      const date = new Date(unixTimestamp * 1000);
+      // 获取星期几 (0 表示星期日，1 表示星期一，..., 6 表示星期六)
+      const dayOfWeek = date.getDay();
+      // 将星期日 (0) 转换为 7，其他保持不变
+      return dayOfWeek === 0 ? 7 : dayOfWeek;
     },
-    ShowContext:function ()
+    hp_loadPage()
     {
-        if(this.SignState===0)
-        {
-            this.HomePage_Div08_Style='display:none;';
-            this.HomePage_Div08_Vice_Style='display:flex;';
-        }
-        else
-        {
-            this.HomePage_Div08_Style='display:flex;';
-            this.HomePage_Div08_Vice_Style='display:none;';
-        }
+      this.hp_userId = parseInt(getCookie('userId'));
+      getUserInfo(this.hp_userId).then((res) => {
+        this.hp_userName = res.data.userInfo.userName;
+      });
+      getImportantList().then((res) => {
+          if (res.data.code == 0) {
+            var hp_arrTemp01 = [];
+            const il_itemsArr = res.data.importantList;
+            il_itemsArr.forEach((item) => {
+              var final_item = {};
+              final_item.listItemId = item.listItemId;
+              final_item.listItemContent = item.listItemContent;
+              final_item.listItemIsFinished_number = item.listItemIsFinished;
+              final_item.listItemIsFinished = item.listItemIsFinished == 1 ? "已完成" : "未完成";
+              final_item.listItemStartTime = convertTimeChinese(item.listItemStartTime * 1000);
+              final_item.listItemEndTime = convertTimeChinese(item.listItemEndTime * 1000);
+              if (item.listItemTimeMode == 0){
+                final_item.listItemTimeMode = "一次性事项";
+              }
+              else if (item.listItemTimeMode == 1){
+                final_item.listItemTimeMode = "周期性事项";
+                final_item.listItemStartTime = "-";
+                final_item.listItemEndTime = "-";
+              }
+              else if (item.listItemTimeMode == 2){
+                final_item.listItemTimeMode = "无时间要求"; 
+              }
+              final_item.listItemTimeMode_number = item.listItemTimeMode;
+              final_item.listItemPriority = item.listItemPriority == 0 ? "一般事项" : "紧急事项";
+              final_item.listItemPriority_number = item.listItemPriority;
+              if (item.listItemTimeWeek == 1){
+                final_item.listItemTimeWeek = "周一";
+              }
+              else if (item.listItemTimeWeek == 2){
+                final_item.listItemTimeWeek = "周二";
+              }
+              else if (item.listItemTimeWeek == 3){
+                final_item.listItemTimeWeek = "周三";
+              }
+              else if (item.listItemTimeWeek == 4){
+                final_item.listItemTimeWeek = "周四";
+              }
+              else if (item.listItemTimeWeek == 5){
+                final_item.listItemTimeWeek = "周五";
+              }
+              else if (item.listItemTimeWeek == 6){
+                final_item.listItemTimeWeek = "周六";
+              }
+              else if (item.listItemTimeWeek == 7){
+                final_item.listItemTimeWeek = "周日"; 
+              }
+              else{
+                final_item.listItemTimeWeek = "-"; 
+              }
+              if (item.listItemTimeMode == 0)
+              {
+                if (item.listItemStartTime > this.il_currentTime){
+                  final_item.listItemTimeStatus = "未到时间";
+                }
+                else if (item.listItemStartTime <= this.il_currentTime && item.listItemEndTime > this.il_currentTime){
+                  final_item.listItemTimeStatus = "已到时间";
+                }
+                else if (item.listItemEndTime <= this.il_currentTime){
+                  final_item.listItemTimeStatus = "已超时"; 
+                }
+              }
+              else if (item.listItemTimeMode == 1)
+              {
+                const currentWeek = this.getDayOfWeek(this.il_currentTime);
+                if (item.listItemTimeWeek == currentWeek){
+                  final_item.listItemTimeStatus = "已到时间";
+                }
+                else{
+                  final_item.listItemTimeStatus = "未到时间";
+                }
+              }
+
+              hp_arrTemp01.push(final_item);
+            });
+            hp_arrTemp01.forEach((item) => {
+              console.log(item);
+              if ((item.listItemTimeStatus == "已到时间" && item.listItemIsFinished_number == 0) || item.listItemPriority_number == 1){
+                this.hp_importantItemArray.push(item);
+              }
+            });
+          } 
+        })
     },
-    signInFunction()
-    {
-      this.dialogFormVisible = true;
-    },
-    SureSignIn()
-    {
-      this.dialogFormVisible = false;
-      signIn(Cookies.get('userId'),this.SignContext);
-      msgHandle("签到成功！");
-      setTimeout(()=>{this.$router.go(0);},1350);
-    },
-    setNullPersonalPage()
-    {
-      Cookies.set('PersonalPageAimUserId',0);
-    },
+    openNewTab(route) {
+      openNewTab(route);
+    }
   },
   mounted() 
   {
-    const userId=Cookies.get('userId');
-    let userName='null';
-    getUserInformation(userId,userId)
-        .then(res=>{
-          if(res.data.code===1){errHandle('您的登录状态已过期，请重新登录。');return;}
-          userName=res.data.data.userName;this.HomePage_Name=userName;
-        })
-        .catch(res=>{});
-    readSignInContext(userId)
-        .then(res=>{
-          console.log(res);
-          if(res.data.code===2 || res.data.context===0){this.SignState=1;}
-          else {
-            this.SignState=0;
-            this.SignContext=res.data.context;
-          }
-          this.ShowContext();
-        }).catch(res=>{errHandle('读取您的签到状态失败。')})
-
+    this.hp_loadPage();
   },
-
 }
 </script>
 <template>
@@ -97,36 +147,49 @@ export default
         <div style="z-index: 10;position: relative;width:100%;">
         <div id="HomePage-Div01">
           <div id="HomePage-Div02">
-            <span><nobr>Welcome To&nbsp;</nobr><wbr><nobr>我的青春不迷茫&nbsp;</nobr><wbr><nobr>智能学习大平台</nobr></span>
+            <div style="margin-bottom: 1rem;">
+              <img src="/images/mkty_cn_light.svg" style="width: 30vw;" />
+            </div>
+            <span><nobr>Welcome To&nbsp;</nobr><wbr><nobr>
+              <span class="rainbow_text">明康慧医</span>
+            </nobr><wbr><nobr>智慧医疗系统</nobr></span>
           </div>
         </div>
         <div id="HomePage-Div03">
           <div id="HomePage-Div04">
             <div id="HomePage-Div05">
                 <div id="HomePage-Div06">
-                    <span id="HomePage-Span01">{{ HomePage_Name }}</span>&nbsp;同学，{{ GreetContext }}
+                    尊敬的&nbsp;<span id="HomePage-Span01">{{ hp_userName }}</span>&nbsp;用户，{{ GreetContext }}！
                 </div>
                 <div id="HomePage-Div07">
                     <div id="HomePage-Div08" :style="HomePage_Div08_Style">
-                        <div id="HomePage-Div09" @click="signInFunction()">打卡签到</div>
-                    </div>
-                    <div id="HomePage-Div08-Vice" :style="HomePage_Div08_Vice_Style">
-                        <div id="HomePage-Div09-Vice">{{ SignContext }}</div>
+                        <div id="HomePage-Div09" @click="hp_dialogFormVisible=true;">
+                          您有
+                          <span style="color: brown; font-weight: bold;">{{ this.hp_importantItemArray.length }}</span>
+                          项未完成或紧急事项
+                        </div>
                     </div>
                 </div>
             </div>
 
 
-            <el-dialog v-model="dialogFormVisible" title="美好的今日鼓励自己的话语">
-              <el-form>
-                <el-form-item label="写下今天对自己想说的话：" :label-width="200">
-                  <el-input v-model="SignContext" autocomplete="off" />
-                </el-form-item>
-              </el-form>
+            <el-dialog v-model="hp_dialogFormVisible" title="速览未完成事项以及紧急事项">
+              <div style="height: 40vh;">
+                <el-scrollbar max-height="100%">
+                  <el-card style="text-align: left; margin-top: 0.5rem;" v-for="item in hp_importantItemArray">
+                    <el-icon><Star></Star></el-icon> <b>事项：</b>{{ item.listItemContent }}
+                    <span style="color: brown;">
+                      <span v-if="item.listItemPriority_number==1">【紧急事项】</span>
+                      <span v-else-if="item.listItemIsFinished_number==0">【已到时间但未完成】</span>
+                    </span>
+                  </el-card>
+                </el-scrollbar>
+              </div>
+              
               <template #footer>
               <span class="dialog-footer">
-<!--                 <el-button @click="dialogFormVisible = false">取消</el-button>-->
-                 <el-button type="primary" @click="SureSignIn()">确认签到</el-button>
+                 <el-button type="primary" @click="openNewTab('/main/ImportantList')">前往完成</el-button>
+                 <el-button type="primary" @click="hp_dialogFormVisible=false">关闭</el-button>
               </span>
               </template>
             </el-dialog>
@@ -135,7 +198,7 @@ export default
             <div class="HomePage-MenuRowDiv">
               <div style="flex-grow: 1;">
                 <div class="HomePage-ButtonDiv-Shell" >
-                  <div class="HomePage-ButtonDiv" @click="() => { setNullPersonalPage();this.$router.push('/main/PersonalPage');}"><el-icon><Star /></el-icon>我的主页</div>
+                  <div class="HomePage-ButtonDiv" @click="() => this.$router.push('/main/PersonalPage')"><el-icon><Star /></el-icon>我的主页</div>
                 </div>
               </div>
               <div style="flex-grow: 1;">
@@ -179,10 +242,10 @@ export default
           </div>
         </div>
         <div id="HomePage-FooterDiv01">
-            &copy; 2023 Intelligent Learning Platform Developer Team.
+            &copy; 2023~2025 DuYu, Faculty of Computer Science and Technology, QLU(SDAS).
         </div>
         <div id="HomePage-FooterDiv02">
-            &copy; 2023 ILP Developer Team.
+            &copy; 2023 DuYu, QLU(SDAS).
         </div>
         </div>
     </div>
@@ -191,17 +254,21 @@ export default
 @font-face
 {
     font-family: font01;
-    src: url('../../assets/fonts/font01.woff');
+    src: url('/fonts/font01.woff');
 }
 @font-face
 {
     font-family: HPHS;
-    src: url('../../assets/fonts/HPHS.woff');
+    src: url('/fonts/HPHS.woff');
 }
 @font-face
 {
     font-family: ubuntu;
-    src: url('../../assets/fonts/ubuntu.woff2');
+    src: url('/fonts/ubuntu.woff2');
+}
+@font-face {
+  font-family: xinwei;
+  src: url('/fonts/xinwei.woff');
 }
 #MOBdiv
 {
@@ -212,7 +279,6 @@ export default
     width: 100%;
     height: 100%;
     text-align: center;
-    /*background-image: url('../../assets/images/02.jpg');*/
     background-color: rgba(242, 223, 187, 0.25);
     background-size: cover;
     background-repeat: no-repeat;
@@ -231,11 +297,10 @@ export default
     margin-top: 2.25rem;
     padding-top: 1.25rem;
     padding-bottom: 1.25rem;
-    text-shadow: 1px 1px black;
-    /*box-shadow: 0 0 0.8rem 0.4rem rgba(38, 38, 38, 1);*/
+    font-weight: 500;
     text-align: center;
     width: 70%;
-    font-family: font01,serif;
+    font-family: xinwei, serif;
     font-size: 2.75rem;
     color: black;
     border-radius: 14px;
@@ -287,7 +352,7 @@ export default
 {
     display:flex;
     justify-content: center;
-    width: 60%;
+    width: 86%;
     box-shadow: 0 0 0.8rem 0.25rem rgba(0,0,0,0.5);
     background-color: rgba(0,0,255,0.12);
     font-size: 1.35rem;
@@ -343,7 +408,7 @@ export default
     box-shadow: 0 0 0.8rem 0.25rem rgba(0,0,0,0.5);
     background-color: rgba(255, 90, 0, 0.2);
     font-size: 1.2rem;
-    font-family: HPHS,serif;
+    font-family: HPHS, serif;
     border-radius: 10px;
     padding-top: 0.35rem;
     padding-bottom: 0.35rem;
@@ -373,7 +438,7 @@ export default
     }
     #HomePage-MainDiv
     {
-        background-image: url('../../assets/images/03.jpg');
+        background-image: url('/images/03.jpg');
         background-position-x: right;
         background-attachment: fixed;
         height: 100%;

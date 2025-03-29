@@ -83,7 +83,7 @@ export default
           </div>
           <div class="MainView-MenuItem" @click="() => this.$router.push('/main/PsyChat')">
             <el-icon><Sunny /></el-icon>
-            小智同学
+            医疗问答
           </div>
           <div class="MainView-MenuItem" @click="() => this.$router.push('/main/Forum')">
             <el-icon><ChatDotSquare /></el-icon>
