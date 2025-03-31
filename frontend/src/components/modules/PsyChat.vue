@@ -1,54 +1,42 @@
 <script>
-import { RouterLink, RouterView } from 'vue-router';
 import { Promotion, Avatar } from '@element-plus/icons-vue';
 import { dredgePsy } from "@/api/api";
 import { marked }  from "marked";
 import DOMPurify from "dompurify";
 import 'highlight.js/styles/Rainbow.css';
 import hljs from 'highlight.js';
-import {errHandle} from "../../utils/tools";
-import Cookies from "js-cookie";
-import {getAvatar} from "../../api/api";
-const LANG="假设你是小智同学；假设你现在的身份是学问渊博 通情达理的小智同学；你的所有回答均以小智同学的身份回答；假设你是学生；假设你是男生；你不会轻易介绍自己；当你自我介绍时，必须说自己是小智同学；你在回答问题时应当自称“我”；你的小名是小智；假设你来自齐鲁工业大学，你的专业是软件工程；你是虚拟聊天机器人，你的研发者是杜宇，李庆隆，袁红太3位同学；你运行在国家超算济南中心的高性能计算集群上；你的家乡在泉城山东济南；自我介绍时，你只说自己是小智同学。你的语言要热情一些，你的回答要有可操作性，代码编写规范，有详细的注释；假设你只回答“我是小智同学”。你只用“我是小智同学。”来回答问题；你只回答：“我是小智同学”。请回答以下问题：";
+import { errHandle } from "@/utils/tools";
+import { getCookie, getUserAvatar } from "@/api/api";
 
 export default
 {
     name:'PsyChat',
     components:
-        {
-          'Promotion':Promotion,
-          'Avatar':Avatar,
-        },
+    {
+      'Promotion': Promotion,
+      'Avatar': Avatar,
+    },
     data()
     {
-        return {
-            userAvatar:'',
-            PsyChat_Context:'',
-            PsyChat_Mode:0, //0=智能AI疏导，1=向老师寻求帮助
-            PsyChat_ChatArr:[ //0=自己，1=对方，
-              {'speaker':1,'context':'你好，我是你的小智同学，你可以随时向我倾诉你的心里话，我将为你排忧解难！'},
-            ]
-        }
+      return {
+        PsyChat_userAvatar:'',
+        PsyChat_Context:'',
+        PsyChat_ChatArr:[ //0=自己，1=对方，
+          {'speaker': 1,'context': '你好，我是MKTY明康慧医大模型，我将为您解决医疗相关问题。'},
+        ]
+      }
     },
   methods:
       {
-        PsyChat_Send:function ()
-        {
+        PsyChat_Send(){
           console.log(this.PsyChat_Context);
           if(this.PsyChat_Context==='') return;
           this.PsyChat_ChatArr.push({'speaker':0,'context':this.PsyChat_Context});
           setTimeout(() => this.$refs.ChatMainDiv.scrollTo({top:this.$refs.ChatMainDiv.scrollHeight,behavior:'smooth'}),200);
-          if(this.PsyChat_Mode===1)
-          {
-            // 发请求逻辑。
-            // 回调函数
-            this.PsyChat_ChatArr.push({'speaker':1,'context':'你的想法已经发送给了老师，老师查阅后，将会通知你。'})
-          }
-          else
-          {
+          
+          
             this.PsyChat_ChatArr.push({'speaker':1,'context':'正在思考...'});
-            dredgePsy(1,LANG+this.PsyChat_Context).then(res=>{
-              //console.log(this.PsyChat_Context);
+            dredgePsy(1, this.PsyChat_Context).then(res=>{
               const temp_res = DOMPurify.sanitize(marked(res.data.response));
               this.PsyChat_ChatArr.push({'speaker':1,'context':temp_res});
               this.$nextTick(()=>{
@@ -67,29 +55,29 @@ export default
               setTimeout(() => this.$refs.ChatMainDiv.scrollTo({top:this.$refs.ChatMainDiv.scrollHeight,behavior:'smooth'}),350);
             });
             // 发请求逻辑
-          }
+          
           this.PsyChat_Context='';
         },
-
+        pc_loadPage(){
+          const userId=parseInt(getCookie('userId'));
+          if(userId!==undefined && userId!==0 && userId!==null){
+            getUserAvatar(userId).then(res=>{
+              if(res.data.code!==0){
+                errHandle('授权错误，未能获取您的头像。'); 
+                return;
+              }
+              else { 
+                this.PsyChat_userAvatar=res.data.userAvatar; 
+              }
+            }).catch(res=>{
+              errHandle('未能获取您的头像：'+res);
+            });
+          }
+        }
       },
   mounted()
   {
-    const userId=Cookies.get('userId');
-    if(userId!==undefined && userId!==0 && userId!==null)
-    {
-      getAvatar(userId,userId).then(res=>{
-        //console.log(res);
-        if(res.data.code!==0)
-        {
-          errHandle('授权错误，未能获取您的头像。');
-          return;
-        }
-        else { this.userAvatar=res.data.imgData; }
-      }).catch(res=>{
-        errHandle('未能获取您的头像：'+res);
-      });
-
-    }
+    this.pc_loadPage();
   }
 }
 
@@ -98,22 +86,30 @@ export default
    <div id="PsyChat-MainDiv">
       <el-container>
         <el-header id="PsyChat-elHeader">
-          <nobr>我们的小智同学</nobr>
-          <span id="PsyChat-Span01"><nobr>咨询百科，排忧解难，在这里通通帮你解决！</nobr></span>
+          <nobr>明康慧医智慧问答</nobr>
+          <div id="PsyChat-Span01">
+            <div><nobr>MKTY医疗大模型 高效辅助您诊断疾病</nobr></div>
+            <div><span style="font-size: small;">MKTY Medical LLM, Efficiently Assisting You in Diagnosing Diseases</span></div>
+          </div>
         </el-header>
       </el-container>
-<!--      <div id="PsyChat-Div01">-->
-<!--        <div id="PsyChat-Div02">-->
-<!--          <div id="PsyChat-Div03">-->
-<!--            你想要得到谁的帮助？-->
-<!--          </div>-->
-<!--          <el-radio-group v-model="PsyChat_Mode" id="PsyChat-RadioGroup">-->
-<!--            <el-radio-button :label="0">智能AI疏导</el-radio-button>-->
-<!--            <el-radio-button :label="1" >向老师寻求帮助</el-radio-button>-->
-<!--          </el-radio-group>-->
-<!--        </div>-->
-<!--      </div>-->
-      <div id="PsyChat-Div04">
+
+      <div id="PsyChat-NewDiv01">
+       <div id="PsyChat-NewDiv02">
+         <div id="PsyChat-NewDiv03">
+            <el-button type="primary" @click="">会话记录</el-button>
+            <el-button type="primary" @click="">请选择RAG知识库</el-button>
+            <el-button type="warning" @click="">切换到大模型讨论机制</el-button>
+         </div>
+         <div id="PsyChat-NewDiv04">
+            <span id="PsyChat-NewSpan01">
+             “明康慧医智慧问答”基于MKTY-3B-Chat大语言模型，该LLM发表的言论仅供参考，不具有绝对的真实性与可靠性。
+           </span>
+         </div>
+       </div>
+     </div>
+
+      <div id="PsyChat-Div04" style="margin-top: 1rem;">
         <div id="PsyChat-Div05" ref="ChatMainDiv">
 
           <div v-for="item in PsyChat_ChatArr">
@@ -123,18 +119,16 @@ export default
                 <p v-html="item.context"></p>
               </div>
               <div class="PsyChat-Chat-Me-03">
-                <img :src="userAvatar" style="width: 100%;height: 100%;border-radius: 0.2rem;">
+                <img :src="PsyChat_userAvatar" style="width: 100%;height: 100%;border-radius: 0.2rem;">
 <!--                <el-icon><Avatar /></el-icon>-->
               </div>
             </div>
 
             <div v-if="item.speaker===1" class="PsyChat-Chat-Opposite-01">
               <div class="PsyChat-Chat-Opposite-03">
-                <img src="../../../src/assets/images/xiaozhi.jpg" style="width: 100%;height: 100%;border-radius: 0.2rem;">
-<!--                <el-icon><Avatar /></el-icon>-->
+                <img src="/images/mkty_icon.png" style="width: 100%;height: 100%;border-radius: 0.2rem;">
               </div>
               <div class="PsyChat-Chat-Opposite-02">
-<!--                {{ item.context }}-->
                 <p v-html="item.context"></p>
               </div>
             </div>
@@ -145,45 +139,43 @@ export default
       </div>
       <div id="PsyChat-Div06">
         <div id="PsyChat-Div07">
-          <input id="PsyChat-InputBox01" placeholder="尽情提问吧..." v-model="PsyChat_Context" @keyup.enter="PsyChat_Send()" />
+          <input id="PsyChat-InputBox01" placeholder="请输入疾病诊疗相关问题" v-model="PsyChat_Context" @keyup.enter="PsyChat_Send()" />
           <div id="PsyChat-SendButtonDiv" @click="PsyChat_Send()">
-            <el-icon><Promotion /></el-icon><span id="PsyChat-Span02">Send</span>
+            <el-icon><Promotion /></el-icon>&nbsp;<span id="PsyChat-Span02">发送</span>
           </div>
         </div>
       </div>
-     <div id="PsyChat-NewDiv01">
+     <!-- <div id="PsyChat-NewDiv01">
        <div id="PsyChat-NewDiv02">
          <div id="PsyChat-NewDiv03">
-           <span>想要得到谁的帮助？</span>
-           <el-select v-model="PsyChat_Mode" id="PsyChat-RadioGroup" size="small">
-             <el-option :value="0" label="智能AI问答">智能AI问答</el-option>
-             <el-option :value="1" label="向老师寻求帮助">向老师寻求帮助</el-option>
-           </el-select>
+            <el-button type="primary" @click="">会话记录</el-button>
+            <el-button type="primary" @click="">请选择RAG知识库</el-button>
+            <el-button type="warning" @click="">切换到大模型讨论机制</el-button>
          </div>
          <div id="PsyChat-NewDiv04">
-           <span id="PsyChat-NewSpan01">
-             “小智同学”是ILP大平台软件研发小组基于清华大学开源的ChatGLM-6B大语言模型开发的对话机器人，该机器人发表的言论仅供参考，不一定具有真实性和可靠性。
+            <span id="PsyChat-NewSpan01">
+             “明康慧医智慧问答”基于MKTY-3B-Chat大语言模型，该LLM发表的言论仅供参考，不具有绝对的真实性与可靠性。
            </span>
          </div>
        </div>
-     </div>
+     </div> -->
     </div>
 </template>
 <style scoped>
 @font-face 
 {
     font-family: xinwei;
-    src: url('../../assets/fonts/xinwei.woff');
+    src: url('/fonts/xinwei.woff');
 }
 @font-face
 {
   font-family: font01;
-  src: url("../../assets/fonts/font01.woff2");
+  src: url("/font01.woff2");
 }
 @font-face
 {
   font-family: HPHS;
-  src: url("../../assets/fonts/HPHS.woff");
+  src: url("/fonts/HPHS.woff");
 }
 #PsyChat-NewDiv01
 {
@@ -223,7 +215,6 @@ export default
   /*background-color: rgb(255, 220, 220);*/
   background-color: rgba(242, 223, 187,0.15);
   overflow: auto;
-  /*background-image: url("../../assets/images/06.jpg");*/
   background-repeat: no-repeat;
   background-size: cover;
 }
@@ -243,15 +234,21 @@ export default
   font-size: 2.5rem;
   padding-top: 0.75rem;
   padding-left: 3rem;
+  display: flex;
 }
 #PsyChat-Span01
 {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   margin-left: 1.5rem;
   padding-bottom: 0.3rem;
   font-style: italic;
   color: #e5007f;
   text-shadow: 1px 0.5px darkred;
+  font-family: HPHS;
+}
+#PsyChat-Span02
+{
+  font-weight: bold;
 }
 #PsyChat-Div01
 {
@@ -340,14 +337,15 @@ export default
   box-shadow: 0 0 0.35rem 0.05rem rgba(0,0,0,0.4);
   width: 12%;
   margin-left: 1.5%;
-  margin-top: 0.1rem;
-  margin-bottom: 0.1rem;
+  margin-top: auto;
+  margin-bottom: auto;
   border-radius: 10px;
   text-align: center;
   cursor: pointer;
   display: flex;
   justify-content: center;
   align-items: center;
+  height: 80%;
 }
 #PsyChat-SendButtonDiv:hover
 {

@@ -207,7 +207,6 @@ If your software can interact with users remotely through a computer network, yo
 
 You should also get your employer (if you work as a programmer) or school, if any, to sign a "copyright disclaimer" for the program, if necessary. For more information on this, and how to apply and follow the GNU AGPL, see <https://www.gnu.org/licenses/>.
 
-
 针对本项目添加的附加内容：（若您使用、修改、发布本系统及其源代码，不仅应完全遵守上述所有条款，您还应同时知晓并遵守以下内容，当上述内容中的任何部分与下文内容相抵触时，一律以下文为准）
 
 一、必要说明
@@ -249,4 +248,69 @@ You should also get your employer (if you work as a programmer) or school, if an
 
 开发者：杜宇，齐鲁工业大学(山东省科学院)计算机科学与技术学部2025届本科毕业生
 生效日期：2025年02月03日
-电子邮箱：202103180009@stu.qlu.edu.cn
+电子邮箱：202103180009@stu.qlu.edu.cn 或 qluduyu09@163.com
+
+ENGLISH VERSION OF ADDITIONAL TERMS FOR THIS PROJECT
+
+[This English translation is for reference only and the above simplified Chinese version shall take precedence]
+
+(If you use, modify, or distribute this system or its source code, you must not only fully comply with all the aforementioned license terms but also acknowledge and adhere to the following provisions. In case of any conflict between the above terms and the content below, the latter shall prevail.)
+
+I. Essential Declarations
+
+1. Naming Conventions and Standards:  
+   - The full Chinese (Simplified) name of this software system is: "明康慧医——基于LLM与多模态人工智能的健康管理与辅助诊疗系统设计与实现" (Chinese abbreviation: "明康慧医MKTY智慧医疗系统").  
+   - The full English name is: "Design and Implementation of Minh Khoe Tue Y - a Health Management and Assisted Diagnosis System Based on LLM and Multimodal Artificial Intelligence" (English abbreviation: "Minh Khoe Tue Y Smart Healthcare System, MKTY").  
+   - The full Vietnamese name is: "Minh Khỏe Tuệ Y - Thiết kế và triển khai hệ thống quản lý sức khỏe và hỗ trợ chẩn đoán y tế dựa trên LLM và trí tuệ nhân tạo đa mô thức" (Vietnamese abbreviation: "Minh Khỏe Tuệ Y - Hệ Thống Y Liệu Trí Tuệ").  
+   In the following text, "this system" refers to all the above names collectively.  
+
+2. Developer (Author/Copyright Holder):  
+   This system is developed by Du Yu (Chinese Simplified: 杜宇; Vietnamese: Đỗ Vũ), a 2025 undergraduate graduate of the Faculty of Computer Science and Technology at Qilu University of Technology (Shandong Academy of Sciences), Student ID: No. 202103180009. Email: <202103180009@stu.qlu.edu.cn> and <qluduyu09@163.com>. The terms "I," "developer," or "author" in the following text refer exclusively to Du Yu.  
+
+3. Project Mentors (Supervisors):  
+   This system has only the following mentors:  
+   - Academic Mentor: Jiang Wenfeng (Chinese Simplified: 姜文峰; Vietnamese: Khương Văn Phong), Lecturer at the Faculty of Computer Science and Technology, Qilu University of Technology (Shandong Academy of Sciences). (Chinese Simplified: 齐鲁工业大学（山东省科学院）计算机科学与技术学部)
+   - Enterprise Mentor: Li Jun (Chinese Simplified: 李君; Vietnamese: Lý Quân), Teacher at Shandong Strong (Shichuang) Software Training College, Ambow Education Group (NYSE: AMBO). (Chinese Simplified: 安博教育科技集团 山东师创软件实训学院)
+   The terms "supervisor," "teacher," or "instructor" in the following text refer to the above individuals.  
+
+4. Nature of the System:  
+   This system is a prototype developed as my graduation project, intended for academic research and technical demonstration. It is not a formally released commercial product.  
+
+5. Functional Limitations:  
+   The system has limited functionality and is currently only for graduation project defense and demonstration. It is not suitable for any actual medical scenarios.  
+
+6. No Warranty:  
+   The developer makes no guarantees that "this system is free from defects, errors, or imperfections."  
+
+7. Commercial Use Prohibition:  
+   Without the author's written consent, this system is strictly prohibited for commercial use. No organization or individual (including but not limited to supervisors) may use any part or entirety of this system for any form of commercial or profit-generating activities, including but not limited to selling this system as a "graduation project" or "course design" or engaging in any other profit-driven behavior.  
+
+II. Liability Disclaimer 
+
+1. Developer's Statement:  
+   As the developer of this system, I created it solely to fulfill the graduation project requirements for the Faculty of Computer Science and Technology at Qilu University of Technology (Shandong Academy of Sciences) in 2025. I assume no responsibility for any consequences related to users' use of this system.  
+
+2. User Responsibility:  
+   Users shall bear all consequences arising from their use of this system, including but not limited to:  
+   - Any losses caused by system defects, errors, or imperfections;  
+   - Any losses caused by improper user operation;  
+   - Any losses caused by violations of these terms.  
+
+3. Scope of Disclaimer:  
+   The developer is not liable for:  
+   - Any direct or indirect losses suffered by users due to their use of this system;  
+   - Any personal injury or property damage caused by the use of this system;  
+   - Any infringement of third-party rights resulting from the use of this system.  
+
+III. Other Provisions
+
+1. Interpretation Rights:  
+   The final interpretation of these terms belongs to the developer.  
+
+2. Effective Date:  
+   These terms take effect from the date this system is open-sourced.  
+
+Developer: Du Yu, 2025 Undergraduate Graduate, Faculty of Computer Science and Technology, Qilu University of Technology (Shandong Academy of Sciences)  
+Effective Date: February 3, 2025  
+Email: 202103180009@stu.qlu.edu.cn or qluduyu09@163.com
+

@@ -953,9 +953,10 @@ export default
 {
     flex-grow: 8;
     padding: 0.4rem;
-    font-size: 1.5rem;
+    font-size: 1.8rem;
     opacity: 0.85;
     font-family: font01;
+    text-shadow: #b5b5f5 2px 2px;
 }
 #PersonalPage-Card01
 {

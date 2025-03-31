@@ -96,8 +96,9 @@ export default
                   this.isLoginWaiting=false;
                   successHandle('登录成功！');
                   setInterval(() => {
-                    this.$router.push('/main/HomePage');
-                  }, 1234);
+                    //this.$router.push('/main/HomePage');
+                    location.href='/main/HomePage';
+                  }, 1000);
                 }
                 else
                 {

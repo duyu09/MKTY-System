@@ -12,6 +12,7 @@ import { convertTime, errHandle, successHandle, convertTimeChinese } from "@/uti
 import "@/assets/css/colorful_div.css";
 import "@/assets/css/rainbow_text.css";
 import { marked } from 'marked';
+import DOMPurify from "dompurify";
 
 export default
 {
@@ -72,7 +73,7 @@ export default
       return parseInt(this.il_weekRadio_char);
     },
     il_aiAncillaryAnalysisResultRendered(){
-      return marked.parse(this.il_aiAncillaryAnalysisResult);
+      return DOMPurify.sanitize(marked.parse(this.il_aiAncillaryAnalysisResult));
     }
   },
   methods:
@@ -419,8 +420,8 @@ export default
     <div v-loading="il_aiAncillaryAnalysisLoading" element-loading-text="AI正在思考中..." element-loading-background="rgba(0, 0, 0, 0.75)">
     <el-card style="margin-top: 0.75rem; height: 100%;">
     <template #header>
-      <div class="card-header" style="color: black;">
-        <span>分析结果</span>
+      <div class="card-header" style="color: black; font-size: medium; font-weight: bold;">
+        <span>AI智能分析结果</span>
       </div>
     </template>
     <div>

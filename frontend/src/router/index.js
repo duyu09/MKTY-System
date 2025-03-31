@@ -33,7 +33,7 @@ const router = createRouter({
           path: 'PsyChat',
           name: 'PsyChat',
           meta: {
-            title: '倾听你的心里话 - ILP心理疏导之家'
+            title: '明康慧医 - 智慧医疗问答'
           },
           component: () => import('@/components/modules/PsyChat.vue'),
         },
@@ -81,7 +81,7 @@ const router = createRouter({
           path: 'HomePage',
           name: 'PersonPage',
           meta: {
-            title: 'ILP学生组织纳新与校园大论坛'
+            title: '欢迎使用明康慧医系统'
           },
           component: () => import('@/components/modules/HomePage.vue'),
         },

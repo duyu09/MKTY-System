@@ -150,9 +150,16 @@ export default
             <div style="margin-bottom: 1rem;">
               <img src="/images/mkty_cn_light.svg" style="width: 30vw;" />
             </div>
-            <span><nobr>Welcome To&nbsp;</nobr><wbr><nobr>
+            <span><nobr>
+              <span style="text-shadow: 2px 2px grey;">
+                Welcome To&nbsp;
+              </span></nobr><wbr><nobr>
               <span class="rainbow_text">明康慧医</span>
-            </nobr><wbr><nobr>智慧医疗系统</nobr></span>
+            </nobr><wbr>
+            <span style="text-shadow: 2px 2px grey;"><nobr>
+              智慧医疗系统
+            </nobr></span>
+            </span>
           </div>
         </div>
         <div id="HomePage-Div03">
@@ -164,7 +171,7 @@ export default
                 <div id="HomePage-Div07">
                     <div id="HomePage-Div08" :style="HomePage_Div08_Style">
                         <div id="HomePage-Div09" @click="hp_dialogFormVisible=true;">
-                          您有
+                          查看
                           <span style="color: brown; font-weight: bold;">{{ this.hp_importantItemArray.length }}</span>
                           项未完成或紧急事项
                         </div>
@@ -323,7 +330,6 @@ export default
 }
 #HomePage-Div05
 {
-    margin-bottom: 1rem;
     display: flex;
 }
 #HomePage-Div06
