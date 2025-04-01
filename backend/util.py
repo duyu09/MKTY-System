@@ -233,7 +233,7 @@ class RpcClient(object):
         self.channel = self.connection.channel()
         self.queue_name = queue_name
 
-        result = self.channel.queue_declare(queue='', exclusive=False, durable=True)
+        result = self.channel.queue_declare(queue='', exclusive=True, durable=False, auto_delete=True)
         self.callback_queue = result.method.queue
 
         self.channel.basic_consume(

@@ -282,6 +282,10 @@ export default
               }
             });
           }, 3500)
+        }).catch((error) => {
+          errHandle("AI分析执行失败：" + error);
+          this.il_aiAncillaryAnalysisLoading = false;
+          this.il_aiAncillaryAnalysisDialogVisible = false; 
         })
 
 

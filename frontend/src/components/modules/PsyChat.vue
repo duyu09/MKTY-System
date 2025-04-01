@@ -1,12 +1,16 @@
+<!-- Copyright (c) 2023~2025 DuYu (202103180009@stu.qlu.edu.cn, https://github.com/duyu09/MKTY-System), Faculty of Computer Science and Technology, Qilu University of Technology (Shandong Academy of Sciences) -->
+<!-- 该文件为“明康慧医MKTY”智慧医疗系统“MKTY大模型智慧医疗问答”页面Vue文件。该文件为MKTY系统的重要组成部分。 -->
+<!-- 创建日期：2025年03月10日 -->
+<!-- 修改日期：2025年03月29日 -->
 <script>
 import { Promotion, Avatar } from '@element-plus/icons-vue';
 import { dredgePsy } from "@/api/api";
 import { marked }  from "marked";
 import DOMPurify from "dompurify";
-import 'highlight.js/styles/Rainbow.css';
+import 'highlight.js/styles/rainbow.css';
 import hljs from 'highlight.js';
 import { errHandle } from "@/utils/tools";
-import { getCookie, getUserAvatar } from "@/api/api";
+import { getCookie, getUserAvatar, llmInferenceGetStatus, llmInferenceSubmitTask } from "@/api/api";
 
 export default
 {
@@ -21,42 +25,63 @@ export default
       return {
         PsyChat_userAvatar:'',
         PsyChat_Context:'',
+        PsyChat_Generating:false, // 页面状态，回答是否在生成中。
         PsyChat_ChatArr:[ //0=自己，1=对方，
-          {'speaker': 1,'context': '你好，我是MKTY明康慧医大模型，我将为您解决医疗相关问题。'},
+          {'role': 'assistant','content': '你好，我是MKTY明康慧医大模型，我将为您解决医疗相关问题。'},
         ]
       }
     },
   methods:
       {
         PsyChat_Send(){
-          console.log(this.PsyChat_Context);
-          if(this.PsyChat_Context==='') return;
-          this.PsyChat_ChatArr.push({'speaker':0,'context':this.PsyChat_Context});
-          setTimeout(() => this.$refs.ChatMainDiv.scrollTo({top:this.$refs.ChatMainDiv.scrollHeight,behavior:'smooth'}),200);
-          
-          
-            this.PsyChat_ChatArr.push({'speaker':1,'context':'正在思考...'});
-            dredgePsy(1, this.PsyChat_Context).then(res=>{
-              const temp_res = DOMPurify.sanitize(marked(res.data.response));
-              this.PsyChat_ChatArr.push({'speaker':1,'context':temp_res});
-              this.$nextTick(()=>{
+          if(this.PsyChat_Context==='') return;  // 聊天框为空时，不发送。
+          if(this.PsyChat_Generating) return;  // 如果正在生成中，不发送。
+          this.PsyChat_Generating=true;  // 正在生成中。
+          const history_ChatArr = JSON.parse(JSON.stringify(this.PsyChat_ChatArr)); // 复制一份聊天记录。
+          this.PsyChat_ChatArr.push({'role': 'user', 'content': this.PsyChat_Context});
+          setTimeout(() => this.$refs.ChatMainDiv.scrollTo({top: this.$refs.ChatMainDiv.scrollHeight, behavior: 'smooth'}), 200);
+          this.PsyChat_ChatArr.push({'role': 'assistant', 'content': 'AI正在思考...'});
+          console.log("history_ChatArr", history_ChatArr);
+          console.log("PsyChat_ChatArr", this.PsyChat_ChatArr);
+
+          llmInferenceSubmitTask(history_ChatArr, this.PsyChat_Context).then((res) => {
+          if(res.data.code != 0) { 
+            errHandle("未成功发送数据：" + res.data.msg);
+            this.PsyChat_Generating = false;
+            return;
+          }
+          const task_id = res.data.taskId;
+          const pc_aiIntervalId = setInterval(() => {
+            llmInferenceGetStatus(task_id).then((res2) => {
+              if(res2.data.code != 0) { 
+                clearInterval(pc_aiIntervalId);
+                errHandle("未成功获取响应：" + res2.data.msg);
+                this.PsyChat_Generating = false;
+                return;
+              }
+              if(res2.data.taskStatus == 0){
+                clearInterval(pc_aiIntervalId);
+                const task_result = res2.data.taskResult;
+                const temp_result_rendered = DOMPurify.sanitize(marked(task_result));
+                this.PsyChat_ChatArr[this.PsyChat_ChatArr.length - 1].content = temp_result_rendered;
+                this.$nextTick(()=>{
+                  setTimeout(() => this.$refs.ChatMainDiv.scrollTo({top:this.$refs.ChatMainDiv.scrollHeight,behavior:'smooth'}),350);
+                  setTimeout(() => {
+                    hljs.highlightAll();
+                  },350);
+                });
                 setTimeout(() => this.$refs.ChatMainDiv.scrollTo({top:this.$refs.ChatMainDiv.scrollHeight,behavior:'smooth'}),350);
-                setTimeout(() => {
-                  hljs.highlightAll();
-                },350);
-              })
-              setTimeout(() => this.$refs.ChatMainDiv.scrollTo({top:this.$refs.ChatMainDiv.scrollHeight,behavior:'smooth'}),350);
-            })
-            .catch(e=>
-            {
-              this.PsyChat_Context='';
-              errHandle('错误：'+e);
-              this.PsyChat_ChatArr.push({'speaker':1,'context':'错误:网络连接错误。'});
-              setTimeout(() => this.$refs.ChatMainDiv.scrollTo({top:this.$refs.ChatMainDiv.scrollHeight,behavior:'smooth'}),350);
+                this.PsyChat_Generating = false;
+                this.PsyChat_Context='';
+              }
             });
-            // 发请求逻辑
-          
-          this.PsyChat_Context='';
+          }, 2500)
+          }).catch((res) => {
+            this.PsyChat_Context='';
+            this.PsyChat_Generating = false;
+            errHandle("未成功发送数据：" + res);
+            setTimeout(() => this.$refs.ChatMainDiv.scrollTo({top:this.$refs.ChatMainDiv.scrollHeight,behavior:'smooth'}),350);
+          });
         },
         pc_loadPage(){
           const userId=parseInt(getCookie('userId'));
@@ -113,10 +138,10 @@ export default
         <div id="PsyChat-Div05" ref="ChatMainDiv">
 
           <div v-for="item in PsyChat_ChatArr">
-            <div v-if="item.speaker===0" class="PsyChat-Chat-Me-01">
+            <div v-if="item.role==='user'" class="PsyChat-Chat-Me-01">
               <div class="PsyChat-Chat-Me-02">
 <!--                {{ item.context }}-->
-                <p v-html="item.context"></p>
+                <p v-html="item.content"></p>
               </div>
               <div class="PsyChat-Chat-Me-03">
                 <img :src="PsyChat_userAvatar" style="width: 100%;height: 100%;border-radius: 0.2rem;">
@@ -124,12 +149,12 @@ export default
               </div>
             </div>
 
-            <div v-if="item.speaker===1" class="PsyChat-Chat-Opposite-01">
+            <div v-if="item.role==='assistant'" class="PsyChat-Chat-Opposite-01">
               <div class="PsyChat-Chat-Opposite-03">
                 <img src="/images/mkty_icon.png" style="width: 100%;height: 100%;border-radius: 0.2rem;">
               </div>
               <div class="PsyChat-Chat-Opposite-02">
-                <p v-html="item.context"></p>
+                <p v-html="item.content"></p>
               </div>
             </div>
           </div>
@@ -138,7 +163,7 @@ export default
 
       </div>
       <div id="PsyChat-Div06">
-        <div id="PsyChat-Div07">
+        <div id="PsyChat-Div07" v-loading="PsyChat_Generating" element-loading-background="rgba(0, 0, 0, 0.75)">
           <input id="PsyChat-InputBox01" placeholder="请输入疾病诊疗相关问题" v-model="PsyChat_Context" @keyup.enter="PsyChat_Send()" />
           <div id="PsyChat-SendButtonDiv" @click="PsyChat_Send()">
             <el-icon><Promotion /></el-icon>&nbsp;<span id="PsyChat-Span02">发送</span>
