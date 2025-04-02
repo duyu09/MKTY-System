@@ -4,7 +4,6 @@
 <!-- 修改日期：2025年03月29日 -->
 <script>
 import { Promotion, Avatar } from '@element-plus/icons-vue';
-import { dredgePsy } from "@/api/api";
 import { marked }  from "marked";
 import DOMPurify from "dompurify";
 import 'highlight.js/styles/rainbow.css';
@@ -25,6 +24,7 @@ export default
       return {
         PsyChat_userAvatar:'',
         PsyChat_Context:'',
+        PsyChat_HistoryDialog:false, // 历史对话会话框是否显示。
         PsyChat_Generating:false, // 页面状态，回答是否在生成中。
         PsyChat_ChatArr:[ //0=自己，1=对方，
           {'role': 'assistant','content': '你好，我是MKTY明康慧医大模型，我将为您解决医疗相关问题。'},
@@ -122,9 +122,9 @@ export default
       <div id="PsyChat-NewDiv01">
        <div id="PsyChat-NewDiv02">
          <div id="PsyChat-NewDiv03">
-            <el-button type="primary" @click="">会话记录</el-button>
-            <el-button type="primary" @click="">请选择RAG知识库</el-button>
-            <el-button type="warning" @click="">切换到大模型讨论机制</el-button>
+            <el-button type="primary" @click="PsyChat_HistoryDialog=true" :disabled="PsyChat_Generating">会话记录</el-button>
+            <el-button type="primary" @click="" :disabled="PsyChat_Generating">请选择RAG知识库</el-button>
+            <el-button type="warning" @click="" :disabled="PsyChat_Generating">切换到大模型讨论机制</el-button>
          </div>
          <div id="PsyChat-NewDiv04">
             <span id="PsyChat-NewSpan01">
@@ -170,6 +170,13 @@ export default
           </div>
         </div>
       </div>
+
+
+      <el-drawer v-model="PsyChat_HistoryDialog" title="会话历史" direction="ltr">
+        
+      </el-drawer>
+
+      
      <!-- <div id="PsyChat-NewDiv01">
        <div id="PsyChat-NewDiv02">
          <div id="PsyChat-NewDiv03">

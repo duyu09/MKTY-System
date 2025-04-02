@@ -656,7 +656,7 @@ def get_current_time():
 @getCursor(conn_pool)
 def llm_inference_submit_task(cursor):
     '''
-    - API功能：提交大语言模型(MKTY-3B-Chat)推理任务
+    - API功能：提交大语言模型(**MKTY-3B-Chat**)推理任务
     - 请求参数：prompt, context
       - `prompt`: 提示词（`str`）
       - `context`: 会话历史（`list`，里面元素均为字典，字典包含`role`和`content`两个键，`role`为`user`或`assistant`，`content`为对话内容）
@@ -702,6 +702,47 @@ def llm_inference_get_status(cursor):
         return jsonify({'code': 0, 'msg': '任务进行中。', 'taskStatus': 1})
     else:
         return jsonify({'code': 0, 'msg': '任务完成', 'taskStatus': 0, 'taskResult': result})
+    
+    
+@app.route('/api/saveLlmSession', methods=['POST'])
+@jwt_required()
+@getCursor(conn_pool)
+def save_llm_session(cursor):
+    '''
+    - API功能：保存MKTY大语言模型会话
+    - 请求参数：sessionId, sessionContent，isSessionDM
+      - `sessionId`: 对话ID（`int`，规定若该字段值为`-1`，则表明建立新会话）
+      - `sessionContent`: 对话内容（`json`）
+      - `isSessionDM`: 是否启用了LLM讨论机制（`int`，`0`=不启用，`1`=启用）
+    - 响应参数：code, msg
+      - `code`: 执行状态（`int`，`0`=保存成功，`1`=保存失败）
+      - `msg`: 自然语言提示信息（`str`）
+      - `sessionId`: 对话ID（`int`，若新建会话，则返回新会话的ID）
+    '''
+    session_data = request.json
+    session_id = session_data.get('sessionId')
+    session_content = session_data.get('sessionContent')
+    is_session_dm = session_data.get('isSessionDM')
+    if session_id is None:
+        return jsonify({'code': 1,'msg': '对话ID不可读取。'})
+    if session_content is None or session_content == "":
+        return jsonify({'code': 1,'msg': '对话内容不可读取。'})
+    if is_session_dm is None:
+        return jsonify({'code': 1,'msg': '对话时间不可读取。'})
+    user_id = get_jwt_identity()
+    try:
+        if session_id == -1:  # 新建会话
+            session_save_time = util_current_time()
+            cursor.execute(
+                f"INSERT INTO llmhistory (isSessionDM, sessionSaveTime, sessionUserId, sessionContent) "
+                f"VALUES ({is_session_dm}, '{session_save_time}', {user_id}, '{session_content}')")
+            session_id = cursor.lastrowid
+        else:  # 更新会话
+            cursor.execute(
+                f"UPDATE llmhistory SET sessionContent='{session_content}', sessionSaveTime='{session_save_time}' WHERE sessionId={session_id} AND sessionUserId={user_id}")
+        return jsonify({'code': 0,'msg': '保存成功！', 'sessionId': session_id})
+    except Exception as e:
+        return jsonify({'code': 1,'msg': '未能成功保存会话记录：'+ str(e)})
 
     
 

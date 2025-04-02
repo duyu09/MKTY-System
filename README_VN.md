@@ -35,11 +35,11 @@
 Dự án này là đồ án tốt nghiệp của tôi tại Đại học Công nghiệp Tề Lỗ (_Qilu_) (Viện Khoa học tỉnh Sơn Đông) năm 2025.
 
 - 👤 **Tác Giả Dự Án**
-  - **Đỗ Vũ** (Tiếng Trung: _杜宇_; Tiếng Anh: _DU Yu_; email: <202103180009@stu.qlu.edu.cn>), sinh viên tốt nghiệp năm 2025, Học bộ Khoa học và Kỹ thuật Máy tính, Đại học Công nghiệp Tề Lỗ (_Qilu_) (Viện Khoa học tỉnh Sơn Đông)
+  - **Đỗ Vũ** (Tiếng Trung Giản Thể: _杜宇_; Tiếng Anh: _DU Yu_; Email: <202103180009@stu.qlu.edu.cn> và <qluduyu09@163.com>), sinh viên tốt nghiệp năm 2025, Học bộ Khoa học và Kỹ thuật Máy tính, Đại học Công nghiệp Tề Lỗ (_Qilu_) (Viện Khoa học tỉnh Sơn Đông)
 
 - 🏫 **Giáo Viên Hướng Dẫn Đồ Án**
-  - Giáo viên trường: **Khương Văn Phong** (Tiếng Trung: _姜文峰_; Tiếng Anh: _JIANG Wenfeng_), giảng viên Học bộ Khoa học và Kỹ thuật Máy tính, Đại học Công nghiệp Tề Lỗ (_Qilu_) (Viện Khoa học tỉnh Sơn Đông).
-  - Giáo viên xí nghiệp: **Lý Quân** (Tiếng Trung: _李君_; Tiếng Anh: _LI Jun_), Học viện Thực huấn Phần mềm Strong (_Sư Sáng_) Sơn Đông, Tập đoàn Khoa kỹ Giáo dục Ambow (_An Bác_, [NYSE: AMBO](https://www.nyse.com/quote/XASE:AMBO)).
+  - Giáo viên trường: **Khương Văn Phong** (Tiếng Trung Giản Thể: _姜文峰_; Tiếng Anh: _JIANG Wenfeng_), giảng viên Học bộ Khoa học và Kỹ thuật Máy tính, Đại học Công nghiệp Tề Lỗ (_Qilu_) (Viện Khoa học tỉnh Sơn Đông).
+  - Giáo viên xí nghiệp: **Lý Quân** (Tiếng Trung Giản Thể: _李君_; Tiếng Anh: _LI Jun_), Học viện Thực huấn Phần mềm Strong (_Sư Sáng_) Sơn Đông, Tập đoàn Khoa kỹ Giáo dục Ambow (_An Bác_, [NYSE: AMBO](https://www.nyse.com/quote/XASE:AMBO)).
 
 Hệ thống này được phát hành theo giấy phép nguồn mở `AGPLv3` đã được chỉnh sửa. Trước khi tải xuống, sử dụng, chỉnh sửa hoặc phát hành dự án phần mềm này và mã nguồn của nó, vui lòng đọc kỹ và hiểu rõ nội dung trong tệp [LICENSE](./LICENSE).
 

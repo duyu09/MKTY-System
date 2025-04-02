@@ -17,7 +17,7 @@
 
 ## 📖 Project Overview
 
-This project aims to leverage large-scale language models (LLM) and multimodal artificial intelligence technologies to enhance the intelligence and personalization of health management and assisted diagnosis systems. Through our innovative "LLM discussion mechanism," which reduces the hallucination effect in large models, and multimodal data analysis methods, the system can intelligently process patients' multimodal electronic health records and health information to provide accurate diagnostic recommendations. This reduces the burden on doctors and improves diagnostic efficiency. The system also supports self-diagnosis for patients, helping users to proactively prevent diseases, reducing unnecessary medical visits, and optimizing healthcare resource allocation. 
+This project aims to leverage large-scale language models (LLM) and multimodal artificial intelligence technologies to enhance the intelligence and personalization of health management and assisted diagnosis systems. Through our innovative "LLM discussion mechanism," which reduces the hallucination effect in large models, and multimodal data analysis methods, the system can intelligently process patients' multimodal electronic health records and health information to provide accurate diagnostic recommendations. This reduces the burden on doctors and improves diagnostic efficiency. The system also supports self-diagnosis for patients, helping users to proactively prevent diseases, reducing unnecessary medical visits, and optimizing healthcare resource allocation.
 
 Incorporating multimodal technology, the system can integrate various data sources in the medical field, including text and medical images, thus enhancing the precision and scientific basis of clinical decision-making and promoting the intelligent development of healthcare services. Furthermore, the system features a medical knowledge base function, where users can freely share high-quality medical knowledge. Users can perform multimodal intelligent searches for knowledge within the system and utilize the knowledge to enhance the content generation of _MKTY LLM_.
 
@@ -39,11 +39,11 @@ In summary, this project explores the deep integration of AI and medicine, provi
 This project serves as the graduation thesis for the 2025 batch of undergraduate students in the Faculty of Computer Science and Technology, Qilu University of Technology (Shandong Academy of Sciences).
 
 - **👤 Project Author:**  
-  - **DU Yu** (Chinese: _杜宇_; Vietnamese: _Đỗ Vũ_; Email: <202103180009@stu.qlu.edu.cn>), undergraduate student at Faculty of Computer Science and Technology, Qilu University of Technology (Shandong Academy of Sciences)
+  - **DU Yu** (Chinese Simplified: _杜宇_; Vietnamese: _Đỗ Vũ_; Email: <202103180009@stu.qlu.edu.cn> and <qluduyu09@163.com>), undergraduate student at Faculty of Computer Science and Technology, Qilu University of Technology (Shandong Academy of Sciences)
 
 - **🏫 Thesis Advisors:**
-  - Academic Mentor: **JIANG Wenfeng** (Chinese: _姜文峰_; Vietnamese: _Khương Văn Phong_), Lecturer, Faculty of Computer Science and Technology, Qilu University of Technology (Shandong Academy of Sciences)
-  - Enterprise Mentor: **LI Jun** (Chinese: _李君_; Vietnamese: _Lý Quân_), Shandong Strong (Shichuang) Software Training College, Ambow Education Group ([NYSE: AMBO](https://www.nyse.com/quote/XASE:AMBO))
+  - Academic Mentor: **JIANG Wenfeng** (Chinese Simplified: _姜文峰_; Vietnamese: _Khương Văn Phong_), Lecturer, Faculty of Computer Science and Technology, Qilu University of Technology (Shandong Academy of Sciences)
+  - Enterprise Mentor: **LI Jun** (Chinese Simplified: _李君_; Vietnamese: _Lý Quân_), Shandong Strong (Shichuang) Software Training College, Ambow Education Group ([NYSE: AMBO](https://www.nyse.com/quote/XASE:AMBO))
   
 This system is released under a modified `AGPLv3` open-source license. Before downloading, using, modifying, or distributing this software system project and its source code, please carefully read and fully understand the contents of the [LICENSE](./LICENSE) file.
 

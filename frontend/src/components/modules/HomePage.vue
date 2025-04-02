@@ -252,7 +252,7 @@ export default
             &copy; 2023~2025 DuYu, Faculty of Computer Science and Technology, QLU(SDAS).
         </div>
         <div id="HomePage-FooterDiv02">
-            &copy; 2023 DuYu, QLU(SDAS).
+            &copy; 2025 DuYu, QLU(SDAS).
         </div>
         </div>
     </div>
