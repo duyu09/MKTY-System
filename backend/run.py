@@ -743,7 +743,86 @@ def save_llm_session(cursor):
         return jsonify({'code': 0,'msg': '保存成功！', 'sessionId': session_id})
     except Exception as e:
         return jsonify({'code': 1,'msg': '未能成功保存会话记录：'+ str(e)})
+    
 
+@app.route('/api/getLlmSession', methods=['POST'])
+@jwt_required()
+@getCursor(conn_pool)
+def get_llm_session(cursor):
+    '''
+    - API功能：获取指定ID的MKTY大语言模型会话内容
+    - 请求参数：sessionId
+      - `sessionId`: 会话ID（`int`）
+    - 响应参数：code, msg, sessionContent
+      - `code`: 执行状态（`int`，`0`=获取成功，`1`=获取失败）
+      - `msg`: 自然语言提示信息（`str`）
+      - `sessionContent`: 对话内容（`json`）
+    '''
+    session_data = request.json
+    session_id = session_data.get('sessionId')
+    if session_id is None:
+        return jsonify({'code': 1,'msg': '对话ID不可读取。'})
+    user_id = get_jwt_identity()
+    try:
+        cursor.execute(f"SELECT * FROM llmhistory WHERE sessionId={session_id} AND sessionUserId={user_id}")
+        result = cursor.fetchall()
+        if result is None or len(result) == 0:
+            return jsonify({'code': 1,'msg': '该会话不存在或您无权读取该ID的会话内容。'})
+        else:
+            return jsonify({'code': 0,'msg': '获取成功','sessionContent': result[0]['sessionContent']})
+    except Exception as e:
+        return jsonify({'code': 1,'msg': '未能成功获取会话记录：'+ str(e)})
+    
+
+@app.route('/api/getLlmSessionList', methods=['POST'])
+@jwt_required()
+@getCursor(conn_pool)
+def get_llm_session_list(cursor):
+    '''
+    - API功能：获取指定用户的MKTY大语言模型会话列表
+    - 请求参数：isSessionDM
+      - `isSessionDM`: 是否启用了LLM讨论机制（`int`，`0`=不启用，`1`=启用）
+    - 响应参数：code, msg, sessionList
+      - `code`: 执行状态（`int`，`0`=获取成功，`1`=获取失败）
+      - `msg`: 自然语言提示信息（`str`）
+      - `sessionList`: 会话列表（`JSON`，返回JSON数组，每个元素是一个`JSON`对象，包含了会话的全部信息。被删除的会话不返回）
+    '''
+    session_data = request.json
+    is_session_dm = session_data.get('isSessionDM')
+    if is_session_dm is None:
+        return jsonify({'code': 1,'msg': '对话时间不可读取。'})
+    user_id = get_jwt_identity()
+    try:
+        cursor.execute(f"SELECT * FROM llmhistory WHERE isSessionDM={is_session_dm} AND sessionUserId={user_id}")
+        result = cursor.fetchall()
+        return jsonify({'code': 0,'msg': '获取成功','sessionList': result})
+    except Exception as e:
+        return jsonify({'code': 1,'msg': '未能成功获取会话列表：'+ str(e)})
+    
+
+@app.route('/api/deleteLlmSession', methods=['POST'])
+@jwt_required()
+@getCursor(conn_pool)
+def delete_llm_session(cursor):
+    '''
+    - API功能：删除指定ID的MKTY大语言模型会话（**数据库级真删除**）
+    - 请求参数：sessionId
+      - `sessionId`: 会话ID（`int`）
+    - 响应参数：code, msg
+      - `code`: 执行状态（`int`，`0`=删除成功，`1`=删除失败）
+      - `msg`: 自然语言提示信息（`str`）
+    '''
+    session_data = request.json
+    session_id = session_data.get('sessionId')
+    if session_id is None:
+        return jsonify({'code': 1,'msg': '对话ID不可读取。'})
+    user_id = get_jwt_identity()
+    try:
+        # 假删：cursor.execute(f"UPDATE llmhistory SET sessionStatus=1 WHERE sessionId={session_id} AND sessionUserId={user_id}")
+        cursor.execute(f"DELETE FROM llmhistory WHERE sessionId={session_id} AND sessionUserId={user_id}")
+        return jsonify({'code': 0,'msg': '删除成功！'})
+    except Exception as e:
+        return jsonify({'code': 1,'msg': '未能成功删除会话记录：'+ str(e)})
     
 
 

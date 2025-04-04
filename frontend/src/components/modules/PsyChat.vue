@@ -22,11 +22,12 @@ export default
     data()
     {
       return {
-        PsyChat_userAvatar:'',
-        PsyChat_Context:'',
-        PsyChat_HistoryDialog:false, // 历史对话会话框是否显示。
-        PsyChat_Generating:false, // 页面状态，回答是否在生成中。
-        PsyChat_ChatArr:[ //0=自己，1=对方，
+        PsyChat_userAvatar: '',
+        PsyChat_Context: '',
+        PsyChat_HistoryDialog: false, // 历史对话会话框是否显示。
+        PsyChat_Generating: false, // 页面状态，回答是否在生成中。
+        PsyChat_SessionId: -1, // 会话ID号。默认是-1（新会话为-1）。
+        PsyChat_ChatArr: [ //0=自己，1=对方，
           {'role': 'assistant','content': '你好，我是MKTY明康慧医大模型，我将为您解决医疗相关问题。'},
         ]
       }

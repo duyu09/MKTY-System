@@ -91,11 +91,11 @@ export default
           </div>
           <div class="MainView-MenuItem" @click="() => this.$router.push('/main/Forum')">
             <el-icon><ChatDotSquare /></el-icon>
-            论坛社团
+            诊疗论坛
           </div>
           <div class="MainView-MenuItem" @click="() => this.$router.push('/main/StartStudy')">
             <el-icon><Management /></el-icon>
-            云上自习
+            病历管理
           </div>
           <div class="MainView-MenuItem" @click="() => this.$router.push('/main/ImportantList')">
             <el-icon><Flag /></el-icon>
@@ -103,7 +103,7 @@ export default
           </div>
           <div class="MainView-MenuItem" @click="() => this.$router.push('/main/Resources')">
             <el-icon><FolderOpened /></el-icon>
-            资源天地
+            资源中心
           </div>
         </div>
         
