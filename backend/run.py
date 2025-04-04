@@ -32,13 +32,21 @@ LLM_MQ_CONNECTION_PARAMETERS = {  # 大规模模型推理端MQ连接参数
     'heartbeat': 0
 }
 LLM_QUEUE_NAME = 'large_model_inference'  # 大规模模型推理端MQ队列名称
+DATABASE_CONNECTION_POOL_PARAMETERS = {  # 数据库连接池参数
+    'host': 'localhost',
+    'user': 'root',
+    'password': '',
+    'database': 'mkty_02',
+    'pool_size': 5,
+    'pool_name': 'mkty'
+}
 
 # 程序启动，首先打印必要信息
 start_print(VERSION)
 info_print("正在初始化后端服务")
 
 # 建立数据库连接池
-conn_pool = getDataBaseConnectionPool(host='localhost', user='root', password='', database='mkty_02', pool_size=5, pool_name="mkty")
+conn_pool = getDataBaseConnectionPool(DATABASE_CONNECTION_POOL_PARAMETERS)
 
 # 通过MQ分别与MKTY-3B-Chat大语言模型推理端以及多模态智能辅诊端建立连接
 llm_rpc_client = RpcClient(LLM_MQ_CONNECTION_PARAMETERS, LLM_QUEUE_NAME)
