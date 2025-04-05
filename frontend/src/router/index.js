@@ -38,6 +38,14 @@ const router = createRouter({
           component: () => import('@/components/modules/PsyChat.vue'),
         },
         {
+          path: 'PsyChatDM',
+          name: 'PsyChatDM',
+          meta: {
+            title: '明康慧医 - AI智能体讨论解答疑问'
+          },
+          component: () => import('@/components/modules/PsyChatDM.vue'),
+        },
+        {
           path: 'Forum',
           name: 'Forum',
           meta: {

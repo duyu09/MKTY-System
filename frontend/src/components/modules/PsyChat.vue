@@ -1,15 +1,16 @@
 <!-- Copyright (c) 2023~2025 DuYu (202103180009@stu.qlu.edu.cn, https://github.com/duyu09/MKTY-System), Faculty of Computer Science and Technology, Qilu University of Technology (Shandong Academy of Sciences) -->
 <!-- 该文件为“明康慧医MKTY”智慧医疗系统“MKTY大模型智慧医疗问答”页面Vue文件。该文件为MKTY系统的重要组成部分。 -->
 <!-- 创建日期：2025年03月10日 -->
-<!-- 修改日期：2025年03月29日 -->
+<!-- 修改日期：2025年04月06日 -->
 <script>
-import { Promotion, Avatar } from '@element-plus/icons-vue';
+import { Promotion, Avatar, Delete, ChatDotSquare } from '@element-plus/icons-vue';
 import { marked }  from "marked";
 import DOMPurify from "dompurify";
 import 'highlight.js/styles/rainbow.css';
 import hljs from 'highlight.js';
-import { errHandle } from "@/utils/tools";
-import { getCookie, getUserAvatar, llmInferenceGetStatus, llmInferenceSubmitTask } from "@/api/api";
+import { errHandle, successHandle, convertTime } from "@/utils/tools";
+import { getCookie, getUserAvatar, llmInferenceGetStatus, llmInferenceSubmitTask, saveLlmSession, 
+  getLlmSessionList, getLlmSession, deleteLlmSession } from "@/api/api";
 
 export default
 {
@@ -18,6 +19,8 @@ export default
     {
       'Promotion': Promotion,
       'Avatar': Avatar,
+      'Delete': Delete,
+      'ChatDotSquare': ChatDotSquare,
     },
     data()
     {
@@ -27,9 +30,11 @@ export default
         PsyChat_HistoryDialog: false, // 历史对话会话框是否显示。
         PsyChat_Generating: false, // 页面状态，回答是否在生成中。
         PsyChat_SessionId: -1, // 会话ID号。默认是-1（新会话为-1）。
-        PsyChat_ChatArr: [ //0=自己，1=对方，
+        PsyChat_ChatArr: [  // assistant=大模型智能体；user=用户，
           {'role': 'assistant','content': '你好，我是MKTY明康慧医大模型，我将为您解决医疗相关问题。'},
-        ]
+        ],
+        PsyChat_LlmSessionList:[],
+        PsyChat_LlmSessionListLoading: false // 历史对话会话框加载中。
       }
     },
   methods:
@@ -74,6 +79,16 @@ export default
                 setTimeout(() => this.$refs.ChatMainDiv.scrollTo({top:this.$refs.ChatMainDiv.scrollHeight,behavior:'smooth'}),350);
                 this.PsyChat_Generating = false;
                 this.PsyChat_Context='';
+                // 这里写保存聊天记录的代码。
+                saveLlmSession(this.PsyChat_SessionId, this.PsyChat_ChatArr, 0).then((res3) => {
+                  if(res3.data.code!= 0) { 
+                    errHandle("未成功保存聊天记录：" + res3.data.msg); 
+                  }
+                  else {
+                    console.log("保存聊天记录成功。");
+                    this.PsyChat_SessionId = res3.data.sessionId; // 更新会话ID号。
+                  }
+                })
               }
             });
           }, 2500)
@@ -99,6 +114,61 @@ export default
               errHandle('未能获取您的头像：'+res);
             });
           }
+        },
+        pc_getLlmSessionList(){
+          this.PsyChat_LlmSessionListLoading=true;
+          this.PsyChat_LlmSessionList=[];
+          getLlmSessionList(0).then(res=>{
+            if(res.data.code!==0){
+              errHandle('获取会话列表失败：'+res.data.msg);
+              this.PsyChat_LlmSessionListLoading=false;
+              return;
+            }
+            else {
+              this.PsyChat_LlmSessionList=res.data.sessionList;
+              this.PsyChat_LlmSessionListLoading=false;
+              console.log("this.PsyChat_LlmSessionList", this.PsyChat_LlmSessionList);
+            }
+          })
+
+        },
+        pc_newSession(){
+          this.PsyChat_SessionId=-1; // 新会话。
+          this.PsyChat_ChatArr=[]; // 清空聊天记录。
+          this.PsyChat_ChatArr.push({'role': 'assistant','content': '你好，我是MKTY明康慧医大模型，我将为您解决医疗相关问题。'}); 
+          successHandle('已新建会话');
+        },
+        pc_conTime(unixTime){
+          return convertTime(unixTime);
+        },
+        pc_loadSession(sessionId){
+          getLlmSession(sessionId).then(res=>{
+            if(res.data.code!==0){
+              errHandle('获取会话记录失败：'+res.data.msg);
+              return;
+            }
+            else {
+              this.PsyChat_ChatArr=JSON.parse(res.data.sessionContent); // 加载聊天记录。
+              // console.log("this.PsyChat_ChatArr", this.PsyChat_ChatArr);
+              setTimeout(() => this.$refs.ChatMainDiv.scrollTo({top:this.$refs.ChatMainDiv.scrollHeight,behavior:'smooth'}),350);
+              this.PsyChat_SessionId=sessionId; // 新会话Id。
+              this.PsyChat_HistoryDialog=false; // 关闭历史对话会话框。
+              successHandle('已加载会话记录'); 
+            }  
+          }) 
+        },
+        pc_deleteSession(sessionId){
+          deleteLlmSession(sessionId).then(res=>{
+            if(res.data.code!==0){
+              errHandle('删除会话记录失败：'+res.data.msg);
+              return;
+            }
+            else {
+              this.PsyChat_LlmSessionList=[]; // 清空会话列表。
+              this.pc_getLlmSessionList(); // 重新加载会话列表。
+              successHandle('已删除会话记录'); 
+            }
+          }) 
         }
       },
   mounted()
@@ -123,9 +193,10 @@ export default
       <div id="PsyChat-NewDiv01">
        <div id="PsyChat-NewDiv02">
          <div id="PsyChat-NewDiv03">
+            <el-button type="primary" @click="pc_newSession()" :disabled="PsyChat_Generating">新建会话</el-button>
             <el-button type="primary" @click="PsyChat_HistoryDialog=true" :disabled="PsyChat_Generating">会话记录</el-button>
-            <el-button type="primary" @click="" :disabled="PsyChat_Generating">请选择RAG知识库</el-button>
-            <el-button type="warning" @click="" :disabled="PsyChat_Generating">切换到大模型讨论机制</el-button>
+            <el-button type="primary" @click="" :disabled="PsyChat_Generating">选择RAG知识库</el-button>
+            <el-button type="warning" @click="" :disabled="PsyChat_Generating">大模型讨论机制</el-button>
          </div>
          <div id="PsyChat-NewDiv04">
             <span id="PsyChat-NewSpan01">
@@ -141,12 +212,10 @@ export default
           <div v-for="item in PsyChat_ChatArr">
             <div v-if="item.role==='user'" class="PsyChat-Chat-Me-01">
               <div class="PsyChat-Chat-Me-02">
-<!--                {{ item.context }}-->
                 <p v-html="item.content"></p>
               </div>
               <div class="PsyChat-Chat-Me-03">
                 <img :src="PsyChat_userAvatar" style="width: 100%;height: 100%;border-radius: 0.2rem;">
-<!--                <el-icon><Avatar /></el-icon>-->
               </div>
             </div>
 
@@ -173,8 +242,27 @@ export default
       </div>
 
 
-      <el-drawer v-model="PsyChat_HistoryDialog" title="会话历史" direction="ltr">
-        
+      <el-drawer v-model="PsyChat_HistoryDialog" title="会话历史" direction="ltr" @open="pc_getLlmSessionList()">
+        <el-scrollbar height="100%" style="font-size: large;" v-loading="PsyChat_LlmSessionListLoading" element-loading-text="加载中..." element-loading-background="rgba(0, 0, 0, 0.2)">
+          <div v-for="item in PsyChat_LlmSessionList" class="PsyChat-SessionListItem-BG-Div">
+                <div class="PsyChat-SessionListItem" @click="pc_loadSession(item.sessionId)">
+                  <el-icon><ChatDotSquare /></el-icon>
+                  {{ item.sessionTitle }}
+                </div>
+                <div style="text-align: right;">
+                  <span style="font-size: small;">{{ pc_conTime(item.sessionSaveTime * 1000) }}</span>&nbsp;
+                  <el-popconfirm title="您确定删除吗？" @confirm="pc_deleteSession(item.sessionId)" @cancel="">
+                    <template #reference>
+                      <el-icon size="small" color="red" style="cursor: pointer; font-weight: bold;">
+                        <Delete />
+                      </el-icon>
+                    </template>
+                  </el-popconfirm>
+                  &nbsp;&nbsp;
+                </div>
+                <el-divider style="margin: 10px;"></el-divider>           
+              </div>
+        </el-scrollbar>
       </el-drawer>
 
       
@@ -209,6 +297,25 @@ export default
 {
   font-family: HPHS;
   src: url("/fonts/HPHS.woff");
+}
+.PsyChat-SessionListItem
+{
+  margin: 0.75rem 0.25rem 0rem 0.25rem;
+  cursor: pointer;
+}
+.PsyChat-SessionListItem:hover
+{
+  color: darkblue;
+  font-weight: bold;
+}
+.PsyChat-SessionListItem-BG-Div
+{
+  width: 100%;text-align: left;
+}
+.PsyChat-SessionListItem-BG-Div:hover
+{
+  transition: background-color 0.7s ease;
+  background-color: rgba(0, 0, 0, 0.2);
 }
 #PsyChat-NewDiv01
 {

@@ -1,22 +1,10 @@
 <!-- Copyright (c) 2023~2025 DuYu (202103180009@stu.qlu.edu.cn, https://github.com/duyu09/MKTY-System), Faculty of Computer Science and Technology, Qilu University of Technology (Shandong Academy of Sciences) -->
 <!-- 该文件为“明康慧医MKTY”智慧医疗系统侧边栏按钮列组件Vue文件。该文件为MKTY系统的重要组成部分。 -->
 <!-- 创建日期：2025年02月29日 -->
-<!-- 修改日期：2025年03月30日 -->
+<!-- 修改日期：2025年04月06日 -->
 <script>
-import { HomeFilled } from "@element-plus/icons-vue";
-import { Sunny } from "@element-plus/icons-vue";
-import { Guide } from "@element-plus/icons-vue";
-import { ChatDotSquare } from "@element-plus/icons-vue";
-import { Management } from "@element-plus/icons-vue";
-import { FolderOpened } from "@element-plus/icons-vue";
-import { Flag } from "@element-plus/icons-vue";
+import { HomeFilled, Sunny, Guide, ChatDotSquare, Management, FolderOpened, Flag } from "@element-plus/icons-vue";
 import { getCookie, setCookie, getUserAvatar, getUserInfo } from '@/api/api';
-import {
-  Document,
-  Menu as IconMenu,
-  Location,
-  Setting,
-} from '@element-plus/icons-vue';
 
 export default
 {

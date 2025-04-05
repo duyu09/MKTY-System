@@ -1,3 +1,9 @@
+/*
+ - Copyright (c) 2023~2025 DuYu (202103180009@stu.qlu.edu.cn, https://github.com/duyu09/MKTY-System), Faculty of Computer Science and Technology, Qilu University of Technology (Shandong Academy of Sciences)
+ - 该文件为“明康慧医MKTY”智慧医疗系统API JS文件。该文件为MKTY系统的重要组成部分。
+ - 创建日期：2025年02月22日
+ - 修改日期：2025年04月06日
+*/
 import axios from "axios";
 import Cookies from 'js-cookie';
 import { errHandle, msgHandle } from "../utils/tools";
@@ -8,7 +14,7 @@ export
     getUserAvatar, getUserInfo, modifyUserInfo, modifyUserAvatar, modifyUserPassword, getMailList, getMailList_Reverse, 
     deleteMailItem, addMailItem, multimodalDiagnosisSubmitTask, multimodalDiagnosisGetStatus, getCurrentTime,
     getImportantList, addImportantItem, deleteImportantItem, finishImportantItem, llmInferenceGetStatus, llmInferenceSubmitTask, 
-
+    saveLlmSession, getLlmSession, getLlmSessionList, deleteLlmSession,
     setUserInformation, updataInformation, setAvatar, addFlag, showFlag, deleteFlag, showOrg, deleteOrg, creatForum, createOrg, releaseItem, showForum, showItem, deleteItem, showPsy, signIn, readSignInContext, readStudyRoom, startStudy, readStudyStatus, dredgePsy, skillTest, upvote, upload, showFile, downloadFile, getMusicList
 }
 
@@ -267,6 +273,39 @@ function llmInferenceGetStatus(taskId)
     },{headers: {'Authorization': getToken()}});
 }
 
+// 23. 保存MKTY大语言模型会话
+function saveLlmSession(sessionId, sessionContent, isSessionDM)
+{
+    return axios.post(baseURL+'/saveLlmSession',{
+        'sessionId': sessionId,
+        'sessionContent': sessionContent,
+        'isSessionDM': isSessionDM
+    },{headers: {'Authorization': getToken()}});
+}
+
+// 24. 获取指定ID的MKTY大语言模型会话内容
+function getLlmSession(sessionId)
+{
+    return axios.post(baseURL+'/getLlmSession',{
+       'sessionId': sessionId
+    },{headers: {'Authorization': getToken()}});
+}
+
+// 25. 获取指定用户的MKTY大语言模型会话列表
+function getLlmSessionList(isSessionDM)
+{
+    return axios.post(baseURL+'/getLlmSessionList',{
+      'isSessionDM': isSessionDM
+    },{headers: {'Authorization': getToken()}});
+}
+
+// 26. 删除指定ID的MKTY大语言模型会话（数据库级真删除）
+function deleteLlmSession(sessionId)
+{
+    return axios.post(baseURL+'/deleteLlmSession',{
+      'sessionId': sessionId
+    },{headers: {'Authorization': getToken()}});
+}
 
 
 

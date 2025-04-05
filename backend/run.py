@@ -5,6 +5,7 @@
 - 著作权声明：Copyright (c) 2025 DuYu (https://github.com/duyu09/MKTY-System)
 '''
 import os
+import json
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
@@ -46,7 +47,7 @@ start_print(VERSION)
 info_print("正在初始化后端服务")
 
 # 建立数据库连接池
-conn_pool = getDataBaseConnectionPool(DATABASE_CONNECTION_POOL_PARAMETERS)
+conn_pool = getDataBaseConnectionPool(**DATABASE_CONNECTION_POOL_PARAMETERS)
 
 # 通过MQ分别与MKTY-3B-Chat大语言模型推理端以及多模态智能辅诊端建立连接
 llm_rpc_client = RpcClient(LLM_MQ_CONNECTION_PARAMETERS, LLM_QUEUE_NAME)
@@ -667,7 +668,7 @@ def llm_inference_submit_task(cursor):
     - API功能：提交大语言模型(**MKTY-3B-Chat**)推理任务
     - 请求参数：prompt, context
       - `prompt`: 提示词（`str`）
-      - `context`: 会话历史（`list`，里面元素均为字典，字典包含`role`和`content`两个键，`role`为`user`或`assistant`，`content`为对话内容）
+      - `context`: 会话历史（`json list`，里面元素均为字典，字典包含`role`和`content`两个键，`role`为`user`或`assistant`，`content`为对话内容）
     - 响应参数：code, msg, taskId
       - `code`: 执行状态（`int`，`0`=提交成功，`1`=提交失败）
       - `msg`: 自然语言提示信息（`str`）
@@ -720,7 +721,7 @@ def save_llm_session(cursor):
     - API功能：保存MKTY大语言模型会话
     - 请求参数：sessionId, sessionContent，isSessionDM
       - `sessionId`: 对话ID（`int`，规定若该字段值为`-1`，则表明建立新会话）
-      - `sessionContent`: 对话内容（`json`）
+      - `sessionContent`: 对话内容（`json list`，规定：里面元素均为字典，字典包含`role`和`content`两个键，`role`为`user`或`assistant`，`content`为对话内容）
       - `isSessionDM`: 是否启用了LLM讨论机制（`int`，`0`=不启用，`1`=启用）
     - 响应参数：code, msg
       - `code`: 执行状态（`int`，`0`=保存成功，`1`=保存失败）
@@ -732,25 +733,35 @@ def save_llm_session(cursor):
     session_content = session_data.get('sessionContent')
     is_session_dm = session_data.get('isSessionDM')
     if session_id is None:
-        return jsonify({'code': 1,'msg': '对话ID不可读取。'})
-    if session_content is None or session_content == "":
-        return jsonify({'code': 1,'msg': '对话内容不可读取。'})
+        return jsonify({'code': 1, 'msg': '对话ID不可读取。'})
+    if session_content is None or session_content == {}:
+        return jsonify({'code': 1, 'msg': '对话内容不可读取。'})
     if is_session_dm is None:
-        return jsonify({'code': 1,'msg': '对话时间不可读取。'})
+        return jsonify({'code': 1, 'msg': '对话时间不可读取。'})
+    if len(session_content) < 2:  # 对话内容最少1条
+        return jsonify({'code': 1, 'msg': '对话过短，不可保存。'})
     user_id = get_jwt_identity()
+    session_save_time = util_current_time()
     try:
         if session_id == -1:  # 新建会话
-            session_save_time = util_current_time()
+            # cursor.execute(
+            #     f"INSERT INTO llmhistory (isSessionDM, sessionSaveTime, sessionUserId, sessionContent) "
+            #     f"VALUES ({is_session_dm}, '{session_save_time}', {user_id}, '{session_content}')")
             cursor.execute(
-                f"INSERT INTO llmhistory (isSessionDM, sessionSaveTime, sessionUserId, sessionContent) "
-                f"VALUES ({is_session_dm}, '{session_save_time}', {user_id}, '{session_content}')")
+                "INSERT INTO llmhistory (isSessionDM, sessionSaveTime, sessionUserId, sessionContent) "
+                "VALUES (%s, %s, %s, %s)",
+                (is_session_dm, session_save_time, user_id, json.dumps(session_content)))
             session_id = cursor.lastrowid
         else:  # 更新会话
+            # cursor.execute(
+            #     f"UPDATE llmhistory SET sessionContent='{session_content}', sessionSaveTime='{session_save_time}' WHERE sessionId={session_id} AND sessionUserId={user_id}")
             cursor.execute(
-                f"UPDATE llmhistory SET sessionContent='{session_content}', sessionSaveTime='{session_save_time}' WHERE sessionId={session_id} AND sessionUserId={user_id}")
-        return jsonify({'code': 0,'msg': '保存成功！', 'sessionId': session_id})
+                "UPDATE llmhistory SET sessionContent=%s, sessionSaveTime=%s "
+                "WHERE sessionId=%s AND sessionUserId=%s",
+                (json.dumps(session_content), session_save_time, session_id, user_id))
+        return jsonify({'code': 0, 'msg': '保存成功！', 'sessionId': session_id})
     except Exception as e:
-        return jsonify({'code': 1,'msg': '未能成功保存会话记录：'+ str(e)})
+        return jsonify({'code': 1, 'msg': '未能成功保存会话记录：'+ str(e)})
     
 
 @app.route('/api/getLlmSession', methods=['POST'])
@@ -793,7 +804,7 @@ def get_llm_session_list(cursor):
     - 响应参数：code, msg, sessionList
       - `code`: 执行状态（`int`，`0`=获取成功，`1`=获取失败）
       - `msg`: 自然语言提示信息（`str`）
-      - `sessionList`: 会话列表（`JSON`，返回JSON数组，每个元素是一个`JSON`对象，包含了会话的全部信息。被删除的会话不返回）
+      - `sessionList`: 会话列表（`json`，返回JSON数组，每个元素是一个JSON对象，每个对象中包含：`sessionId`：会话Id、`sessionSaveTime`：会话最后一次保存时间（以秒为单位Unix时间戳，服务器时间）、`sessionTitle`：每项会话的标题，取该会话中用户第一次发言的前16余个字符。）
     '''
     session_data = request.json
     is_session_dm = session_data.get('isSessionDM')
@@ -803,7 +814,8 @@ def get_llm_session_list(cursor):
     try:
         cursor.execute(f"SELECT * FROM llmhistory WHERE isSessionDM={is_session_dm} AND sessionUserId={user_id}")
         result = cursor.fetchall()
-        return jsonify({'code': 0,'msg': '获取成功','sessionList': result})
+        result_return = [{'sessionId': item['sessionId'], 'sessionSaveTime': item['sessionSaveTime'], 'sessionTitle': json.loads(item['sessionContent'])[1]['content'][:16]} for item in result]
+        return jsonify({'code': 0,'msg': '获取成功','sessionList': result_return})
     except Exception as e:
         return jsonify({'code': 1,'msg': '未能成功获取会话列表：'+ str(e)})
     
