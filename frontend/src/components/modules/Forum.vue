@@ -1,8 +1,8 @@
 <script>
-import CreateForum from "./CreateForum.vue";
-import CreateOrg from "./CreateOrg.vue";
-import JoinOrg from "./JoinOrg.vue";
-import ForumOverview from "./ForumOverview.vue";
+import CreateForum from "@/components/modules/CreateForum.vue";
+import CreateOrg from "@/components/modules/CreateOrg.vue";
+import JoinOrg from "@/components/modules/JoinOrg.vue";
+import ForumOverview from "@/components/modules/ForumOverview.vue";
 export default
 {
   name: "Forum",
@@ -21,12 +21,12 @@ export default
     <el-header id="Forum-elHeader">
       <div id="Forum-elHeader-title01">
         <div id="Forum-elHeader-title03">
-          <nobr>ILP专属论坛与纳新基地</nobr>
+          <nobr>MKTY专属医学与诊疗论坛平台</nobr>
         </div>
         <div id="Forum-elHeader-title02">
-          <nobr>技术与学术的海洋，社团与组织的天堂</nobr><br>
+          <nobr>医师们可讨论学术&nbsp;&nbsp;患者们可分享病情</nobr><br>
           <span id="Forum-elHeader-title04">
-            <nobr>ILP Exclusive Forum and Enrollment Base</nobr>
+            <nobr>Physicians Can Discuss Academics, Patients Can Share Medical Conditions</nobr>
           </span>
         </div>
       </div>
@@ -48,18 +48,18 @@ export default
 <style scoped>
 @font-face
 {
-  font-family: font01;
-  src: url("../../assets/fonts/font01.woff");
-}
-@font-face
-{
   font-family: ubuntu;
-  src:url("../../assets/fonts/ubuntu.woff2");
+  src:url("/fonts/ubuntu.woff2");
 }
 @font-face
 {
   font-family: HPHS;
-  src: url("../../assets/fonts/HPHS.woff");
+  src: url("/fonts/HPHS.woff");
+}
+@font-face
+{
+  font-family: xinwei;
+  src: url("/fonts/xinwei.woff");
 }
 #Forum-Div01
 {
@@ -92,7 +92,7 @@ export default
 }
 #Forum-elHeader-title01
 {
-  font-family: font01,serif;
+  font-family: xinwei, serif;
   padding-left: 1.5rem;
   font-size: 2.25rem;
   display: flex;

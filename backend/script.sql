@@ -2,23 +2,13 @@
 -- 该文件为“明康慧医MKTY”智慧医疗系统的数据库DDL文件（SQL建表语句）。该文件为MKTY系统的重要组成部分。
 -- 该文件由DataGrip IDE生成
 -- 创建日期：2025/01/21
--- 修改日期：2025/02/17
+-- 修改日期：2025/04/14
 
 -- 创建数据库 mkty
 CREATE DATABASE IF NOT EXISTS mkty;
 
 -- 选择数据库
 USE mkty;
-
-create table forumsummary
-(
-	forumId bigint auto_increment comment '论坛ID，唯一标识一个论坛。'
-		primary key,
-	forumName text not null comment '论坛名称。',
-	forumType tinyint(1) not null comment '论坛类型: True - 疾病论坛, False - 医学知识论坛。',
-	forumCreateTime text not null comment '论坛创建时间，Unix时间戳，精确到秒，服务器时间。'
-)
-comment '论坛列表' charset=utf8mb3;
 
 create table knowledgeentity
 (
@@ -58,6 +48,21 @@ create table userinfo
 )
 comment '用户信息表' charset=utf8mb3;
 
+create table forumsummary
+(
+	forumId bigint auto_increment comment '论坛ID，唯一标识一个论坛。'
+		primary key,
+	forumCreator bigint not null comment '论坛创建者userId',
+	forumName text not null comment '论坛名称。',
+	forumType tinyint(1) not null comment '论坛类型: True - 疾病论坛, False - 医学知识论坛。',
+	forumCreateTime text not null comment '论坛创建时间，Unix时间戳，精确到秒，服务器时间。',
+	forumPermission tinyint(1) not null comment '论坛权限，0=不限人员类型；1=仅限医师创建、参与；2=仅限患者创建、参与',
+	forumStatus int not null comment '论坛状态：0=正常；1=已被删除；2=其他情况',
+	constraint forumsummary_userinfo_userId_fk
+		foreign key (forumCreator) references userinfo (userId)
+)
+comment '论坛列表' charset=utf8mb3;
+
 create table forumcontent
 (
 	postId bigint auto_increment comment '帖子ID，唯一标识一个帖子。'
@@ -65,7 +70,7 @@ create table forumcontent
 	postCreateTime text not null comment '帖子发布时间，Unix时间戳，精确到秒，服务器时间。',
 	postPosterId bigint not null comment '发帖者的用户ID。',
 	postForumId bigint not null comment '帖子所属论坛ID。',
-	postContent text not null comment '帖子具体内容。',
+	postContent json not null comment '帖子具体内容（images字段：值为一个数组，里面存有各图像的GUID字符串，规定所有图像为webp格式；content字段：帖子文本字符串）',
 	postPraiseNumber int default 0 null comment '帖子被点赞的数量。',
 	constraint forumcontent_ibfk_1
 		foreign key (postPosterId) references userinfo (userId)
