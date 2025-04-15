@@ -845,7 +845,189 @@ def delete_llm_session(cursor):
         return jsonify({'code': 1,'msg': '未能成功删除会话记录：'+ str(e)})
     
 
+@app.route('/api/addForum', methods=['POST'])
+@jwt_required()
+@getCursor(conn_pool)
+def add_forum(cursor):
+    '''
+    - API功能：创建论坛（论坛列表的“增”操作）
+    - 负责人：郭长霖
+    - 请求参数：
+      - `forumName`: 论坛名称（`str`）
+      - `forumType`: 论坛类型（`int`，0=医学知识论坛，1=疾病论坛）
+      - `forumPermission`: 论坛权限（`int`，0=不限人员类型，1=仅限医师创建、参与，2=仅限患者创建、参与）
+    - 响应参数：
+      - `code`: 响应码（0=正常执行，1=出现错误）
+      - `msg`: 提示信息
+      - `forumId`: 论坛ID（`int`）
+      - `forumCreateTime`: 论坛创建时间（`int`）
+    '''
+    user_id = get_jwt_identity()
+    data = request.json
+    forum_name = data.get('forumName')
+    forum_type = data.get('forumType')
+    forum_perm = data.get('forumPermission')
 
+    if not all([forum_name, forum_type in {0,1}, forum_perm in {0,1,2}]):
+        return jsonify({'code':1, 'msg':'参数格式错误'})
+
+    try:
+        create_time = util_current_time()
+        cursor.execute(
+            "INSERT INTO forum (forumName, forumType, forumPermission, forumCreator, forumCreateTime) "
+            "VALUES (%s, %s, %s, %s, %s)",
+            (forum_name, forum_type, forum_perm, user_id, create_time)
+        )
+        forum_id = cursor.lastrowid
+        return jsonify({
+            'code':0,
+            'msg':'创建成功',
+            'forumId':forum_id,
+            'forumCreateTime':create_time
+        })
+    except Exception as e:
+        info_print(f"论坛创建失败：{str(e)}", "error")
+        return jsonify({'code':1, 'msg':'操作失败'})
+
+
+@app.route('/api/getForumList', methods=['POST'])
+@jwt_required()
+@getCursor(conn_pool)
+def get_forum_list(cursor):
+    '''
+    - API功能：获取论坛列表（论坛列表的“查”操作）
+    - 负责人：郭长霖
+    - 请求参数：
+      - `forumType`: 筛选类型（0=医学知识论坛；1=疾病论坛；2=所有论坛）
+      - `forumPermission`: 筛选权限（0=不限人员类型；1=仅限医师创建、参与；2=仅限患者创建、参与；3=所有论坛）
+    - 响应参数：
+      - `code`: 响应码（`int`，0=正常执行；1=出现错误）
+      - `msg`: 提示信息（`str`）
+      - `forumList`: 查询结果（`JSON Array`）
+    '''
+    data = request.json
+    f_type = data.get('forumType', 2)
+    f_perm = data.get('forumPermission', 3)
+
+    conditions = ["forumStatus=0"]
+    params = []
+    
+    if f_type != 2:
+        conditions.append("forumType=%s")
+        params.append(f_type)
+    if f_perm != 3:
+        conditions.append("forumPermission=%s")
+        params.append(f_perm)
+
+    query = "SELECT * FROM forum WHERE " + " AND ".join(conditions)
+    
+    try:
+        cursor.execute(query, params)
+        forums = cursor.fetchall()
+
+        for f in forums:
+            f['forumCreateTime'] = int(f['forumCreateTime'].timestamp())
+        return jsonify({
+            'code':0,
+            'msg':'获取成功',
+            'forumList':forums
+        })
+    except Exception as e:
+        info_print(f"论坛列表查询失败：{str(e)}", "error")
+        return jsonify({'code':1, 'msg':'查询失败'})
+
+
+@app.route('/api/modifyForumType', methods=['POST'])
+@jwt_required()
+@getCursor(conn_pool)
+def modify_forum_type(cursor):
+    '''
+    - API功能：修改论坛类型（论坛列表的“改”操作，论坛一旦创建则不可修改权限）
+    - 负责人：郭长霖
+    - 请求参数：
+      - `forumId`: 待修改论坛的ID（`int`）
+      - `forumType`: 论坛类型代码（`int`，0=医学知识论坛；1=疾病论坛）
+    - 响应参数：
+      - `code`: 响应码（`int`，0=正常执行；1=出现错误）
+      - `msg`: 提示信息（`str`）
+    '''
+    user_id = get_jwt_identity()
+    data = request.json
+
+    forum_id = data.get('forumId')
+    new_type = data.get('forumType')
+    
+    if forum_id is None or new_type is None:
+        return jsonify({'code':1, 'msg':'缺少必要参数'})
+    if not isinstance(forum_id, int):
+        return jsonify({'code':1, 'msg':'forumId必须为整数'})
+    if new_type not in {0, 1}:
+        return jsonify({'code':1, 'msg':'无效论坛类型值'})
+
+    try:
+        cursor.execute(
+            "SELECT forumCreator FROM forum WHERE forumId=%s AND forumStatus=0",
+            (forum_id,)
+        )
+        forum = cursor.fetchone()
+        if not forum:
+            return jsonify({'code':1, 'msg':'论坛不存在或已删除'})
+        if forum['forumCreator'] != user_id:
+            return jsonify({'code':1, 'msg':'只有创建者才有权修改论坛类型'}) 
+
+        cursor.execute(
+            "UPDATE forum SET forumType=%s WHERE forumId=%s",
+            (new_type, forum_id)
+        )
+        return jsonify({'code':0, 'msg':'论坛类型修改成功'})
+    except Exception as e:
+        info_print(f"论坛类型修改失败：{str(e)}", "error")
+        return jsonify({'code':1, 'msg':'数据库操作失败'})
+
+
+@app.route('/api/deleteForum', methods=['POST'])
+@jwt_required()
+@getCursor(conn_pool)
+def delete_forum(cursor):
+    '''
+    - API功能：删除论坛（论坛列表的“删”操作）
+    - 负责人：郭长霖
+    - 请求参数：
+      - `forumId`: 待修改论坛的ID（`int`）
+    - 响应参数：
+      - `code`: 响应码（`int`，0=正常执行；1=出现错误）
+      - `msg`: 提示信息（`str`）
+    '''
+    user_id = get_jwt_identity()
+    data = request.json
+    
+    forum_id = data.get('forumId')
+    if forum_id is None:
+        return jsonify({'code':1, 'msg':'缺少forumId参数'})
+    if not isinstance(forum_id, int):
+        return jsonify({'code':1, 'msg':'forumId必须为整数'})
+
+    try:
+        cursor.execute(
+            "SELECT forumCreator FROM forum WHERE forumId=%s AND forumStatus=0",
+            (forum_id,)
+        )
+        forum = cursor.fetchone()
+        if not forum:
+            return jsonify({'code':1, 'msg':'论坛不存在或已删除'})
+        if forum['forumCreator'] != user_id:
+            return jsonify({'code':1, 'msg':'无删除权限'})
+
+        cursor.execute(
+            "UPDATE forum SET forumStatus=1 WHERE forumId=%s",
+            (forum_id,)
+        )
+        return jsonify({'code':0, 'msg':'删除成功'})
+    except Exception as e:
+        info_print(f"论坛删除失败：{str(e)}", "error")
+        return jsonify({'code':1, 'msg':'数据库操作失败'})
+    
+    
 if __name__ == '__main__':
     info_print(f"正在启动后端服务(Port:{PORT};Host:{HOST})")
     if MODE == 'prod':
