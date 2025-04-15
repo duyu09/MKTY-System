@@ -892,9 +892,9 @@ def add_forum(cursor):
     try:
         create_time = util_current_time()
         cursor.execute(
-            "INSERT INTO forum (forumName, forumType, forumPermission, forumCreator, forumCreateTime) "
-            "VALUES (%s, %s, %s, %s, %s)",
-            (forum_name, forum_type, forum_perm, user_id, create_time)
+            "INSERT INTO forumsummary (forumName, forumType, forumPermission, forumCreator, forumCreateTime, forumStatus) "
+            "VALUES (%s, %s, %s, %s, %s, %s)",
+            (forum_name, forum_type, forum_perm, user_id, create_time, 0)
         )
         forum_id = cursor.lastrowid
         return jsonify({
@@ -905,7 +905,7 @@ def add_forum(cursor):
         })
     except Exception as e:
         info_print(f"论坛创建失败：{str(e)}", "error")
-        return jsonify({'code':1, 'msg':'操作失败'})
+        return jsonify({'code':1, 'msg':'操作失败：' + str(e)})
 
 
 @app.route('/api/getForumList', methods=['POST'])
@@ -924,8 +924,8 @@ def get_forum_list(cursor):
       - `forumList`: 查询结果（`JSON Array`）
     '''
     data = request.json
-    f_type = data.get('forumType', 2)
-    f_perm = data.get('forumPermission', 3)
+    f_type = data.get('forumType')
+    f_perm = data.get('forumPermission')
 
     conditions = ["forumStatus=0"]
     params = []
@@ -937,14 +937,12 @@ def get_forum_list(cursor):
         conditions.append("forumPermission=%s")
         params.append(f_perm)
 
-    query = "SELECT * FROM forum WHERE " + " AND ".join(conditions)
+    query = "SELECT * FROM forumsummary WHERE " + " AND ".join(conditions)
     
     try:
         cursor.execute(query, params)
         forums = cursor.fetchall()
 
-        for f in forums:
-            f['forumCreateTime'] = int(f['forumCreateTime'].timestamp())
         return jsonify({
             'code':0,
             'msg':'获取成功',
@@ -952,7 +950,7 @@ def get_forum_list(cursor):
         })
     except Exception as e:
         info_print(f"论坛列表查询失败：{str(e)}", "error")
-        return jsonify({'code':1, 'msg':'查询失败'})
+        return jsonify({'code':1, 'msg':'查询失败：' + str(e)})
 
 
 @app.route('/api/modifyForumType', methods=['POST'])
@@ -984,7 +982,7 @@ def modify_forum_type(cursor):
 
     try:
         cursor.execute(
-            "SELECT forumCreator FROM forum WHERE forumId=%s AND forumStatus=0",
+            "SELECT forumCreator FROM forumsummary WHERE forumId=%s AND forumStatus=0",
             (forum_id,)
         )
         forum = cursor.fetchone()
@@ -994,13 +992,13 @@ def modify_forum_type(cursor):
             return jsonify({'code':1, 'msg':'只有创建者才有权修改论坛类型'}) 
 
         cursor.execute(
-            "UPDATE forum SET forumType=%s WHERE forumId=%s",
+            "UPDATE forumsummary SET forumType=%s WHERE forumId=%s",
             (new_type, forum_id)
         )
         return jsonify({'code':0, 'msg':'论坛类型修改成功'})
     except Exception as e:
         info_print(f"论坛类型修改失败：{str(e)}", "error")
-        return jsonify({'code':1, 'msg':'数据库操作失败'})
+        return jsonify({'code':1, 'msg':'数据库操作失败：' + str(e)})
 
 
 @app.route('/api/deleteForum', methods=['POST'])
@@ -1027,7 +1025,7 @@ def delete_forum(cursor):
 
     try:
         cursor.execute(
-            "SELECT forumCreator FROM forum WHERE forumId=%s AND forumStatus=0",
+            "SELECT forumCreator FROM forumsummary WHERE forumId=%s AND forumStatus=0",
             (forum_id,)
         )
         forum = cursor.fetchone()
@@ -1037,14 +1035,15 @@ def delete_forum(cursor):
             return jsonify({'code':1, 'msg':'无删除权限'})
 
         cursor.execute(
-            "UPDATE forum SET forumStatus=1 WHERE forumId=%s",
+            "UPDATE forumsummary SET forumStatus=1 WHERE forumId=%s",
             (forum_id,)
         )
         return jsonify({'code':0, 'msg':'删除成功'})
     except Exception as e:
         info_print(f"论坛删除失败：{str(e)}", "error")
         return jsonify({'code':1, 'msg':'数据库操作失败'})
-    
+
+
     
 if __name__ == '__main__':
     info_print(f"正在启动后端服务(Port:{PORT};Host:{HOST})")
