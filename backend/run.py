@@ -1,6 +1,6 @@
 '''
 - 文件描述：明康慧医MKTY智慧医疗系统后端服务
-- 负责人：齐鲁工业大学（山东省科学院）计算机科学与技术学部 软件工程（软件开发）21-1班 杜宇 (@duyu09, 202103180009@stu.qlu.edu.cn)
+- 总负责人：齐鲁工业大学（山东省科学院）计算机科学与技术学部 软件工程（软件开发）21-1班 杜宇 (@duyu09, 202103180009@stu.qlu.edu.cn)
 - 文件名：run.py
 - 著作权声明：Copyright (c) 2025 DuYu (https://github.com/duyu09/MKTY-System)
 '''
@@ -86,6 +86,7 @@ def t_token():
 def login_verification(cursor):
     '''
     - API功能：用户登录
+    - 负责人：杜宇
     - 请求参数：userLoginKey, userLoginType, userPassword
       - `userLoginKey`: 用户登录标识（`str`，可以是用户ID或联系方式等）
       - `userLoginKeyType`: 用户登录标识类型（`int`，`0`=用户ID，`1`=联系方式）
@@ -126,6 +127,7 @@ def login_verification(cursor):
 def register(cursor):
     '''
     - API功能：用户注册
+    - 负责人：杜宇
     - 请求参数：userName, userType, userSex, userSexPermission, userAge, userAgePermission, userFrom, userFromPermission, userContact, userContactPermission, userDescription, userImportantInfo, userImportantInfoPermission, userPassword, userAvatar
       - `userName`: 用户姓名（`str`）
       - `userType`: 用户类型（`str`，其在数据库中不以数值存储，`0`=患者，`1`=医师，`2`=其他人员）
@@ -193,6 +195,7 @@ def register(cursor):
 def get_user_avatar(cursor):
     '''
     - API功能：获取用户头像的带头部Base64字符串
+    - 负责人：杜宇
     - 请求参数：userId
       - `userId`: 用户ID（`int`，此处表示查看`userId`的头像，不表示token对应的`userId`）
     - 响应参数：code, msg, userAvatar
@@ -220,6 +223,7 @@ def get_user_avatar(cursor):
 def get_user_info(cursor):
     '''
     - API功能：获取用户信息，不包括头像Base64字符串以及密码。
+    - 负责人：杜宇
     - 请求参数：userId
       - `userId`: 用户ID（`int`，此处表示查看userId的信息，不表示token对应的userId）
     - 响应参数：code, msg, userInfo
@@ -259,6 +263,7 @@ def get_user_info(cursor):
 def modify_user_info(cursor):
     '''
     - API功能：修改用户信息（不包括头像和密码，被修改者userId是传入的token中携带的userId）
+    - 负责人：杜宇
     - 请求参数：userName, userType, userSex, userSexPermission, userAge, userAgePermission, userFrom, userFromPermission, userContact, userContactPermission, userDescription, userImportantInfo, userImportantInfoPermission
       - `userName`: 用户姓名（字符串）
       - `userType`: 用户类型（0=患者，1=医师，2=其他人员）
@@ -322,6 +327,7 @@ def modify_user_info(cursor):
 def modify_user_avatar(cursor):
     '''
     - API功能：修改用户头像
+    - 负责人：杜宇
     - 请求参数：userAvatar
       - `userAvatar`: 用户头像（`str`，带头部的图像base64字符串，经前端剪裁压缩）
     - 响应参数：code, msg
@@ -358,6 +364,7 @@ def modify_user_avatar(cursor):
 def modify_user_password(cursor):
     '''
     - API功能：修改用户密码
+    - 负责人：杜宇
     - 请求参数：userOldPassword, userNewPassword
       - `userOldPassword`: 旧密码（`str`，密文，前端负责加密）
       - `userNewPassword`: 新密码（`str`，密文，前端负责加密）
@@ -391,6 +398,7 @@ def modify_user_password(cursor):
 def add_mail_item(cursor):
     '''
     - API功能：向用户发送留言
+    - 负责人：杜宇
     - 请求参数：mailItemContent, mailItemReceiverUserId
       - `mailItemContent`: 留言内容（`str`）
       - `mailItemReceiverUserId`: 留言接收者userId（`int`）
@@ -420,6 +428,7 @@ def add_mail_item(cursor):
 def get_mail_list(cursor):
     '''
     - API功能：获取用户的留言列表
+    - 负责人：杜宇
     - 请求参数：mode
       - `mode`: 获取模式（`int`，`0`=获取自己给别人的留言，`1`=获取别人发给自己的留言）
     - 响应参数：code, msg, mailList
@@ -445,6 +454,7 @@ def get_mail_list(cursor):
 def delete_mail_item(cursor):
     '''
     - API功能：删除用户的留言，只有自己发布的留言才有权删除。
+    - 负责人：杜宇
     - 请求参数：mailItemId
       - `mailItemId`: 留言ID（`int`）
     - 响应参数：code, msg
@@ -471,6 +481,7 @@ def delete_mail_item(cursor):
 def multimodal_diagnosis_submit_task(cursor):
     '''
     - API功能：提交多模态诊断任务
+    - 负责人：杜宇
     - 请求参数：language, texts, imageBase64
       - `language`: 语言类型（`str`，`zh`=中文，`en`=英文）
       - `texts`: 文本数组（`list`，里面元素均为字符串）
@@ -507,6 +518,7 @@ def multimodal_diagnosis_submit_task(cursor):
 def multimodal_diagnosis_get_status(cursor):
     '''
     - API功能：获取多模态诊断任务状态
+    - 负责人：杜宇
     - 请求参数：taskId
       - `taskId`: 任务ID（`str`）
     - 响应参数：code, msg, taskStatus，taskResult
@@ -532,6 +544,7 @@ def multimodal_diagnosis_get_status(cursor):
 def add_important_item(cursor):
     '''
     - API功能：向重要事项清单中添加一项诊疗事项
+    - 负责人：杜宇
     - 请求参数：
       - `listItemContent`: 重要诊疗事项内容（`str`）
       - `listItemTimeMode`: 事项时间模式（`int`，`0`=一次性事项，`1`=周期性事项，`2`=无时间要求）
@@ -582,6 +595,7 @@ def add_important_item(cursor):
 def delete_important_item(cursor):
     '''
     - API功能：删除诊疗事项清单中的一项诊疗事项
+    - 负责人：杜宇
     - 请求参数：
       - `listItemId`: 重要事项ID（`int`）
     - 响应参数：
@@ -606,6 +620,7 @@ def delete_important_item(cursor):
 def get_important_list(cursor):
     '''
     - API功能：获取指定用户的重要事项清单
+    - 负责人：杜宇
     - 请求参数：无（userId通过token读取）
     - 响应参数：
       - `code`: 执行状态（`int`，`0`=获取成功，`1`=获取失败）
@@ -624,6 +639,7 @@ def get_important_list(cursor):
 def finish_important_item(cursor):
     '''
     - API功能：标记完成（或未完成）重要事项清单中的一项诊疗事项
+    - 负责人：杜宇
     - 请求参数：
       - `listItemId`: 诊疗事项ID（`int`）
       - `listItemIsFinished`: 是否完成（`int`，`0`=未完成，`1`=已完成）
@@ -650,6 +666,7 @@ def finish_important_item(cursor):
 def get_current_time():
     '''
     - API功能：获取当前时间
+    - 负责人：杜宇
     - 请求参数：无
     - 响应参数：
       - `code`: 执行状态（`int`，`0`=获取成功，`1`=获取失败）
@@ -666,6 +683,7 @@ def get_current_time():
 def llm_inference_submit_task(cursor):
     '''
     - API功能：提交大语言模型(**MKTY-3B-Chat**)推理任务
+    - 负责人：杜宇
     - 请求参数：prompt, context
       - `prompt`: 提示词（`str`）
       - `context`: 会话历史（`json list`，里面元素均为字典，字典包含`role`和`content`两个键，`role`为`user`或`assistant`，`content`为对话内容）
@@ -694,6 +712,7 @@ def llm_inference_submit_task(cursor):
 def llm_inference_get_status(cursor):
     '''
     - API功能：获取大语言模型推理任务状态
+    - 负责人：杜宇
     - 请求参数：taskId
       - `taskId`: 任务ID（`str`）
     - 响应参数：code, msg, taskStatus，taskResult
@@ -719,6 +738,7 @@ def llm_inference_get_status(cursor):
 def save_llm_session(cursor):
     '''
     - API功能：保存MKTY大语言模型会话
+    - 负责人：杜宇
     - 请求参数：sessionId, sessionContent，isSessionDM
       - `sessionId`: 对话ID（`int`，规定若该字段值为`-1`，则表明建立新会话）
       - `sessionContent`: 对话内容（`json list`，规定：里面元素均为字典，字典包含`role`和`content`两个键，`role`为`user`或`assistant`，`content`为对话内容）
@@ -744,17 +764,12 @@ def save_llm_session(cursor):
     session_save_time = util_current_time()
     try:
         if session_id == -1:  # 新建会话
-            # cursor.execute(
-            #     f"INSERT INTO llmhistory (isSessionDM, sessionSaveTime, sessionUserId, sessionContent) "
-            #     f"VALUES ({is_session_dm}, '{session_save_time}', {user_id}, '{session_content}')")
             cursor.execute(
                 "INSERT INTO llmhistory (isSessionDM, sessionSaveTime, sessionUserId, sessionContent) "
                 "VALUES (%s, %s, %s, %s)",
                 (is_session_dm, session_save_time, user_id, json.dumps(session_content)))
             session_id = cursor.lastrowid
         else:  # 更新会话
-            # cursor.execute(
-            #     f"UPDATE llmhistory SET sessionContent='{session_content}', sessionSaveTime='{session_save_time}' WHERE sessionId={session_id} AND sessionUserId={user_id}")
             cursor.execute(
                 "UPDATE llmhistory SET sessionContent=%s, sessionSaveTime=%s "
                 "WHERE sessionId=%s AND sessionUserId=%s",
@@ -770,6 +785,7 @@ def save_llm_session(cursor):
 def get_llm_session(cursor):
     '''
     - API功能：获取指定ID的MKTY大语言模型会话内容
+    - 负责人：杜宇
     - 请求参数：sessionId
       - `sessionId`: 会话ID（`int`）
     - 响应参数：code, msg, sessionContent
@@ -799,6 +815,7 @@ def get_llm_session(cursor):
 def get_llm_session_list(cursor):
     '''
     - API功能：获取指定用户的MKTY大语言模型会话列表
+    - 负责人：杜宇
     - 请求参数：isSessionDM
       - `isSessionDM`: 是否启用了LLM讨论机制（`int`，`0`=不启用，`1`=启用）
     - 响应参数：code, msg, sessionList
@@ -826,6 +843,7 @@ def get_llm_session_list(cursor):
 def delete_llm_session(cursor):
     '''
     - API功能：删除指定ID的MKTY大语言模型会话（**数据库级真删除**）
+    - 负责人：杜宇
     - 请求参数：sessionId
       - `sessionId`: 会话ID（`int`）
     - 响应参数：code, msg
