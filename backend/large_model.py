@@ -1,6 +1,6 @@
 '''
 - 文件描述：明康慧医MKTY智慧医疗系统后端服务大模型推理端模块（大规模模型推理队列MQ消费者端）
-- 负责人：齐鲁工业大学（山东省科学院）计算机科学与技术学部 软件工程（软件开发）21-1班 杜宇 (@duyu09, <202103180009@stu.qlu.edu.cn>)
+- 总负责人：齐鲁工业大学（山东省科学院）计算机科学与技术学部 软件工程（软件开发）21-1班 杜宇 (@duyu09, <202103180009@stu.qlu.edu.cn>)
 - 文件名：large_model.py
 - 著作权声明：Copyright (c) 2025 DuYu (https://github.com/duyu09/MKTY-System)
 '''
@@ -26,6 +26,7 @@ params = { "model": model, "tokenizer": tokenizer, "max_new_tokens": 2000 }
 def predict(message: dict, model, tokenizer, max_new_tokens=2000):
     '''
     - 函数功能：MQ回调函数（模型推理在这里完成）
+    - 负责人：杜宇
     - 输入参数：message, model, tokenizer
       - `message`（`dict`，消息体。按照要求，该参数为第一个形参，接收来自MQ的消息，本函数中消息为一个字典，键`prompt`表示当前会话提示词，键`context`表示会话历史，为一个数组，数组中每个元素的形式为`{"role": "user", "content": prompt}`或`{"role": "assistant", "content": response}`）
       - `model`（模型对象）

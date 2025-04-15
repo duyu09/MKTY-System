@@ -1,6 +1,6 @@
 '''
 - 文件描述：明康慧医MKTY智慧医疗系统后端服务工具方法模块
-- 负责人：齐鲁工业大学（山东省科学院）计算机科学与技术学部 软件工程（软件开发）21-1班 杜宇 (@duyu09, <202103180009@stu.qlu.edu.cn>)
+- 总负责人：齐鲁工业大学（山东省科学院）计算机科学与技术学部 软件工程（软件开发）21-1班 杜宇 (@duyu09, <202103180009@stu.qlu.edu.cn>)
 - 文件名：util.py
 - 著作权声明：Copyright (c) 2025 DuYu (https://github.com/duyu09/MKTY-System)
 '''
@@ -56,6 +56,7 @@ console = Console(markup=False)
 def info_print(msg: str, level: str="info") -> None:
     '''
     - 函数功能：打印日志。日志格式为：`[当前时间 日志级别] [日志内容]`
+    - 负责人：杜宇
     - 输入参数：msg, level
       - `msg`（`str`，要打印的日志信息）
       - `level`（`str`，日志级别，不同级别日志的标头颜色不同以区分。可选值为`initial`、`info`、`warning`、`error`，默认为`info`）
@@ -78,6 +79,7 @@ def info_print(msg: str, level: str="info") -> None:
 def start_print(version: str) -> None:
     '''
     - 函数功能：后台程序启动时打印欢迎信息。欢迎信息包括：本系统英文简称`M.K.T.Y.`的艺术字，以及系统名称、著作权信息、GitHub开源地址、版本号等initial日志。
+    - 负责人：杜宇
     - 输入参数：`version`（`str`，版本号字符串，例如：`v1.1.0`）
     - 返回参数：`None`
     '''
@@ -100,6 +102,7 @@ def start_print(version: str) -> None:
 def util_file2base64(file_path: str, add_header: bool=True) -> str:
     '''
     - 函数功能：将文件转换为base64字符串
+    - 负责人：杜宇
     - 输入参数：file_path, add_header
       - `file_path`（`str`，文件路径）
       - `add_header`（`bool`，控制是否在base64字符串前添加`data:xxx/xxx;base64,`头部，文件类型由`file_path`中的拓展名自动决定。）
@@ -117,6 +120,7 @@ def util_file2base64(file_path: str, add_header: bool=True) -> str:
 def util_base642file(base64_string: str, file_path: str, remove_header: bool=True) -> None:
     '''
     - 函数功能：将base64字符串转换为文件
+    - 负责人：杜宇
     - 输入参数：base64_string, file_path, remove_header
       - `base64_string`（`str`，base64编码后的文件数据字符串）
       - `file_path`（`str`，文件路径）
@@ -132,6 +136,7 @@ def util_base642file(base64_string: str, file_path: str, remove_header: bool=Tru
 def util_uuid() -> str:
     '''
     - 函数功能：生成`GUID`字符串
+    - 负责人：杜宇
     - 输入参数：无参数
     - 返回参数：`guid_string`（`str`，生成的GUID字符串）
     '''
@@ -141,6 +146,7 @@ def util_uuid() -> str:
 def util_current_time() -> int:
     '''
     - 函数功能：获取当前服务器上以秒为单位的Unix时间戳
+    - 负责人：杜宇
     - 输入参数：无参数
     - 返回参数：`time`（`int`，当前以秒为单位的Unix时间戳）
     '''
@@ -150,6 +156,7 @@ def util_current_time() -> int:
 def getDataBaseConnectionPool(host: str, user: str, password: str, database: str, pool_size: int=20, pool_name: str="mkty") -> mysql.connector.pooling.MySQLConnectionPool:
     """
     - 函数功能：建立数据库连接池
+    - 负责人：杜宇
     - 输入参数：host, user, password, database
       - `host`（`str`，数据库主机地址）
       - `user`（`str`，数据库用户名）
@@ -174,6 +181,7 @@ def getDataBaseConnectionPool(host: str, user: str, password: str, database: str
 def getCursor(connection_pool: mysql.connector.pooling.MySQLConnectionPool):
     """
     - 修饰器功能：从连接池中获取一个连接，并为flask请求处理函数注入分配的数据库游标对象，要求被修饰函数必须有一个`cursor`形参来接收游标对象，被修饰函数操作后无需关闭游标，此修饰器负责收尾工作。
+    - 负责人：杜宇
     - 输入参数：`connection_pool`（`mysql.connector.pooling.MySQLConnectionPool`，数据库连接池对象）
     """
     def decorator(func):
@@ -202,6 +210,7 @@ def getCursor(connection_pool: mysql.connector.pooling.MySQLConnectionPool):
 def util_encrypt_password(password: str) -> str:
     """
     - 函数功能：使用Argon2算法，对密码明文字符串进行加密，算法参数均使用默认值。
+    - 负责人：杜宇
     - 输入参数：`password`（`str`，明文密码）
     - 返回参数：`hashed_password`（`str`，密码密文（加密后的密码））
     """
@@ -212,6 +221,7 @@ def util_encrypt_password(password: str) -> str:
 def util_verify_password(hashed_password: str, password: str) -> bool:
     """
     - 函数功能：针对Argon2算法，对密码明文字符串与密文进行验证，验证密码是否正确。
+    - 负责人：杜宇
     - 输入参数：`hashed_password`（`str`，密码密文（加密后的密码）），`password`（`str`，密码明文）
     - 返回参数：`bool`，密码验证结果，`True`表示密码正确，`False`表示密码错误。
     """
@@ -225,6 +235,7 @@ def util_verify_password(hashed_password: str, password: str) -> bool:
 class RpcClient(object):
     """
     - 类功能：建立RabbitMQ RPC客户端（MQ生产者端）
+    - 负责人：杜宇
     - 实例初始化参数：`mq_connection_parameters`（`dict`，RabbitMQ连接参数），`queue_name`（`str`，队列名称，默认为`modest_model_inference`）
     """
     def __init__(self, mq_connection_parameters, queue_name="modest_model_inference"):
@@ -251,6 +262,7 @@ class RpcClient(object):
     def call(self, data):
         """
         - 方法功能：向RabbitMQ发送任务，任务发送后返回任务ID，供后续查询任务状态
+        - 负责人：杜宇
         - 输入参数：`data`（`Any`，要发送的任务数据，可以是任何可用`repr`序列化的Python数据类型）
         - 返回参数：`corr_id`（`str`，任务ID（GUID字符串））
         """
@@ -272,6 +284,7 @@ class RpcClient(object):
     def get_response(self, corr_id):
         """
         - 方法功能：查询任务状态，并返回任务结果，若任务结束并返回结果后，将删除任务状态
+        - 负责人：杜宇
         - 输入参数：`corr_id`（`str`，任务ID）
         - 返回值：`response`（`Any`，可能是任何序列化后的Python对象，内容及类型取决于消费者发回的数据，若任务未结束，则返回`None`）
         """

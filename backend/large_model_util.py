@@ -1,6 +1,6 @@
 '''
 - 文件描述：明康慧医MKTY智慧医疗系统后端服务大模型推理端（大规模模型推理队列MQ消费者端）工具函数模块
-- 负责人：齐鲁工业大学（山东省科学院）计算机科学与技术学部 软件工程（软件开发）21-1班 杜宇 (@duyu09, <202103180009@stu.qlu.edu.cn>)
+- 总负责人：齐鲁工业大学（山东省科学院）计算机科学与技术学部 软件工程（软件开发）21-1班 杜宇 (@duyu09, <202103180009@stu.qlu.edu.cn>)
 - 文件名：large_model_util.py
 - 著作权声明：Copyright (c) 2025 DuYu (https://github.com/duyu09/MKTY-System)
 '''
@@ -20,6 +20,7 @@ console = Console(markup=False)
 def info_print(msg: str, level: str="info") -> None:
     '''
     - 函数功能：打印日志。日志格式为：`[当前时间 日志级别] [日志内容]`
+    - 负责人：杜宇
     - 输入参数：msg, level
       - `msg`（`str`，要打印的日志信息）
       - `level`（`str`，日志级别，不同级别日志的标头颜色不同以区分。可选值为`initial`、`info`、`warning`、`error`，默认为`info`）
@@ -42,6 +43,7 @@ def info_print(msg: str, level: str="info") -> None:
 def start_print(version: str) -> None:
     '''
     - 函数功能：大规模模型推理端程序启动时打印欢迎信息。欢迎信息包括：本系统英文简称`M.K.T.Y.`的艺术字，以及系统名称、著作权信息、GitHub开源地址、版本号等initial日志。
+    - 负责人：杜宇
     - 输入参数：`version`（`str`，版本号字符串，例如：`v1.1.0`）
     - 返回参数：`None`
     '''
@@ -64,6 +66,7 @@ def start_print(version: str) -> None:
 def get_mq_channel(mq_connection_parameters: dict, callback: callable, callback_parameters: dict, queue_name: str = "task_queue", durable: bool = True) -> pika.adapters.blocking_connection.BlockingChannel:
     '''
     - 函数功能：连接到RabbitMQ服务器并返回一个通道对象
+    - 负责人：杜宇
     - 输入参数：mq_connection_parameters, callback, queue_name, durable
       - `mq_connection_parameters`（`dict`，RabbitMQ连接参数）
       - `callback`（`function`，消息处理回调函数，要求回调函数的第一个参数须接收从MQ中接收到的信息，模型的推理调用在这个函数里完成）
@@ -94,6 +97,7 @@ def get_mq_channel(mq_connection_parameters: dict, callback: callable, callback_
 def load_model_and_tokenizer_mkty3b(model_dir: str):
     '''
     - 函数功能：加载`MKTY-3B-Chat`大模型及其分词器。
+    - 负责人：杜宇
     - 输入参数：model_dir
       - `model_dir`（`str`，模型目录路径）
     - 返回参数：model, tokenizer
