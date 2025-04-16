@@ -1172,7 +1172,7 @@ def get_post_content(cursor):
 @getCursor(conn_pool)
 def delete_post(cursor):
     '''
-    - API功能：删除指定ID的帖子（数据库级假删除，但帖子中包含的图片文件为真删除）
+    - API功能：删除指定ID的帖子（数据库级假删除，但帖子中包含的图片文件为真删除，只有帖子发布者自己有权删除）
     - 负责人：杜宇
     - 请求参数：
       - `postId`: 帖子ID（`int`）
@@ -1183,13 +1183,14 @@ def delete_post(cursor):
     SPLIT_CHARACTER = "$^"
     session_data = request.json
     post_id = session_data.get('postId')
+    user_id = get_jwt_identity()
     if post_id is None or post_id < 0:
         return jsonify({'code': 1,'msg': '帖子ID不可读取。'})
     try:
-        cursor.execute(f"SELECT * FROM forumcontent WHERE postId={post_id} AND postStatus=0")
+        cursor.execute(f"SELECT * FROM forumcontent WHERE postId={post_id} AND postStatus=0 AND postPosterId={user_id}")
         result = cursor.fetchall()
         if len(result) == 0:
-            return jsonify({'code': 1,'msg': '该帖子不存在或已被删除。'})
+            return jsonify({'code': 1,'msg': '该帖子不存在或已被删除或您无权删除。'})
         else:
             post_content = result[0]['postContent']
             post_images_guid_list = post_content['images'].split(SPLIT_CHARACTER)
@@ -1199,7 +1200,7 @@ def delete_post(cursor):
                 image_path = os.path.join(DATA_DIR, "post_images", (image_guid + ".webp"))
                 if os.path.exists(image_path):
                     os.remove(image_path)
-            cursor.execute(f"UPDATE forumcontent SET postStatus=1 WHERE postId={post_id}")
+            cursor.execute(f"UPDATE forumcontent SET postStatus=1 WHERE postId={post_id} AND postPosterId={user_id}")
             return jsonify({'code': 0,'msg': '删除成功！'})
     except Exception as e:
         return jsonify({'code': 1,'msg': '数据库修改失败:'+ str(e)})
@@ -1210,7 +1211,7 @@ def delete_post(cursor):
 @getCursor(conn_pool)
 def praise_post(cursor):
     '''
-    - API功能：给指定ID的帖子点赞
+    - API功能：给指定ID的帖子点赞（因时间关系，暂不考虑防刷赞等的情况）
     - 负责人：杜宇
     - 请求参数：
       - `postId`: 帖子ID（`int`）

@@ -72,6 +72,7 @@ create table forumcontent
 	postForumId bigint not null comment '帖子所属论坛ID。',
 	postContent json not null comment '帖子具体内容（images字段：值为一个数组，里面存有各图像的GUID字符串，规定所有图像为webp格式；content字段：帖子文本字符串）',
 	postPraiseNumber int default 0 null comment '帖子被点赞的数量。',
+	postStatus int not null comment '帖子状态（0=正常；1=被删除；2=其他情况）',
 	constraint forumcontent_ibfk_1
 		foreign key (postPosterId) references userinfo (userId)
 			on delete cascade,
