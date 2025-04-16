@@ -1,6 +1,6 @@
 '''
 - 文件描述：明康慧医MKTY智慧医疗系统后端服务小规模模型端模块（MQ消费者端）
-- 负责人：齐鲁工业大学（山东省科学院）计算机科学与技术学部 软件工程（软件开发）21-1班 杜宇 (@duyu09, <202103180009@stu.qlu.edu.cn>)
+- 总负责人：齐鲁工业大学（山东省科学院）计算机科学与技术学部 软件工程（软件开发）21-1班 杜宇 (@duyu09, <202103180009@stu.qlu.edu.cn>)
 - 文件名：modest_model.py
 - 著作权声明：Copyright (c) 2025 DuYu (https://github.com/duyu09/MKTY-System)
 '''
@@ -36,6 +36,7 @@ params = {"model": model, "tokenizer": tokenizer, "preprocess": preprocess, "dev
 def predict(message: dict, model, tokenizer, preprocess, device, mt_model, mt_tokenizer, remove_header: bool=True):
     '''
     - 函数功能：MQ回调函数（模型推理在这里完成）
+    - 负责人：杜宇
     - 输入参数：message, model, tokenizer, preprocess, device
       - `message`（`dict`，消息体。按照要求，该参数为第一个形参，接收来自MQ的消息，本函数中消息为一个字典，键`texts`表示一个文本数组，键`image_base64`表示图像的base64字符串，键`language`表示文本的语言，可以为`zh`、`en`等，若为`zh`则启用翻译）
       - `model`（模型对象）

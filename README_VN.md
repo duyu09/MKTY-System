@@ -36,7 +36,7 @@ Dự án này là đồ án tốt nghiệp của tôi tại Đại học Công n
 
 - 👤 **Tác Giả Dự Án**
   - **Đỗ Vũ** (Tiếng Trung Giản Thể: _杜宇_; Tiếng Anh: _DU Yu_; Email: <202103180009@stu.qlu.edu.cn> và <qluduyu09@163.com>), sinh viên tốt nghiệp năm 2025, Học bộ Khoa học và Kỹ thuật Máy tính, Đại học Công nghiệp Tề Lỗ (_Qilu_) (Viện Khoa học tỉnh Sơn Đông)
-  - **Quách Trường Lâm** (Tiếng Trung Giản Thể: _郭长霖_; Tiếng Anh: _Guo Changlin_; Email: <202311143014@stu.qlu.edu.cn> và <changlin539@163.com>), học sinh, Học bộ Khoa học và Kỹ thuật Máy tính, Đại học Công nghiệp Tề Lỗ (_Qilu_) (Viện Khoa học tỉnh Sơn Đông)
+  - **Quách Trường Lâm** (Tiếng Trung Giản Thể: _郭长霖_; Tiếng Anh: _GUO Changlin_; Email: <202311143014@stu.qlu.edu.cn> và <changlin539@163.com>), học sinh, Học bộ Khoa học và Kỹ thuật Máy tính, Đại học Công nghiệp Tề Lỗ (_Qilu_) (Viện Khoa học tỉnh Sơn Đông)
 
 - 🏫 **Giáo Viên Hướng Dẫn Đồ Án**
   - Giáo viên trường: **Khương Văn Phong** (Tiếng Trung Giản Thể: _姜文峰_; Tiếng Anh: _JIANG Wenfeng_), giảng viên Học bộ Khoa học và Kỹ thuật Máy tính, Đại học Công nghiệp Tề Lỗ (_Qilu_) (Viện Khoa học tỉnh Sơn Đông).

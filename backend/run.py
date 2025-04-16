@@ -10,7 +10,7 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from util import util_file2base64, util_base642file, util_uuid, util_current_time, info_print, start_print, getDataBaseConnectionPool, getCursor
-from util import util_encrypt_password, util_verify_password, RpcClient
+from util import util_encrypt_password, util_verify_password, RpcClient, save_base64_image
 from gevent.pywsgi import WSGIServer
 
 # 全局变量配置
@@ -1044,6 +1044,195 @@ def delete_forum(cursor):
         return jsonify({'code':1, 'msg':'数据库操作失败'})
 
 
+@app.route('/api/sendPost', methods=['POST'])
+@jwt_required() 
+@getCursor(conn_pool)
+def send_post(cursor):
+    '''
+    - API功能：发送帖子
+    - 负责人：杜宇
+    - 请求参数：
+      - `forumId`: 论坛ID（`int`）
+      - `postContent`: 帖子内容（`str`）
+      - `postImagesBase64List`: 帖子图片Base64格式数据列表（`str`，列表格式要求：每一项“元素”均为带头部的图片数据Base64字符串，字符串之间用SPLIT_CHARACTER(="$^")来隔开。**流程简要说明：** 后台拿到字符串后解析为多个base64并一律转为webp格式写入文件，最多包含3张图片，数据库中存储文件GUID，文件名为`"文件GUID".webp`，多个GUID也用`SPLIT_CHARACTER`隔开；**上传图片要求：** 拓展名仅支持`png`、`jpg`、`jpeg`、`webp`、`bmp`、`ico`、`gif`，且单个文件base64长度不可超过300KB，文件有效性不做检查）
+    - 响应参数：
+      - `code`: 执行状态（`int`，`0`=发送成功，`1`=发送失败）
+      - `msg`: 自然语言提示信息（`str`）
+      - `postId`: 帖子ID（`int`）
+      - `postCreateTime`: 帖子创建时间（`int`，以秒为单位的Unix时间戳）
+    '''
+    SPLIT_CHARACTER = "$^"
+    user_id = get_jwt_identity()
+    session_data = request.json
+    forum_id = session_data.get('forumId')
+    post_content = session_data.get('postContent')
+    post_images_base64_list = session_data.get('postImagesBase64List')
+    if forum_id is None or forum_id < 0:
+        return jsonify({'code': 1,'msg': '论坛ID不可读取。'})
+    if post_content is None or post_content == "":
+        return jsonify({'code': 1,'msg': '帖子内容不可读取。'})
+    if post_images_base64_list is None or post_images_base64_list == "":
+        return jsonify({'code': 1,'msg': '帖子图片不可读取。'})
+    post_images_base64_list = post_images_base64_list.split(SPLIT_CHARACTER)
+    if len(post_images_base64_list) > 3:
+        return jsonify({'code': 1,'msg': '帖子图片数量超过限制。'})
+    if all(len(s) < 300 * 1024 for s in post_images_base64_list):
+        return jsonify({'code': 1,'msg': '帖子图片大小超过限制。'})
+    post_images_guid_list = []
+    for image_base64 in post_images_base64_list:
+        if image_base64 == "":
+            continue
+        image_guid = util_uuid()
+        image_path = os.path.join(DATA_DIR, "post_images", (image_guid + ".webp"))
+        save_base64_image(image_base64, image_path)
+        post_images_guid_list.append(image_guid)
+    post_images_guid_list = SPLIT_CHARACTER.join(post_images_guid_list)
+    post_create_time = util_current_time()
+    post_content_json = json.dumps({"content": post_content, "images": post_images_guid_list})
+    try:
+        cursor.execute(
+            "INSERT INTO forumcontent (postForumId, postContent, postPosterId, postCreateTime, postPraiseNumber, postStatus) "
+            "VALUES (%s, %s, %s, %s, %s, %s)",
+            (forum_id, post_content_json, user_id, post_create_time, 0, 0)
+        )
+        post_id = cursor.lastrowid
+        return jsonify({'code': 0,'msg': '发送成功！','postId': post_id,'postCreateTime': post_create_time})
+    except Exception as e:
+        return jsonify({'code': 1,'msg': '后台数据库写入失败:'+ str(e)})
+    
+
+@app.route('/api/getPostList', methods=['POST'])
+@jwt_required()
+@getCursor(conn_pool)
+def get_post_list(cursor):
+    '''
+    - API功能：获取指定论坛的帖子列表（为了减轻服务端压力，该函数只返回特定论坛中包含帖子的ID列表，由前端轮询请求列表中各帖子的具体内容。）
+    - 负责人：杜宇
+    - 请求参数：
+      - `forumId`: 论坛ID（`int`）
+    - 响应参数：
+      - `code`: 执行状态（`int`，`0`=获取成功，`1`=获取失败）
+      - `msg`: 自然语言提示信息（`str`）
+      - `postList`: 帖子Id列表（`JSON Array`，返回JSON数组，包含各帖子的Id。被删除的帖子不返回。）
+    '''
+    session_data = request.json
+    forum_id = session_data.get('forumId')
+    if forum_id is None or forum_id < 0:
+        return jsonify({'code': 1,'msg': '论坛ID不可读取。'})
+    try:
+        cursor.execute(f"SELECT * FROM forumcontent WHERE postForumId={forum_id} AND postStatus=0")
+        result = cursor.fetchall()
+        return jsonify({'code': 0,'msg': '获取成功','postList': result})
+    except Exception as e:
+        return jsonify({'code': 1,'msg': '后台数据库读取失败:'+ str(e)})
+
+
+@app.route('/api/getPostContent', methods=['POST'])
+@jwt_required()
+@getCursor(conn_pool)
+def get_post_content(cursor):
+    '''
+    - API功能：获取指定帖子ID的具体内容
+    - 负责人：杜宇
+    - 请求参数：
+      - `postId`: 帖子ID（`int`）
+    - 响应参数：
+      - `code`: 执行状态（`int`，`0`=获取成功，`1`=获取失败）
+      - `msg`: 自然语言提示信息（`str`）
+      - `postContent`: 帖子内容（`JSON`，键`content`的值为帖子文本，键`images`值为JSON数组，里面均为带头部的图像Base64字符串。）
+    '''
+    SPLIT_CHARACTER = "$^"
+    session_data = request.json
+    post_id = session_data.get('postId')
+    if post_id is None or post_id < 0:
+        return jsonify({'code': 1,'msg': '帖子ID不可读取。'})
+    try:
+        cursor.execute(f"SELECT * FROM forumcontent WHERE postId={post_id} AND postStatus=0")
+        result = cursor.fetchall()
+        if len(result) == 0:
+            return jsonify({'code': 1,'msg': '该帖子不存在或已被删除。'})
+        else:
+            post_content = result[0]['postContent']
+            post_images_guid_list = post_content['images'].split(SPLIT_CHARACTER)
+            post_images_base64_list = []
+            for image_guid in post_images_guid_list:
+                if image_guid == "":
+                    continue
+                image_path = os.path.join(DATA_DIR, "post_images", (image_guid + ".webp"))
+                if os.path.exists(image_path):
+                    post_images_base64_list.append(util_file2base64(image_path, add_header=True))
+            content = post_content['content']
+            return jsonify({'code': 0,'msg': '获取成功','postContent': {'content': content,'images': post_images_base64_list}})
+    except Exception as e:
+        return jsonify({'code': 1,'msg': '数据库读取失败:'+ str(e)})
+    
+
+@app.route('/api/deletePost', methods=['POST'])
+@jwt_required()
+@getCursor(conn_pool)
+def delete_post(cursor):
+    '''
+    - API功能：删除指定ID的帖子（数据库级假删除，但帖子中包含的图片文件为真删除）
+    - 负责人：杜宇
+    - 请求参数：
+      - `postId`: 帖子ID（`int`）
+    - 响应参数：
+      - `code`: 执行状态（`int`，`0`=删除成功，`1`=删除失败）
+      - `msg`: 自然语言提示信息（`str`）
+    '''
+    SPLIT_CHARACTER = "$^"
+    session_data = request.json
+    post_id = session_data.get('postId')
+    if post_id is None or post_id < 0:
+        return jsonify({'code': 1,'msg': '帖子ID不可读取。'})
+    try:
+        cursor.execute(f"SELECT * FROM forumcontent WHERE postId={post_id} AND postStatus=0")
+        result = cursor.fetchall()
+        if len(result) == 0:
+            return jsonify({'code': 1,'msg': '该帖子不存在或已被删除。'})
+        else:
+            post_content = result[0]['postContent']
+            post_images_guid_list = post_content['images'].split(SPLIT_CHARACTER)
+            for image_guid in post_images_guid_list:
+                if image_guid == "":
+                    continue
+                image_path = os.path.join(DATA_DIR, "post_images", (image_guid + ".webp"))
+                if os.path.exists(image_path):
+                    os.remove(image_path)
+            cursor.execute(f"UPDATE forumcontent SET postStatus=1 WHERE postId={post_id}")
+            return jsonify({'code': 0,'msg': '删除成功！'})
+    except Exception as e:
+        return jsonify({'code': 1,'msg': '数据库修改失败:'+ str(e)})
+
+
+@app.route('/api/praisePost', methods=['POST'])
+@jwt_required()
+@getCursor(conn_pool)
+def praise_post(cursor):
+    '''
+    - API功能：给指定ID的帖子点赞
+    - 负责人：杜宇
+    - 请求参数：
+      - `postId`: 帖子ID（`int`）
+    - 响应参数：
+      - `code`: 执行状态（`int`，`0`=点赞成功，`1`=点赞失败）
+      - `msg`: 自然语言提示信息（`str`）
+    '''
+    session_data = request.json
+    post_id = session_data.get('postId')
+    if post_id is None or post_id < 0:
+        return jsonify({'code': 1,'msg': '帖子ID不可读取。'})
+    try:
+        cursor.execute(f"SELECT * FROM forumcontent WHERE postId={post_id} AND postStatus=0")
+        result = cursor.fetchall()
+        if len(result) == 0:
+            return jsonify({'code': 1,'msg': '该帖子不存在或已被删除。'})
+        else:
+            cursor.execute(f"UPDATE forumcontent SET postPraiseNumber=postPraiseNumber+1 WHERE postId={post_id}")
+            return jsonify({'code': 0,'msg': '点赞成功！'})
+    except Exception as e:
+        return jsonify({'code': 1,'msg': '数据库修改失败:'+ str(e)})
+    
     
 if __name__ == '__main__':
     info_print(f"正在启动后端服务(Port:{PORT};Host:{HOST})")
