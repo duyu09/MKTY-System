@@ -5,21 +5,24 @@
 - 著作权声明：Copyright (c) 2025 DuYu (https://github.com/duyu09/MKTY-System)
 '''
 
+import os
+import io
 import base64
 import uuid
 import mimetypes
 import time
+import pika
+import ast
+import traceback
+import mysql.connector.cursor
+import mysql.connector
+import mysql.connector.pooling
+from PIL import Image
 from datetime import datetime
 from rich.console import Console
 from rich.rule import Rule
 from functools import wraps
-import mysql.connector.cursor
-import mysql.connector
-import mysql.connector.pooling
-import traceback
 from argon2 import PasswordHasher, exceptions
-import pika
-import ast
 
 # 定义常用文件扩展名及其对应的 MIME 类型
 common_mime_types = {
@@ -33,6 +36,11 @@ common_mime_types = {
     '.svg': 'image/svg+xml',
     '.ico': 'image/vnd.microsoft.icon',
     '.bmp': 'image/bmp',
+    '.jpg': 'image/jpeg',
+    '.jpeg': 'image/jpeg',
+    '.png': 'image/png',
+    '.gif': 'image/gif',
+    '.ico': 'image/icon',
     '.tiff': 'image/tiff',
     '.flac': 'audio/flac',
     '.ogg': 'audio/ogg',
@@ -128,7 +136,7 @@ def util_base642file(base64_string: str, file_path: str, remove_header: bool=Tru
     - 返回参数：`None`
     '''
     if remove_header:
-        base64_string = base64_string[base64_string.find(",")+1:]
+        base64_string = base64_string[base64_string.find(",") + 1:]
     file_data = base64.b64decode(base64_string)
     with open(file_path, "wb") as file:
         file.write(file_data)
@@ -297,4 +305,43 @@ class RpcClient(object):
             response = ast.literal_eval(response)
             del self.responses[corr_id]
         return response
-    
+
+def save_base64_image(base64_str: str, output_file: str) -> str | None:
+    """
+    - 函数功能：将带头部的base64图片数据保存为指定格式的文件（ **刻意避免使用临时文件方法以提升效率，故内部未调用已有的`util_file2base64`函数及`util_base642file`函数** ）
+    - 负责人：杜宇
+    - 输入参数:
+      - base64_str (`str`, 带头部的base64字符串)
+      - output_file (`str`, 输出文件路径，文件扩展名决定输出格式)  
+    - 返回参数：成功返回`None`，失败返回错误信息(`str`)
+    """
+    try:
+        if not output_file or not isinstance(output_file, str):  # 检查输出文件路径是否有效
+            return "输出文件路径无效"
+        ext = os.path.splitext(output_file)[1].lower()  # 获取文件扩展名并验证
+        if not ext:
+            return "无法从输出文件名中确定文件格式"
+        format_map = {  # 支持的图片格式映射
+            '.jpg': 'JPEG',
+            '.jpeg': 'JPEG',
+            '.png': 'PNG',
+            '.gif': 'GIF',
+            '.bmp': 'BMP',
+            '.webp': 'WEBP'
+        }
+        if ext not in format_map:
+            return f"不支持的输出格式: {ext}"
+        if base64_str.startswith('data:'):  # 从Base64字符串中分离头部提取实际数据
+            header, base64_str = base64_str.split(',', 1)
+        image_data = base64.b64decode(base64_str)
+        with Image.open(io.BytesIO(image_data)) as img:  # 使用Pillow在内存中处理图片
+            if img.mode is not 'RGB':  # 一律转换为RGB或RGBA模式
+                img = img.convert('RGB')
+            output_buffer = io.BytesIO()  # 输出字节流
+            img.save(output_buffer, format=format_map[ext])  # 保存为指定格式
+            with open(output_file, 'wb') as f:
+                f.write(output_buffer.getvalue())
+        return None
+    except Exception as e:
+        return f"发生错误: {str(e)}"
+
