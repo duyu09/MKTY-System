@@ -1066,17 +1066,16 @@ def send_post(cursor):
     session_data = request.json
     forum_id = session_data.get('forumId')
     post_content = session_data.get('postContent')
-    post_images_base64_list = session_data.get('postImagesBase64List')
+    post_images_base64_list_str = session_data.get('postImagesBase64List')
     if forum_id is None or forum_id < 0:
         return jsonify({'code': 1,'msg': '论坛ID不可读取。'})
     if post_content is None or post_content == "":
         return jsonify({'code': 1,'msg': '帖子内容不可读取。'})
-    if post_images_base64_list is None or post_images_base64_list == "":
-        return jsonify({'code': 1,'msg': '帖子图片不可读取。'})
-    post_images_base64_list = post_images_base64_list.split(SPLIT_CHARACTER)
+    # 帖子可以不包含图片，故不作检查
+    post_images_base64_list = post_images_base64_list_str.split(SPLIT_CHARACTER)
     if len(post_images_base64_list) > 3:
         return jsonify({'code': 1,'msg': '帖子图片数量超过限制。'})
-    if all(len(s) < 300 * 1024 for s in post_images_base64_list):
+    if not all(len(s) < 300 * 1024 for s in post_images_base64_list):
         return jsonify({'code': 1,'msg': '帖子图片大小超过限制。'})
     post_images_guid_list = []
     for image_base64 in post_images_base64_list:
@@ -1120,8 +1119,9 @@ def get_post_list(cursor):
     if forum_id is None or forum_id < 0:
         return jsonify({'code': 1,'msg': '论坛ID不可读取。'})
     try:
-        cursor.execute(f"SELECT * FROM forumcontent WHERE postForumId={forum_id} AND postStatus=0")
+        cursor.execute(f"SELECT postId FROM forumcontent WHERE postForumId={forum_id} AND postStatus=0")
         result = cursor.fetchall()
+        result = [] if result is None else [item['postId'] for item in result]
         return jsonify({'code': 0,'msg': '获取成功','postList': result})
     except Exception as e:
         return jsonify({'code': 1,'msg': '后台数据库读取失败:'+ str(e)})
@@ -1147,12 +1147,13 @@ def get_post_content(cursor):
     if post_id is None or post_id < 0:
         return jsonify({'code': 1,'msg': '帖子ID不可读取。'})
     try:
-        cursor.execute(f"SELECT * FROM forumcontent WHERE postId={post_id} AND postStatus=0")
+        cursor.execute("SELECT * FROM forumcontent WHERE postId=%s AND postStatus=0", (post_id,))
         result = cursor.fetchall()
         if len(result) == 0:
             return jsonify({'code': 1,'msg': '该帖子不存在或已被删除。'})
         else:
             post_content = result[0]['postContent']
+            post_content = json.loads(post_content)
             post_images_guid_list = post_content['images'].split(SPLIT_CHARACTER)
             post_images_base64_list = []
             for image_guid in post_images_guid_list:
@@ -1193,6 +1194,7 @@ def delete_post(cursor):
             return jsonify({'code': 1,'msg': '该帖子不存在或已被删除或您无权删除。'})
         else:
             post_content = result[0]['postContent']
+            post_content = json.loads(post_content)
             post_images_guid_list = post_content['images'].split(SPLIT_CHARACTER)
             for image_guid in post_images_guid_list:
                 if image_guid == "":
