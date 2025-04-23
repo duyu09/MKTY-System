@@ -54,7 +54,7 @@ create table forumsummary
 		primary key,
 	forumCreator bigint not null comment '论坛创建者userId',
 	forumName text not null comment '论坛名称。',
-	forumType tinyint(1) not null comment '论坛类型: True - 疾病论坛, False - 医学知识论坛。',
+	forumType tinyint(1) not null comment '论坛类型: 0=医学知识论坛；1=疾病论坛。',
 	forumCreateTime text not null comment '论坛创建时间，Unix时间戳，精确到秒，服务器时间。',
 	forumPermission tinyint(1) not null comment '论坛权限，0=不限人员类型；1=仅限医师创建、参与；2=仅限患者创建、参与',
 	forumStatus int not null comment '论坛状态：0=正常；1=已被删除；2=其他情况',
