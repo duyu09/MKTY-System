@@ -1,7 +1,5 @@
 <script>
 import CreateForum from "@/components/modules/CreateForum.vue";
-import CreateOrg from "@/components/modules/CreateOrg.vue";
-import JoinOrg from "@/components/modules/JoinOrg.vue";
 import ForumOverview from "@/components/modules/ForumOverview.vue";
 export default
 {
@@ -9,8 +7,6 @@ export default
   components:
       {
         'CreateForum':CreateForum,
-        'CreateOrg':CreateOrg,
-        'JoinOrg':JoinOrg,
         'ForumOverview':ForumOverview,
       },
 }
@@ -32,13 +28,10 @@ export default
       </div>
     </el-header>
 
-
     <div id="Forum-Div01">
       <el-tabs tab-position="top" id="Forum-elTab01" class="demo-tabs">
         <el-tab-pane label="论坛概览"><ForumOverview></ForumOverview></el-tab-pane>
-        <el-tab-pane label="加入学生组织"><JoinOrg></JoinOrg></el-tab-pane>
         <el-tab-pane label="创建论坛"><CreateForum></CreateForum></el-tab-pane>
-        <el-tab-pane label="创建学生组织"><CreateOrg></CreateOrg></el-tab-pane>
       </el-tabs>
     </div>
 
@@ -136,10 +129,6 @@ export default
 {
   height: 100%;
 }
-
-
-
-
 @media screen and (max-width:40rem)
 {
   #Forum-elHeader

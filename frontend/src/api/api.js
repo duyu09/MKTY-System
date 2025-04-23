@@ -14,7 +14,8 @@ export
     getUserAvatar, getUserInfo, modifyUserInfo, modifyUserAvatar, modifyUserPassword, getMailList, getMailList_Reverse, 
     deleteMailItem, addMailItem, multimodalDiagnosisSubmitTask, multimodalDiagnosisGetStatus, getCurrentTime,
     getImportantList, addImportantItem, deleteImportantItem, finishImportantItem, llmInferenceGetStatus, llmInferenceSubmitTask, 
-    saveLlmSession, getLlmSession, getLlmSessionList, deleteLlmSession,
+    saveLlmSession, getLlmSession, getLlmSessionList, deleteLlmSession, addForum, getForumList, deleteForum, 
+    modifyForumType, sendPost, getPostList, getPostContent, praisePost, deletePost,
     setUserInformation, updataInformation, setAvatar, addFlag, showFlag, deleteFlag, showOrg, deleteOrg, creatForum, createOrg, releaseItem, showForum, showItem, deleteItem, showPsy, signIn, readSignInContext, readStudyRoom, startStudy, readStudyStatus, dredgePsy, skillTest, upvote, upload, showFile, downloadFile, getMusicList
 }
 
@@ -106,7 +107,7 @@ function register(userName, userType, userSex, userSexPermission, userAge, userA
     });
 }
 
-//03.获取用户头像
+// 03.获取用户头像
 function getUserAvatar(aimUserId)
 {
     return axios.post(baseURL+'/getUserAvatar',{
@@ -114,7 +115,7 @@ function getUserAvatar(aimUserId)
     },{headers: {'Authorization': getToken()}})
 }
 
-//04.获取用户基本信息
+// 04.获取用户基本信息
 function getUserInfo(aimUserId) {
     return axios.post(baseURL+'/getUserInfo',{
         'userId': aimUserId
@@ -149,7 +150,7 @@ function modifyUserAvatar(userAvatar)
     },{headers: {'Authorization': getToken()}});
 }
 
-//07.修改用户密码
+// 07.修改用户密码
 function modifyUserPassword(userOldPassword, userNewPassword)
 {
     return axios.post(baseURL+'/modifyUserPassword',{
@@ -158,7 +159,7 @@ function modifyUserPassword(userOldPassword, userNewPassword)
     },{headers: {'Authorization': getToken()}});
 }
 
-//08. 获取留言列表（读取别人发给自己的留言）
+// 08. 获取留言列表（读取别人发给自己的留言）
 function getMailList()
 {
     return axios.post(baseURL+'/getMailList',{
@@ -166,7 +167,7 @@ function getMailList()
     },{headers: {'Authorization': getToken()}});
 }
 
-//09. 获取留言列表（读取自己发给别人的留言）
+// 09. 获取留言列表（读取自己发给别人的留言）
 function getMailList_Reverse()
 {
     return axios.post(baseURL+'/getMailList',{
@@ -211,21 +212,21 @@ function multimodalDiagnosisGetStatus(taskId)
 }
 
 
-// 16. 获取服务器当前时间戳（以秒为单位，Unix时间戳）
+// 14. 获取服务器当前时间戳（以秒为单位，Unix时间戳）
 function getCurrentTime() 
 {
     return axios.post(baseURL+'/getCurrentTime');
 }
 
 
-// 17. 获取用户医疗事项列表
+// 15. 获取用户医疗事项列表
 function getImportantList()
 {
     return axios.post(baseURL+'/getImportantList',{
     },{headers: {'Authorization': getToken()}});
 }
 
-// 18. 添加诊疗事项
+// 16. 添加诊疗事项
 function addImportantItem(listItemContent, listItemTimeMode, listItemTimeWeek, listItemStartTime, listItemEndTime, listItemPriority, listItemIsFinished)
 {
     return axios.post(baseURL+'/addImportantItem',{
@@ -239,7 +240,7 @@ function addImportantItem(listItemContent, listItemTimeMode, listItemTimeWeek, l
     },{headers: {'Authorization': getToken()}});
 }
 
-// 19. 删除诊疗事项
+// 17. 删除诊疗事项
 function deleteImportantItem(listItemId)
 {
     return axios.post(baseURL+'/deleteImportantItem',{
@@ -247,7 +248,7 @@ function deleteImportantItem(listItemId)
     },{headers: {'Authorization': getToken()}});
 }
 
-// 20. 标记医疗事项是否完成
+// 18. 标记医疗事项是否完成
 function finishImportantItem(listItemId, listItemIsFinished)
 {
     return axios.post(baseURL+'/finishImportantItem',{
@@ -256,7 +257,7 @@ function finishImportantItem(listItemId, listItemIsFinished)
     },{headers: {'Authorization': getToken()}});
 }
 
-// 21. 提交大语言模型(MKTY-3B-Chat)推理任务
+// 19. 提交大语言模型(MKTY-3B-Chat)推理任务
 function llmInferenceSubmitTask(context, prompt)
 {
     return axios.post(baseURL+'/llmInferenceSubmitTask',{
@@ -265,7 +266,7 @@ function llmInferenceSubmitTask(context, prompt)
     },{headers: {'Authorization': getToken()}});
 }
 
-// 22. 获取大语言模型推理任务状态
+// 20. 获取大语言模型推理任务状态
 function llmInferenceGetStatus(taskId)
 {
     return axios.post(baseURL+'/llmInferenceGetStatus',{
@@ -273,7 +274,7 @@ function llmInferenceGetStatus(taskId)
     },{headers: {'Authorization': getToken()}});
 }
 
-// 23. 保存MKTY大语言模型会话
+// 21. 保存MKTY大语言模型会话
 function saveLlmSession(sessionId, sessionContent, isSessionDM)
 {
     return axios.post(baseURL+'/saveLlmSession',{
@@ -283,7 +284,7 @@ function saveLlmSession(sessionId, sessionContent, isSessionDM)
     },{headers: {'Authorization': getToken()}});
 }
 
-// 24. 获取指定ID的MKTY大语言模型会话内容
+// 22. 获取指定ID的MKTY大语言模型会话内容
 function getLlmSession(sessionId)
 {
     return axios.post(baseURL+'/getLlmSession',{
@@ -291,7 +292,7 @@ function getLlmSession(sessionId)
     },{headers: {'Authorization': getToken()}});
 }
 
-// 25. 获取指定用户的MKTY大语言模型会话列表
+// 23. 获取指定用户的MKTY大语言模型会话列表
 function getLlmSessionList(isSessionDM)
 {
     return axios.post(baseURL+'/getLlmSessionList',{
@@ -299,7 +300,7 @@ function getLlmSessionList(isSessionDM)
     },{headers: {'Authorization': getToken()}});
 }
 
-// 26. 删除指定ID的MKTY大语言模型会话（数据库级真删除）
+// 24. 删除指定ID的MKTY大语言模型会话（数据库级真删除）
 function deleteLlmSession(sessionId)
 {
     return axios.post(baseURL+'/deleteLlmSession',{
@@ -307,6 +308,83 @@ function deleteLlmSession(sessionId)
     },{headers: {'Authorization': getToken()}});
 }
 
+// 25. 创建论坛（论坛列表的“增”操作）
+function addForum(forumName, forumType, forumPermission)
+{
+    return axios.post(baseURL+'/addForum',{
+        'forumName': forumName,
+        'forumType': forumType,
+        'forumPermission': forumPermission
+    },{headers: {'Authorization': getToken()}}); 
+}
+
+// 26. 获取论坛列表（论坛列表的“查”操作）
+function getForumList(forumType, forumPermission)
+{
+    return axios.post(baseURL+'/getForumList',{
+        'forumType': forumType,
+        'forumPermission': forumPermission
+    },{headers: {'Authorization': getToken()}});
+} 
+
+// 27. 修改论坛类型（论坛列表的“改”操作）
+function modifyForumType(forumId, forumType)
+{
+    return axios.post(baseURL+'/modifyForumType',{
+        'forumId': forumId,
+        'forumType': forumType
+    },{headers: {'Authorization': getToken()}});
+}
+
+// 28. 删除论坛（论坛列表的“删”操作）
+function deleteForum(forumId)
+{
+    return axios.post(baseURL+'/deleteForum',{
+        'forumId': forumId
+    },{headers: {'Authorization': getToken()}});
+}
+
+// 29. 在论坛发布帖子
+function sendPost(forumId, postContent, postImagesBase64List)
+{
+    return axios.post(baseURL+'/sendPost',{
+        'forumId': forumId,
+        'postContent': postContent,
+        'postImagesBase64List': postImagesBase64List
+    },{headers: {'Authorization': getToken()}});
+}
+
+// 30. 获取指定论坛的帖子列表
+function getPostList(forumId)
+{
+    return axios.post(baseURL+'/getPostList',{
+        'forumId': forumId
+    },{headers: {'Authorization': getToken()}});
+}
+
+// 31. 获取指定帖子ID的具体内容
+function getPostContent(postId)
+{
+    return axios.post(baseURL+'/getPostContent',{
+        'postId': postId
+    },{headers: {'Authorization': getToken()}});
+}
+
+// 32. 给指定帖子点赞
+function praisePost(postId)
+{
+    return axios.post(baseURL+'/praisePost',{
+        'postId': postId
+    },{headers: {'Authorization': getToken()}});
+}
+
+// 33. 删除帖子
+function deletePost(postId)
+{
+    return axios.post(baseURL+'/deletePost',{
+        'postId': postId
+    },{headers: {'Authorization': getToken()}});
+}
 
 
 
