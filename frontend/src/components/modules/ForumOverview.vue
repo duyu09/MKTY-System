@@ -4,7 +4,6 @@
 <!-- 修改日期：2025年04月24日 -->
 <script>
 import { Position, Search } from "@element-plus/icons-vue";
-import Cookies from 'js-cookie'
 import { getForumList, modifyForumType, deleteForum, getUserInfo, getUserAvatar, getCookie } from "@/api/api";
 import { convertTimeChinese, errHandle, openNewTab, successHandle } from "@/utils/tools";
 
@@ -88,7 +87,10 @@ export default
                 }
                 const userInfo = res.data.userInfo;
                 const forumCreatorName = userInfo.userName;
-                const forumCreatorDescription = userInfo.userDescription;
+                var forumCreatorDescription = userInfo.userDescription;
+                if(forumCreatorDescription.length>12){
+                  forumCreatorDescription = forumCreatorDescription.substring(0,12)+"...";
+                }
                 var forumCreatorType = null;userInfo.userType;
                 if(userInfo.userType == 0){
                  forumCreatorType = "患者"; 
@@ -210,7 +212,7 @@ export default
               </div>
             </template>
             <div style="display: flex;">
-              <el-avatar :src="item.forumCreatorAvatar" size="medium" style="cursor: pointer;"></el-avatar>
+              <el-avatar :src="item.forumCreatorAvatar" size="default" style="cursor: pointer;"></el-avatar>
               <div style="margin-left: 0.5rem;">
                 <div style="font-weight: bold;">{{ item.forumCreatorName }}</div>
                 <div>类型：{{ item.forumCreatorType }}</div>
@@ -283,7 +285,17 @@ export default
 @font-face
 {
   font-family: ubuntu;
-  src: url("../../assets/fonts/ubuntu.woff2");
+  src: url("/fonts/ubuntu.woff2");
+}
+@font-face
+{
+  font-family: HPHS;
+  src: url("/fonts/HPHS.woff2");
+}
+@font-face
+{
+  font-family: font01;
+  src: url("/fonts/font01.woff2");
 }
 #ForumOverview-MainDiv
 {
@@ -331,7 +343,7 @@ export default
 .ForumOverview-TableItemNameLabel
 {
   padding-bottom: 0.25rem;
-  font-family: HPHS,serif;
+  font-family: HPHS, serif;
   color: #555555;
 }
 .ForumOverview-TableItemName
@@ -340,7 +352,7 @@ export default
   display: flex;
   justify-content: left;
   align-items: center;
-  font-family: font01,serif;
+  font-family: font01, serif;
 }
 .ForumOverview-TableItemName:hover
 {

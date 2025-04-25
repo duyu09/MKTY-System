@@ -49,7 +49,7 @@ const router = createRouter({
           path: 'Forum',
           name: 'Forum',
           meta: {
-            title: 'ILP学生组织纳新与校园大论坛'
+            title: 'MKTY专属医学与诊疗论坛平台'
           },
           component: () => import('@/components/modules/Forum.vue'),
         },
@@ -65,7 +65,7 @@ const router = createRouter({
           path: 'ForumInner',
           name: 'ForumInner',
           meta: {
-            title: 'ILP学生组织纳新与校园大论坛'
+            title: 'MKTY专属医学与诊疗论坛平台'
           },
           component: () => import('@/components/modules/ForumInner.vue'),
         },
@@ -76,14 +76,6 @@ const router = createRouter({
             title: '重要事项清单 - 明康慧医系统'
           },
           component: () => import('@/components/modules/ImportantList.vue'),
-        },
-        {
-          path: 'StartStudy',
-          name: 'StartStudy',
-          meta: {
-            title: '即将开始自习'
-          },
-          component: () => import('@/components/modules/StartStudy.vue'),
         },
         {
           path: 'HomePage',

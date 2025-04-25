@@ -1139,6 +1139,9 @@ def get_post_content(cursor):
     - 响应参数：
       - `code`: 执行状态（`int`，`0`=获取成功，`1`=获取失败）
       - `msg`: 自然语言提示信息（`str`）
+      - `postPosterId`: 帖子发布者ID（`int`）
+      - `postCreateTime`: 帖子创建时间（`int`，以秒为单位的Unix时间戳）
+      - `postPraiseNumber`: 帖子点赞数（`int`）
       - `postContent`: 帖子内容（`JSON`，键`content`的值为帖子文本，键`images`值为JSON数组，里面均为带头部的图像Base64字符串。）
     '''
     SPLIT_CHARACTER = "$^"
@@ -1152,6 +1155,9 @@ def get_post_content(cursor):
         if len(result) == 0:
             return jsonify({'code': 1,'msg': '该帖子不存在或已被删除。'})
         else:
+            post_poster_id = result[0]['postPosterId']
+            post_create_time = result[0]['postCreateTime']
+            post_praise_number = result[0]['postPraiseNumber']
             post_content = result[0]['postContent']
             post_content = json.loads(post_content)
             post_images_guid_list = post_content['images'].split(SPLIT_CHARACTER)
@@ -1163,7 +1169,7 @@ def get_post_content(cursor):
                 if os.path.exists(image_path):
                     post_images_base64_list.append(util_file2base64(image_path, add_header=True))
             content = post_content['content']
-            return jsonify({'code': 0,'msg': '获取成功','postContent': {'content': content,'images': post_images_base64_list}})
+            return jsonify({'code': 0,'msg': '获取成功','postContent': {'content': content,'images': post_images_base64_list}, 'postPosterId': post_poster_id,'postCreateTime': post_create_time,'postPraiseNumber': post_praise_number})
     except Exception as e:
         return jsonify({'code': 1,'msg': '数据库读取失败:'+ str(e)})
     
