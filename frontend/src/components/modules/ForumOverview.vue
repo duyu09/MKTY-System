@@ -160,7 +160,10 @@ export default
             this.fo_loadForumList();
             successHandle("已执行删除论坛。");
           });
-        }
+        },
+        openNewTab(url) {
+          openNewTab(url);
+        },
 
       }
 }
@@ -197,7 +200,7 @@ export default
       <div class="ForumOverview-TableItemNameLabel">
         论坛名称:<el-icon id="ForumOverview-Pos02"><Position /></el-icon>
       </div>
-      <div class="ForumOverview-TableItemName" @click="()=>{this.SelectId=item.id;this.ClickForum();}">
+      <div class="ForumOverview-TableItemName" @click="openNewTab('/main/ForumInner?forumId=' + item.forumId)">
         <el-icon id="ForumOverview-Pos01"><Position /></el-icon>{{ item.forumName }}
       </div>
       <div style="margin-top: 0.6rem;">
@@ -249,7 +252,7 @@ export default
 </div>
 
 <el-dialog title="论坛元数据更改" v-model="fo_modify_dialogVisible">
-  <div>
+  <div style="background-color: rgb(238,238,238); padding: 0.5rem; border-radius: 8px;">
     <div style="margin: 0.5rem;">
       论坛名称：<span style="font-weight: bold;">{{ fo_modify_forumName }}</span>
     </div>

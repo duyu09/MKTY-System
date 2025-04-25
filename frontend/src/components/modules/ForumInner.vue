@@ -1,9 +1,13 @@
+<!-- Copyright (c) 2023~2025 DuYu (202103180009@stu.qlu.edu.cn, https://github.com/duyu09/MKTY-System), Faculty of Computer Science and Technology, Qilu University of Technology (Shandong Academy of Sciences) -->
+<!-- 该文件为“明康慧医MKTY”智慧医疗系统“MKTY专属医学与诊疗论坛平台 论坛内部”页面Vue文件。该文件为MKTY系统的重要组成部分。 -->
+<!-- 创建日期：2025年04月24日 -->
+<!-- 修改日期：2025年04月26日 -->
 <script>
 import ForumInnerHeader from "@/components/modules/ForumInnerHeader.vue";
 import { ChatDotRound, Clock, InfoFilled, Promotion, PictureFilled, 
   Delete, Pointer, ChatLineRound, Star } from "@element-plus/icons-vue";
-import { convertTime, convertTimeChinese, errHandle, successHandle } from "@/utils/tools";
-import { getCookie, getPostContent, getPostList, getUserAvatar, getUserInfo } from "@/api/api";
+import { convertTime, convertTimeChinese, errHandle, openNewTab, successHandle } from "@/utils/tools";
+import { getCookie, getPostContent, getPostList, getUserAvatar, getUserInfo, getForumInfo, praisePost, deletePost, sendPost } from "@/api/api";
 
 export default
 {
@@ -24,21 +28,42 @@ export default
   data()
   {
     return{
+      fo_userId:parseInt(getCookie('userId')),
       loading:false,
       ForumName:"正在加载...",
-      ForumImgData:'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg',
+      ForumImgData:'/images/mkty_icon.png',
       ForumInner_CreateTime:'正在加载...',
       ForumInner_Attrib:"正在加载...",
       ForumInner_Id:-1,
       ForumInner_Context:'',
+      ForumInner_ContextImage:[],
       ForumInner_PostList:[],
-      ForumInner_Arr:[{"userAvatar":"", "userName":"加载中...", "userFrom": "加载中...", "userType": "加载中...", "postTextContent": "加载中...", "postImageContent": [], "postPraiseNumber": 0, "postCreateTime": "加载中...","floor": 0, "postPosterId": 8}],
+      ForumInner_Arr:[{"userAvatar":"", "userName":"加载中...", "userFrom": "加载中...", "userType": "加载中...", "postTextContent": "加载中...", "postImageContent": [], "postPraiseNumber": 0, "postCreateTime": "加载中...","floor": 0, "postPosterId": 8, "userDescription": "加载中...", "postId":0, "postCreateTimeNumber": 0}],
     }
   },
   methods:
   {
     fi_loadPage()
     {
+      getForumInfo(parseInt(this.$route.query.forumId)).then(res=>{
+        if(res.data.code!=0){
+          errHandle(res.data.msg);
+          return;
+        }
+        this.ForumName = res.data.forumInfo.forumName;
+        this.ForumInner_CreateTime = convertTimeChinese(res.data.forumInfo.forumCreateTime * 1000);
+        const forumType = parseInt(res.data.forumInfo.forumType);
+        if (forumType == 0) {
+          this.ForumInner_Attrib = "医学知识论坛";
+        } else if (forumType == 1) {
+          this.ForumInner_Attrib = "病情讨论区";
+        } else {
+          this.ForumInner_Attrib = "其它论坛"; 
+        }
+      }).catch(err=>{
+        errHandle(err);
+      })
+
       this.loading = true;
       this.ForumInner_Arr = [];
       const forum_id = parseInt(this.$route.query.forumId);
@@ -55,9 +80,7 @@ export default
           return;
         }
         this.ForumInner_PostList = res.data.postList;
-        var floorCount = 0;
         this.ForumInner_PostList.forEach(item=>{
-          floorCount++;
           getPostContent(parseInt(item)).then(res02=>{
             if(res02.data.code!=0){
               errHandle(res02.data.msg);
@@ -69,25 +92,272 @@ export default
               getUserAvatar(parseInt(res02.data.postPosterId)).then(res04=>{
                 if(res04.data.code!=0){
                   errHandle(res04.data.msg);
-                } 
+                }
+
+                var userFrom = res03.data.userInfo.userFrom;
+                var userType = res03.data.userInfo.userType;
+                var userDescription = res03.data.userInfo.userDescription;
+                if (userFrom.length > 20) {
+                  userFrom = userFrom.substring(0, 20) + "...";
+                }
+                userDescription = userDescription.substring(0, 12) + "...";
+                if(parseInt(userType) == 0){
+                  userType = "患者";
+                }
+                else if(parseInt(userType) == 1){
+                  userType = "医师"; 
+                }
+                else if(parseInt(userType) == 2){
+                  userType = "其他人员"; 
+                }
                 this.ForumInner_Arr.push({
-                  "userAvatar":res04.data.userAvatar,
-                  "userName":res03.data.userInfo.userName,
-                  "userFrom":res03.data.userInfo.userFrom,
-                  "userType":res03.data.userInfo.userType,
-                  "postTextContent":res02.data.postContent.content,
-                  "postImageContent":res02.data.postContent.images,
-                  "postPraiseNumber":res02.data.postPraiseNumber,
-                  "postCreateTime":convertTimeChinese(res02.data.postCreateTime * 1000),
-                  "floor":floorCount,
-                  "postPosterId":res02.data.postPosterId,
+                  "userAvatar": res04.data.userAvatar,
+                  "userName": res03.data.userInfo.userName,
+                  "userFrom": userFrom,
+                  "userType": userType,
+                  "userDescription": userDescription,
+                  "postTextContent": res02.data.postContent.content,
+                  "postImageContent": res02.data.postContent.images,
+                  "postPraiseNumber": res02.data.postPraiseNumber,
+                  "postId": res02.data.postId,
+                  "postCreateTime": convertTimeChinese(res02.data.postCreateTime * 1000),
+                  "postCreateTimeNumber": res02.data.postCreateTime,
+                  "floor": 0,
+                  "postPosterId": res02.data.postPosterId,
                 });
+                this.ForumInner_Arr.sort((b, a) => parseInt(a.postCreateTimeNumber) - parseInt(b.postCreateTimeNumber));
               });
             });
           });
         });
       });
       this.loading = false;
+
+// this.loading = true;
+// this.ForumInner_Arr = [];
+// const forum_id = parseInt(this.$route.query.forumId);
+// if (forum_id == undefined) {
+//   errHandle("出错：无法获取论坛编号！");
+//   this.loading = false;
+//   return;
+// }
+
+// this.ForumInner_Id = forum_id;
+
+// // 创建一个数组来收集所有嵌套的Promise
+// const allPromises = [];
+
+// getPostList(this.ForumInner_Id).then(res => {
+//   if (res.data.code != 0) {
+//     errHandle(res.data.msg);
+//     this.loading = false;
+//     return;
+//   }
+
+//   this.ForumInner_PostList = res.data.postList;
+  
+//   // 收集每个帖子的Promise
+//   const postPromises = this.ForumInner_PostList.map(item => {
+//     return getPostContent(parseInt(item)).then(res02 => {
+//       if (res02.data.code != 0) {
+//         errHandle(res02.data.msg);
+//         return; // 继续执行其他帖子
+//       }
+      
+//       // 收集用户信息和头像的Promise
+//       return Promise.all([
+//         getUserInfo(parseInt(res02.data.postPosterId)),
+//         getUserAvatar(parseInt(res02.data.postPosterId))
+//       ]).then(([res03, res04]) => {
+//         if (res03.data.code != 0) {
+//           errHandle(res03.data.msg);
+//         }
+//         if (res04.data.code != 0) {
+//           errHandle(res04.data.msg);
+//         }
+//         var userFrom = res03.data.userInfo.userFrom;
+//         var userType = res03.data.userInfo.userType;
+//         var userDescription = res03.data.userInfo.userDescription;
+//         if (userFrom.length > 20) {
+//           userFrom = userFrom.substring(0, 20) + "...";
+//         }
+//         userDescription = userDescription.substring(0, 12) + "...";
+//         if(parseInt(userType) == 0){
+//           userType = "患者";
+//         }
+//         else if(parseInt(userType) == 1){
+//           userType = "医师"; 
+//         }
+//         else if(parseInt(userType) == 2){
+//           userType = "其他人员"; 
+//         }
+//         this.ForumInner_Arr.push({
+//           "userAvatar": res04.data.userAvatar,
+//           "userName": res03.data.userInfo.userName,
+//           "userFrom": userFrom,
+//           "userType": userType,
+//           "userDescription": userDescription,
+//           "postTextContent": res02.data.postContent.content,
+//           "postImageContent": res02.data.postContent.images,
+//           "postPraiseNumber": res02.data.postPraiseNumber,
+//           "postId": res02.data.postId,
+//           "postCreateTime": convertTimeChinese(res02.data.postCreateTime * 1000),
+//           "postCreateTimeNumber": res02.data.postCreateTime,
+//           "floor": 0,
+//           "postPosterId": res02.data.postPosterId,
+//         });
+//         this.ForumInner_Arr.sort((b, a) => parseInt(a.postCreateTimeNumber) - parseInt(b.postCreateTimeNumber));
+//       });
+//     });
+//   });
+
+//   // 将帖子Promise添加到总Promise数组
+//   allPromises.push(Promise.all(postPromises));
+// }).catch(err => {
+//   errHandle(err);
+//   this.loading = false;
+// });
+
+// // 等待所有Promise完成
+// Promise.all(allPromises)
+//   .then(() => {
+//     var floorCount = 0;
+//     this.ForumInner_Arr.forEach(item => {
+//       floorCount++;
+//       item.floor = floorCount;
+//     });
+//     this.loading = false;
+//   })
+//   .catch(err => {
+//     errHandle(err);
+//     this.loading = false;
+//   });
+    },
+    openNewTab(url)
+    {
+      openNewTab(url);
+    },
+    reply(userName)
+    {
+      this.ForumInner_Context = "回复：@" + userName + "：";
+    },
+    praise(item)
+    {
+      const postId = item.postId;
+      item.postPraiseNumber++;
+      praisePost(parseInt(postId)).then(res=>{
+        if(res.data.code!=0){
+          errHandle("点赞未成功："+res.data.msg);
+          return;
+        }
+        successHandle("点赞成功！");
+      }).catch(err=>{
+        errHandle("点赞未成功："+err);
+      })
+    },
+    addImage()
+    {
+      if(this.ForumInner_ContextImage.length == 3){
+        errHandle("最多只能添加三张图片！");
+        return;
+      }
+      // 辅助函数：将文件读取为DataURL
+      function readFileAsDataURL(file) {
+        return new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = (e) => resolve(e.target.result);
+          reader.readAsDataURL(file);
+        });
+      }
+
+      // 辅助函数：处理图片（缩放和转换格式）
+      function processImage(dataUrl) {
+        return new Promise((resolve) => {
+          const img = new Image();
+          img.onload = () => {
+            // 计算缩放比例
+            const maxSize = 350;
+            let width = img.width;
+            let height = img.height;
+            if (width > height && width > maxSize) {
+              height *= maxSize / width;
+              width = maxSize;
+            } else if (height > maxSize) {
+            width *= maxSize / height;
+            height = maxSize;
+            }
+            // 创建canvas进行缩放和格式转换
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            // 转换为webp格式的base64
+            const webpDataUrl = canvas.toDataURL('image/webp', 0.654321);
+            resolve(webpDataUrl);
+          };
+          img.src = dataUrl;
+        });
+      }
+
+      // 创建文件输入元素
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/jpeg, image/jpg, image/png, image/webp';
+      input.onchange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        try {
+          // 读取文件为DataURL
+          const originalDataUrl = await readFileAsDataURL(file);
+          // 加载图片并处理
+          const processedDataUrl = await processImage(originalDataUrl);
+          // 添加到数组
+          if (processedDataUrl) {
+            if (!this.ForumInner_ContextImage) {
+              this.ForumInner_ContextImage = [];
+            }
+            this.ForumInner_ContextImage.push(processedDataUrl);
+            console.log('图片已添加到数组:', this.ForumInner_ContextImage);
+          }
+        } catch (error) {
+          console.error('图片处理失败:', error);
+        }
+      };
+      
+      // 触发文件选择对话框
+      input.click();
+    },
+    clearImage() {
+      this.ForumInner_ContextImage = [];
+    },
+    deletePost(postId) {
+      deletePost(parseInt(postId)).then(res => {
+        if (res.data.code != 0) {
+          errHandle(res.data.msg);
+          return;
+        }
+        successHandle("删除成功！");
+        this.ForumInner_Arr = this.ForumInner_Arr.filter(item => item.postId !== postId);
+      }).catch(err => {
+        errHandle(err);
+      });
+    },
+    fo_sendPost() {
+      if (this.ForumInner_Context.trim() === "") {
+        errHandle("请输入内容再发布！");
+        return;
+      }
+      sendPost(parseInt(this.ForumInner_Id), this.ForumInner_Context, (this.ForumInner_ContextImage.join('$^') || '')).then(res => {
+        if (res.data.code!= 0) {
+          errHandle("未成功发布："+res.data.msg);
+          return; 
+        }
+        this.ForumInner_Context = '';
+        this.ForumInner_ContextImage = [];
+        this.fi_loadPage();
+        successHandle("发布成功！");
+      })
     }
   },
   mounted()
@@ -114,7 +384,7 @@ export default
         <div id="ForumInner-Div07">
           <span id="ForumInner-Span01">
             <el-icon><ChatDotRound /></el-icon>
-            {{ ForumInner_Arr.length }}
+            帖子数:{{ ForumInner_Arr.length }}
           </span>
           <span id="ForumInner-Span02">
             <el-icon><InfoFilled /></el-icon>
@@ -135,24 +405,29 @@ export default
           <div class="ForumInner-Class-Div11" v-for="item in ForumInner_Arr">
             <div class="ForumInner-Class-Div12">
               <div class="ForumInner-Class-Div13">
-                <img :src="item.userAvatar" class="ForumInner-Class-Image02">
+                <!-- <img :src="item.userAvatar" class="ForumInner-Class-Image02"> -->
+                <el-image :src="item.userAvatar" class="ForumInner-Class-Image02" :preview-src-list="[item.userAvatar]"></el-image>
               </div>
               <div class="ForumInner-Class-Div14">
-                <el-popover
-                    placement="top-start"
-                    :title="item.userName"
-                    :width="200"
-                    trigger="hover"
-                    :content="item.userName"
-                >
+                <el-popover placement="right" width="auto" trigger="hover">
                   <template #reference>
-                    <span class="ForumInner-Class-Span02" @click="">{{ item.userName }}</span>
+                    <span class="ForumInner-Class-Span02" @click="openNewTab('/main/PersonalPage?userId=' + item.postPosterId)">{{ item.userName }}</span>
                   </template>
+                  <div style="display: flex;">
+                    <el-avatar :src="item.userAvatar" size="default" style="cursor: pointer;"></el-avatar>
+                    <div style="margin-left: 0.5rem;">
+                      <div style="font-weight: bold;">{{ item.userName }}</div>
+                      <div>类型：{{ item.userType }}</div>
+                    </div>
+                  </div>
+                  <div style="margin-top: 0.5rem;">
+                    用户描述：{{ item.userDescription }}
+                  </div>
                 </el-popover>
                 <div class="ForumInner-Class-Div15">{{ item.userType }} | {{ item.userFrom }}</div>
               </div>
             </div>
-            <div class="ForumInner-Class-Div16" style="display: flex;">
+            <div class="ForumInner-Class-Div16" style="display: flex;" v-if="item.postImageContent.length!=0">
               <div style="margin-right: 0.75rem;" v-for="(image, index) in item.postImageContent">
                 <el-image style="width: 50px; height: 50px; border-radius: 4px;" :src="image" :preview-src-list="item.postImageContent" :initial-index="index" fit="cover" />
               </div>
@@ -165,11 +440,22 @@ export default
               <el-icon><Clock /></el-icon>{{ item.postCreateTime }}
               <span class="ForumInner-Class-Span03">
                 <span>第{{ item.floor }}层&nbsp;</span>
-                <span @click="" class="ForumInner-Upvote-Btn"><el-icon><Pointer /></el-icon>点赞</span>&nbsp;
-                <span @click="" class="ForumInner-Reply-Btn"><el-icon><ChatLineRound /></el-icon>回复</span>
+                <span @click="praise(item)" class="ForumInner-Upvote-Btn"><el-icon><Pointer /></el-icon>点赞</span>&nbsp;&nbsp;
+                <span @click="reply(item.userName);" class="ForumInner-Reply-Btn"><el-icon><ChatLineRound /></el-icon>回复</span>&nbsp;&nbsp;
+                <el-popconfirm title="您确定删除吗？" @confirm="deletePost(item.postId);" @cancel="" v-if="item.postPosterId==this.fo_userId">
+                  <template #reference>
+                    <span>
+                      <el-icon size="small" color="red" style="cursor: pointer; font-weight: bold;"><Delete /></el-icon>
+                      <span style="color: red; font-weight: bold;">
+                        删除
+                      </span>
+                    </span>
+                  </template>
+                </el-popconfirm>&nbsp;&nbsp;
               </span>
             </div>
           </div>
+          <div style="height: 33.3vh;" class="ForumInner-Class-Div11"></div>
          </div>
         </div>
     </div>
@@ -180,26 +466,23 @@ export default
 
         <div>
           <div id="PsyChat-Div06">
-            <div style="display: flex; box-shadow: 0 0 0.8rem 0.075rem rgba(0,0,0,0.5); padding: 0.5rem 0.3rem 0.3rem 0.8rem; margin-bottom: 0.4rem; border-radius: 12px;">
+            <div style="display: flex; box-shadow: 0 0 0.8rem 0.075rem rgba(0,0,0,0.5); padding: 0.5rem 0.3rem 0.3rem 0.8rem; margin-bottom: 0.4rem; border-radius: 12px;" v-if="ForumInner_ContextImage.length!=0">
               <div style="margin-right: 0.75rem; align-content:center;font-family: HPHS;">
                 <span>添加图片</span>
               </div>
-              <div style="margin-right: 0.75rem;">
-                <el-image style="width: 37px; height: 37px; border-radius: 2px;" src="https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg" fit="cover" />
-              </div>
-              <div style="margin-right: 0.75rem;">
-                <el-image style="width: 37px; height: 37px; border-radius: 2px;" src="https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg" fit="cover" />
+              <div style="margin-right: 0.75rem;" v-for="(image, index) in ForumInner_ContextImage">
+                <el-image style="width: 37px; height: 37px; border-radius: 2px;" :src="image" fit="cover" :preview-src-list="ForumInner_ContextImage" :initial-index="index" />
               </div>
               <div style="margin-right: 0.75rem; align-content:center;font-family: HPHS;">
-                <el-button type="danger" circle ><el-icon><Delete /></el-icon></el-button>
+                <el-button type="danger" circle @click="clearImage();"><el-icon><Delete /></el-icon></el-button>
               </div>
             </div>
             <div id="PsyChat-Div07">
               <input id="PsyChat-InputBox01" placeholder="讨论学术，分享病情，请文明用语" v-model="ForumInner_Context" @keyup.enter="" />
-              <div class="PsyChat-SendButtonDiv" @click="">
+              <div class="PsyChat-SendButtonDiv" @click="addImage();">
                 <el-icon><PictureFilled /></el-icon><span class="PsyChat-Span02">添图</span>
               </div>
-              <div class="PsyChat-SendButtonDiv" @click="">
+              <div class="PsyChat-SendButtonDiv" @click="fo_sendPost();">
                 <el-icon><Promotion /></el-icon><span class="PsyChat-Span02">发布</span>
               </div>
             </div>

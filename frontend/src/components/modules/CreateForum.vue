@@ -48,7 +48,9 @@ export default
     <el-form
         label-position="top"
     >
-      <el-form-item label="请注意：论坛名称与论坛权限，一旦创建成功则不可修改。"></el-form-item>
+      <div style="font-size: medium;padding: 0.8rem; margin-bottom: 0.5rem; border-radius: 9px; background-color: rgb(238,238,238);">
+        请注意：论坛名称与论坛权限，一旦创建成功则不可修改。
+      </div>
       <el-form-item label="论坛名称">
         <el-input v-model="ForumName" placeholder="例如：高血压预防探讨" />
       </el-form-item>
