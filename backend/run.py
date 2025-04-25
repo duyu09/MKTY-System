@@ -1042,7 +1042,35 @@ def delete_forum(cursor):
     except Exception as e:
         info_print(f"论坛删除失败：{str(e)}", "error")
         return jsonify({'code':1, 'msg':'数据库操作失败'})
-
+    
+@app.route('/api/getForumInfo', methods=['POST'])
+@jwt_required()
+@getCursor(conn_pool)
+def get_forum_info(cursor):
+    '''
+    - API功能：获取指定Id的论坛信息元数据
+    - 负责人：杜宇
+    - 请求参数：
+      - `forumId`: 论坛ID（`int`）
+    - 响应参数：
+      - `code`: 执行状态（`int`，`0`=获取成功，`1`=获取失败）
+      - `msg`: 自然语言提示信息（`str`）
+      - `forumInfo`: 论坛信息元数据（`JSON`）
+    '''
+    user_id = get_jwt_identity()
+    forum_data = request.json
+    forum_id = forum_data.get('forumId')
+    if forum_id is None or forum_id < 0:
+        return jsonify({'code': 1,'msg': '论坛ID不可读取。'})
+    try:
+        cursor.execute(f"SELECT * FROM forumsummary WHERE forumId={forum_id} AND forumStatus=0")
+        result = cursor.fetchall()
+        if result is None or len(result) == 0:
+            return jsonify({'code': 1,'msg': '该论坛不存在或您无权读取该ID的论坛内容。'})
+        else:
+            return jsonify({'code': 0,'msg': '获取成功','forumInfo': result[0]})
+    except Exception as e:
+        return jsonify({'code': 1,'msg': '未能成功获取论坛记录：'+ str(e)})
 
 @app.route('/api/sendPost', methods=['POST'])
 @jwt_required() 
@@ -1139,6 +1167,9 @@ def get_post_content(cursor):
     - 响应参数：
       - `code`: 执行状态（`int`，`0`=获取成功，`1`=获取失败）
       - `msg`: 自然语言提示信息（`str`）
+      - `postPosterId`: 帖子发布者ID（`int`）
+      - `postCreateTime`: 帖子创建时间（`int`，以秒为单位的Unix时间戳）
+      - `postPraiseNumber`: 帖子点赞数（`int`）
       - `postContent`: 帖子内容（`JSON`，键`content`的值为帖子文本，键`images`值为JSON数组，里面均为带头部的图像Base64字符串。）
     '''
     SPLIT_CHARACTER = "$^"
@@ -1152,6 +1183,10 @@ def get_post_content(cursor):
         if len(result) == 0:
             return jsonify({'code': 1,'msg': '该帖子不存在或已被删除。'})
         else:
+            post_poster_id = result[0]['postPosterId']
+            post_create_time = result[0]['postCreateTime']
+            post_praise_number = result[0]['postPraiseNumber']
+            post_id = result[0]['postId']
             post_content = result[0]['postContent']
             post_content = json.loads(post_content)
             post_images_guid_list = post_content['images'].split(SPLIT_CHARACTER)
@@ -1163,7 +1198,7 @@ def get_post_content(cursor):
                 if os.path.exists(image_path):
                     post_images_base64_list.append(util_file2base64(image_path, add_header=True))
             content = post_content['content']
-            return jsonify({'code': 0,'msg': '获取成功','postContent': {'content': content,'images': post_images_base64_list}})
+            return jsonify({'code': 0,'msg': '获取成功','postContent': {'content': content,'images': post_images_base64_list}, 'postPosterId': post_poster_id,'postCreateTime': post_create_time,'postPraiseNumber': post_praise_number, 'postId': post_id})
     except Exception as e:
         return jsonify({'code': 1,'msg': '数据库读取失败:'+ str(e)})
     

@@ -15,7 +15,7 @@ export
     deleteMailItem, addMailItem, multimodalDiagnosisSubmitTask, multimodalDiagnosisGetStatus, getCurrentTime,
     getImportantList, addImportantItem, deleteImportantItem, finishImportantItem, llmInferenceGetStatus, llmInferenceSubmitTask, 
     saveLlmSession, getLlmSession, getLlmSessionList, deleteLlmSession, addForum, getForumList, deleteForum, 
-    modifyForumType, sendPost, getPostList, getPostContent, praisePost, deletePost,
+    modifyForumType, sendPost, getPostList, getPostContent, praisePost, deletePost, getForumInfo, 
     setUserInformation, updataInformation, setAvatar, addFlag, showFlag, deleteFlag, showOrg, deleteOrg, creatForum, createOrg, releaseItem, showForum, showItem, deleteItem, showPsy, signIn, readSignInContext, readStudyRoom, startStudy, readStudyStatus, dredgePsy, skillTest, upvote, upload, showFile, downloadFile, getMusicList
 }
 
@@ -383,6 +383,14 @@ function deletePost(postId)
 {
     return axios.post(baseURL+'/deletePost',{
         'postId': postId
+    },{headers: {'Authorization': getToken()}});
+}
+
+// 34. 获取指定Id的论坛信息元数据
+function getForumInfo(forumId)
+{
+    return axios.post(baseURL+'/getForumInfo',{
+        'forumId': forumId
     },{headers: {'Authorization': getToken()}});
 }
 

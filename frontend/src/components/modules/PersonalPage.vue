@@ -3,29 +3,12 @@
 <!-- 创建日期：2025年02月09日 -->
 <!-- 修改日期：2025年03月02日 -->
 <script>
-import { RouterLink, RouterView } from 'vue-router';
-import { errHandle, msgHandle, successHandle, writeImgDataFunc, getImgDataAsBase64Func, convertTime, openNewTab } from "@/utils/tools";
-import { convertBlobToBase64, removeCookie, 
-  removeToken, getCookie, modifyUserInfo, getMailList, 
-  getMailList_Reverse, addMailItem, 
-  modifyUserAvatar, modifyUserPassword, 
-  deleteMailItem} from "@/api/api";
-import {
-  getUserAvatar,
-  getUserInfo,
-  readStudyStatus,
-  setAvatar,
-  updataInformation
-} from "@/api/api";
+import { errHandle, msgHandle, writeImgDataFunc, convertTime, openNewTab } from "@/utils/tools";
+import { convertBlobToBase64, removeCookie, removeToken, getCookie, 
+  modifyUserInfo, getMailList, getMailList_Reverse, addMailItem, modifyUserAvatar, 
+  modifyUserPassword, deleteMailItem, getUserAvatar, getUserInfo } from "@/api/api";
 import "@/assets/css/file_input.css";
-import {
-  Check,
-  Delete,
-  Edit,
-  Message,
-  Search,
-  Star,
-} from '@element-plus/icons-vue'
+import { Delete } from '@element-plus/icons-vue'
 
 
 export default
@@ -593,7 +576,8 @@ export default
     <div id="PersonalPage-MainDiv" ref="PersonalPageMainDiv">
         <div id="PersonalPage-Div01">
           <div id="PersonalPage-Div02">
-            <img id="PersonalPage-Image01" :src="userAvatar">
+            <!-- <img id="PersonalPage-Image01" :src="userAvatar"> -->
+            <el-image id="PersonalPage-Image01" :src="userAvatar" :preview-src-list="[userAvatar]"></el-image>
           </div>
           <div id="PersonalPage-Div03">
             <el-card shadow="always" id="PersonalPage-Card01"> {{ userName }}的个人名片 </el-card>
@@ -940,6 +924,7 @@ export default
 {
     flex-grow: 1;
     padding: 0.4rem;
+    align-content: center;
 }
 #PersonalPage-Image01
 {

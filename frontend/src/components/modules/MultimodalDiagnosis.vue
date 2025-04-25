@@ -1,11 +1,10 @@
 <script>
-import { Star, Opportunity, Promotion } from "@element-plus/icons-vue";
+import { Star, Opportunity, Promotion, Document, Setting } from "@element-plus/icons-vue";
 import 'element-plus/dist/index.css';
-import { getUserInfo, getCookie } from '@/api/api';
 import "@/assets/css/file_input.css";
-import { multimodalDiagnosisGetStatus, multimodalDiagnosisSubmitTask } from '@/api/api';
-import { errHandle } from  "@/utils/tools";
 import "@/assets/css/colorful_div.css";
+import { getUserInfo, getCookie, multimodalDiagnosisGetStatus, multimodalDiagnosisSubmitTask } from '@/api/api';
+import { errHandle } from  "@/utils/tools";
 
 
 import * as echarts from 'echarts/core';
@@ -39,6 +38,8 @@ export default
       "Star":Star,
       "Opportunity":Opportunity,
       "Promotion":Promotion,
+      "Document":Document,
+      "Setting":Setting
     },
     data()
     {
@@ -241,8 +242,11 @@ export default
           </div>
           <div style="flex: 1;display: flex;" v-loading="md_analyzing" element-loading-text="正在分析，请稍候" element-loading-background="rgba(0, 0, 0, 0.75)">
             <div style="width: 100%;height: 100%;">
-              <el-card style="max-height: 95%;height: 95%;">
-                <el-scrollbar height="calc(99vh - 19rem)">
+              <el-card style="max-height: 100%;height: 100%;">
+                <div style="color: darkblue; font-weight: bold;">
+                  <el-icon><Document /></el-icon>待分析的诊断内容表
+                </div>
+                <el-scrollbar height="calc(99vh - 21rem)">
                 <el-table :data="text_table">
                   <el-table-column type="index" label="序号" width="60%"/>
                   <el-table-column prop="text" label="待分析的诊断内容" />
@@ -257,7 +261,10 @@ export default
                 </el-scrollbar>
               </el-card>
             </div>
-            <div style="width: 100%;">
+            <div style="width: 100%; background-color: rgb(200,200,200); padding: 1rem; margin-left: 1rem; border-radius: 10px;">
+            <div style="color: darkblue; font-weight: bold;">
+              <el-icon><Setting /></el-icon>待分析诊断内容设置
+            </div>
             <div style="margin-left: 1rem;">
               <div style="font-family: HPHS;margin: 0.5rem;">
                 添加待分析的诊断内容
