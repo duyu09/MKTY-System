@@ -518,6 +518,11 @@ export default
   font-family: HPHS, serif;
   text-align: left;
 }
+.PsyChat-Chat-Me-02:hover
+{
+  font-weight: bold; 
+  background-color: rgba(0, 0, 255, 0.3);
+}
 .PsyChat-Chat-Me-03
 {
   font-size: larger;
@@ -551,6 +556,11 @@ export default
   font-family: HPHS, serif;
   overflow: auto;
   text-align: left;
+}
+.PsyChat-Chat-Opposite-02:hover
+{
+  font-weight: bold; 
+  background-color: rgba(0, 0, 0, 0.2);
 }
 .PsyChat-Chat-Opposite-03
 {

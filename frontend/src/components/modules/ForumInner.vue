@@ -6,7 +6,7 @@
 import ForumInnerHeader from "@/components/modules/ForumInnerHeader.vue";
 import { ChatDotRound, Clock, InfoFilled, Promotion, PictureFilled, 
   Delete, Pointer, ChatLineRound, Star } from "@element-plus/icons-vue";
-import { convertTime, convertTimeChinese, errHandle, openNewTab, successHandle } from "@/utils/tools";
+import { convertTime, convertTimeChinese, errHandle, msgHandle, openNewTab, successHandle } from "@/utils/tools";
 import { getCookie, getPostContent, getPostList, getUserAvatar, getUserInfo, getForumInfo, praisePost, deletePost, sendPost } from "@/api/api";
 
 export default
@@ -66,14 +66,7 @@ export default
 
       this.loading = true;
       this.ForumInner_Arr = [];
-      const forum_id = parseInt(this.$route.query.forumId);
-      if(forum_id!=undefined){ 
-        this.ForumInner_Id = forum_id;
-      }
-      else{
-        errHandle("出错：无法获取论坛编号！");
-        return; 
-      }
+      const forum_id = parseInt(this.ForumInner_Id);
       getPostList(this.ForumInner_Id).then(res=>{
         if(res.data.code!=0){
           errHandle(res.data.msg);
@@ -358,11 +351,54 @@ export default
         this.fi_loadPage();
         successHandle("发布成功！");
       })
+    },
+    checkPermission() {
+      getForumInfo(parseInt(this.ForumInner_Id)).then(res => {
+        const forumPermission = parseInt(res.data.forumInfo.forumPermission);
+        getUserInfo(parseInt(this.fo_userId)).then(res01=>{
+          if(res01.data.code!=0){
+            errHandle("用户信息读取错误："+res01.data.msg);
+            return "error";
+          }
+          const userTypeNumber = parseInt(res01.data.userInfo.userType);
+          var userType = null;
+          switch (userTypeNumber) {
+            case 0: userType = "患者"; break;
+            case 1: userType = "医师"; break;
+            case 2: userType = "其他"; break;
+          }
+          console.log("用户类型："+userType);
+          console.log("论坛权限："+forumPermission);
+          if(userType!="医师" && forumPermission==1){
+            errHandle('对不起，您不是医师，无权访问仅医师可参与的论坛。');
+            msgHandle("对不起，您不是医师，无权访问仅医师可参与的论坛。您将被重定向至论坛概览页面。");
+            setTimeout(()=>{this.$router.push({path:"/main/Forum"});},1234);
+            return "error";
+          }
+          if(userType!="患者" && forumPermission==2){
+            errHandle('对不起，您不是患者，无权访问仅患者可参与的论坛。');  
+            msgHandle("对不起，您不是患者，无权访问仅患者可参与的论坛。您将被重定向至论坛概览页面。");
+            setTimeout(()=>{this.$router.push({path:"/main/Forum"});},1234);
+            return "error";
+          }
+        });
+      });
     }
   },
   mounted()
   {
-    this.fi_loadPage();
+    const forum_id = parseInt(this.$route.query.forumId);
+    if(forum_id!=undefined){ 
+      this.ForumInner_Id = forum_id;
+    }
+    else{
+      errHandle("出错：无法获取论坛编号！");
+      return; 
+    }
+    const result = this.checkPermission();
+    if(result != "error"){
+      this.fi_loadPage();
+    }
   }
 }
 </script>
