@@ -301,7 +301,7 @@ export default
               </div>
             </div>
             <div style="margin-left: 3rem; display: flex; align-items: center;">
-              <img :src="md_el_avatar_01_src" id="md-el-avatar-01" ref="md_el_avatar_01" style="border-radius: 4px; max-height: 8.5rem; max-width: 8.5rem; background-size: cover; box-shadow: 0 0.35rem 0.35rem 0 rgba(0,0,0,0.5);object-fit: cover;" /><br>
+              <el-image :src="md_el_avatar_01_src" id="md-el-avatar-01" ref="md_el_avatar_01" style="border-radius: 4px; max-height: 8.5rem; max-width: 8.5rem; background-size: cover; box-shadow: 0 0.35rem 0.35rem 0 rgba(0,0,0,0.5);object-fit: cover;" :preview-src-list="[md_el_avatar_01_src]"/><br>
             </div>
             </div>
             </div>

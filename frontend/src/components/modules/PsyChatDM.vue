@@ -153,9 +153,9 @@ export default
               setTimeout(() => this.$refs.ChatMainDiv.scrollTo({top:this.$refs.ChatMainDiv.scrollHeight,behavior:'smooth'}),350);
               this.PsyChat_SessionId=sessionId; // 新会话Id。
               this.PsyChat_HistoryDialog=false; // 关闭历史对话会话框。
-              successHandle('已加载会话记录'); 
+              successHandle('已加载会话记录');
             }  
-          }) 
+          });
         },
         pc_deleteSession(sessionId){
           deleteLlmSession(sessionId).then(res=>{
@@ -182,10 +182,10 @@ export default
    <div id="PsyChat-MainDiv">
       <el-container>
         <el-header id="PsyChat-elHeader">
-          <nobr>明康慧医智慧问答</nobr>
+          <nobr>明康慧医 智能体深度分析</nobr>
           <div id="PsyChat-Span01">
-            <div><nobr>MKTY医疗大模型 高效辅助您诊断疾病</nobr></div>
-            <div><span style="font-size: small;">MKTY Medical LLM, Efficiently Assisting You in Diagnosing Diseases</span></div>
+            <div><nobr>MKTY医疗大模型 智能体医师讨论机制</nobr></div>
+            <div><span style="font-size: small;">AI Agent Physician Discussion Mechanism for Deep Analyzing Based on MKTY Medical LLM</span></div>
           </div>
         </el-header>
       </el-container>
@@ -196,11 +196,11 @@ export default
             <el-button type="primary" @click="pc_newSession()" :disabled="PsyChat_Generating">新建会话</el-button>
             <el-button type="primary" @click="PsyChat_HistoryDialog=true" :disabled="PsyChat_Generating">会话记录</el-button>
             <el-button type="primary" @click="" :disabled="PsyChat_Generating">选择RAG知识库</el-button>
-            <el-button type="warning" @click="" :disabled="PsyChat_Generating">大模型讨论机制</el-button>
+            <el-button type="warning" @click="this.$router.push('/main/PsyChat')" :disabled="PsyChat_Generating">智慧问答模式</el-button>
          </div>
          <div id="PsyChat-NewDiv04">
             <span id="PsyChat-NewSpan01">
-             “明康慧医智慧问答”基于MKTY-3B-Chat大语言模型，该LLM发表的言论仅供参考，不具有绝对的真实性与可靠性。
+             “明康慧医智能体深度分析”基于MKTY-3B-Chat大语言模型，该LLM发表的言论仅供参考，不具有绝对的真实性与可靠性。
            </span>
          </div>
        </div>

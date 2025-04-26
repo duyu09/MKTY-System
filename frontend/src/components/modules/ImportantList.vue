@@ -346,8 +346,8 @@ export default
                   <div class="Medical-ItemDiv">事项类型:<br>【{{ item.listItemTimeMode }}】</div>
                   <div class="Medical-ItemDiv" v-if="item.listItemPriority_number==0">优先级:<br>【{{ item.listItemPriority }}】</div>
                   <div class="Medical-ItemDiv" style="font-weight: bold; color: red;" v-if="item.listItemPriority_number==1">优先级:<br>【{{ item.listItemPriority }}】</div>
-                  <div class="Medical-ItemDiv" v-if="item.listItemTimeMode_number == 0">{{ item.listItemStartTime }} ~ {{ item.listItemEndTime }}</div>
-                  <div class="Medical-ItemDiv" v-else-if="item.listItemTimeMode_number == 1">时间：每周<b>{{ item.listItemTimeWeek }}</b></div>
+                  <div class="Medical-ItemDiv" v-if="item.listItemTimeMode_number == 0" style="background-color: transparent;">{{ item.listItemStartTime }} ~ {{ item.listItemEndTime }}</div>
+                  <div class="Medical-ItemDiv" v-else-if="item.listItemTimeMode_number == 1" style="background-color: transparent;">时间：每周<b>{{ item.listItemTimeWeek }}</b></div>
                 </div>
                 <span class="Aims-Class-Span03">
                   <span class="Aims-Class-Span04" @click="il_finishItem(item.listItemId)"><el-icon><Finished /></el-icon>&nbsp;标记完成</span>&nbsp;
@@ -442,6 +442,9 @@ export default
   </el-dialog>
 
   <el-drawer title="添加诊疗事项" v-model="il_addItemDialogVisible" width="60%">
+    <div style="font-size: medium;padding: 0.8rem; margin-bottom: 1.25rem; border-radius: 9px; background-color: rgb(238,238,238);">
+      请注意：诊疗事项一旦创建成功则不可修改。
+    </div>
     <el-form>
       <el-form-item label="事项内容">
         <el-input placeholder="请输入事项内容" v-model="il_listItemContent"></el-input>
@@ -486,7 +489,7 @@ export default
 @font-face
 {
   font-family: HPHS;
-  src: url("../../assets/fonts/HPHS.woff");
+  src: url("/fonts/HPHS.woff");
 }
 #Aims-HeaderDiv
 {
@@ -671,8 +674,12 @@ export default
 {
   padding-left: 0.5rem;
   padding-right: 0.5rem;
-  border-left: double 3px #000;
-
+  /* border-left: double 3px #000; */
+  background-color: rgb(238,238,238);
+  margin-left: 0.25rem;
+  margin-right: 0.25rem;
+  border-radius: 10px;
+  padding: 0.4rem;
   
 }
 #PsyChat-Div06
