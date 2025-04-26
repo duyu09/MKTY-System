@@ -237,10 +237,12 @@ export default
     <main>
       <div class="py-3 text-center">
         <img class="d-block mx-auto mb-4" src="/images/mkty_en_light.svg" alt="" width="550" height="120" id="logoImg">
+        <div style="background-color: rgb(230,230,230); padding: 1.5rem; border-radius: 18px;">
         <h2><nobr><span style="font-family: hanwang,serif;font-size: larger;">明康慧醫&nbsp;<wbr>智慧醫療大平臺</span></nobr><wbr><nobr>&nbsp;个人账号注册</nobr></h2>
-        <p class="lead" style="font-family: font01,serif;font-weight: lighter;">
+        <span class="lead" style="font-family: font01,serif;font-weight: lighter;">
           MKTY智慧医疗平台 AI新技术助力医疗行业发展 为医师减负 使患者安心！
-        </p>
+        </span>
+        </div>
       </div>
       <hr class="my-4">
 

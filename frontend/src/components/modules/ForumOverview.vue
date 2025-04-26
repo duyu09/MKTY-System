@@ -18,7 +18,8 @@ export default
   data()
   {
     return{
-      fo_userId:getCookie("userId"),
+      fo_userId:parseInt(getCookie("userId")),
+      fo_userTypeNumber:0,
       Search:Search,
       ForumData:[{"forumCreateTime": "2025年", "forumCreator": 1, "forumId": 2, "forumName": "测试论坛", "forumType": "医学知识论坛","forumPermission": "不限人员", "forumCreatorName":"加载中...","forumCreatorAvatar":"","forumCreatorType":"加载中","forumCreatorDescription":"加载中..."}],
       SearchBoxContext:'',

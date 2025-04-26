@@ -1,6 +1,6 @@
 <script>
 import { errHandle, successHandle, msgHandle } from "@/utils/tools";
-import { addForum } from "@/api/api";
+import { addForum, getCookie, getUserInfo } from "@/api/api";
 
 export default
 {
@@ -8,7 +8,7 @@ export default
   data()
   {
     return{
-      userId:0,
+      cf_userId:parseInt(getCookie("userId")),
       ForumName:'',
       ForumAttr:'',
       ForumDesc:'',
@@ -28,15 +28,35 @@ export default
             msgHandle('请输入论坛名称。');
             return; 
           }
-          addForum(this.ForumName, parseInt(this.cf_forumType), parseInt(this.cf_forumPermission)).then(res=>{
-            if(res.data.code==0){
-              successHandle('创建论坛成功：你创建的论坛编号为'+res.data.forumId+"号，您可前往论坛概览版块查看。");
-              setTimeout(()=>{this.$router.go(0);},1234);
+          getUserInfo(this.cf_userId).then(res=>{
+            if(res.data.code!=0){ 
+              errHandle('未能成功获取用户信息：' + res.data.msg);return;  
             }
-            else
-            { errHandle('未能成功创建论坛：' + res.data.msg);return; }
-          }).catch(res=>{
-            errHandle('未能成功创建论坛：'+res);return;
+            
+            const userTypeNumber = res.data.userInfo.userType;
+            var userType = null;
+            switch (userTypeNumber) {
+              case 0: userType = "患者"; break;
+              case 1: userType = "医师"; break;
+              case 2: userType = "其他"; break;
+            }
+            if(userType!="医师" && this.cf_forumPermission=="1"){
+              errHandle('对不起，您不是医师，无法创建仅医师可参与的论坛。');return;
+            }
+            if(userType!="患者" && this.cf_forumPermission=="2"){
+              errHandle('对不起，您不是患者，无法创建仅患者可参与的论坛。');return;
+            }
+            addForum(this.ForumName, parseInt(this.cf_forumType), parseInt(this.cf_forumPermission)).then(res=>{
+              if(res.data.code==0){
+                successHandle('创建论坛成功：你创建的论坛编号为'+res.data.forumId+"号，您可前往论坛概览版块查看。");
+                setTimeout(()=>{this.$router.go(0);},1234);
+              }
+              else{ 
+                errHandle('未能成功创建论坛：' + res.data.msg);return; 
+              }
+            }).catch(res=>{
+              errHandle('未能成功创建论坛：'+res);return;
+            });
           });
         },
       }
