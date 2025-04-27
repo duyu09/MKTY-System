@@ -67,14 +67,14 @@ export default
       this.loading = true;
       this.ForumInner_Arr = [];
       const forum_id = parseInt(this.ForumInner_Id);
-      getPostList(this.ForumInner_Id).then(res=>{
+      getPostList(this.ForumInner_Id).then(async (res)=>{
         if(res.data.code!=0){
           errHandle(res.data.msg);
           return;
         }
         this.ForumInner_PostList = res.data.postList;
-        this.ForumInner_PostList.forEach(item=>{
-          getPostContent(parseInt(item)).then(res02=>{
+        for (const item of this.ForumInner_PostList) {
+          const res02 = await getPostContent(parseInt(item));
             if(res02.data.code!=0){
               errHandle(res02.data.msg);
             }
@@ -121,8 +121,8 @@ export default
                 this.ForumInner_Arr.sort((b, a) => parseInt(a.postCreateTimeNumber) - parseInt(b.postCreateTimeNumber));
               });
             });
-          });
-        });
+          
+        };
       });
       this.loading = false;
 
@@ -269,7 +269,7 @@ export default
           const img = new Image();
           img.onload = () => {
             // 计算缩放比例
-            const maxSize = 350;
+            const maxSize = 550;
             let width = img.width;
             let height = img.height;
             if (width > height && width > maxSize) {
@@ -286,7 +286,7 @@ export default
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0, width, height);
             // 转换为webp格式的base64
-            const webpDataUrl = canvas.toDataURL('image/webp', 0.654321);
+            const webpDataUrl = canvas.toDataURL('image/webp', 0.8);
             resolve(webpDataUrl);
           };
           img.src = dataUrl;

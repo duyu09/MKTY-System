@@ -169,7 +169,7 @@ jQuery('.login-reg-panel input[type="radio"]').on('change', function() {
         <img src="/images/mkty_en_light.svg" />
         <input type="text" placeholder="User Identification" v-model="userLoginKey" style="border-radius: 10px;border-width: 2px;">
         <input type="password" placeholder="Password" v-model="password" style="border-radius: 10px;border-width: 2px;">
-        <input type="button" value="登录平台" style="border-radius: 10px;border-width: 2px;" @click="LoginBtn()">
+        <input type="button" value="登录平台" class="login-input-button" @click="LoginBtn()">
         <div>
           <div class="form-check" id="conf_check01">
             <input type="checkbox" class="form-check-input" id="conf" checked v-model="userLoginKeyType">
@@ -241,6 +241,17 @@ input[type="text"]:active,input[type="password"]:active
   animation: frame01 3s;
   height:100%;
   transition: background-image 0.888s ease-in-out;
+}
+.login-input-button
+{
+  border-radius: 12px !important;
+  border-width: 2px;
+}
+.login-input-button:hover
+{
+  background-color: #007bff;
+  color: #fff;
+  transition: background-color 0.3s ease-in-out;
 }
 @keyframes frame01
 {

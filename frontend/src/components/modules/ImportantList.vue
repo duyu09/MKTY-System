@@ -680,7 +680,12 @@ export default
   margin-right: 0.25rem;
   border-radius: 10px;
   padding: 0.4rem;
-  
+}
+.Medical-ItemDiv:hover
+{
+  background-color: rgb(208,208,208);
+  transition: background-color 0.18s ease-in-out;
+  font-weight: bold;
 }
 #PsyChat-Div06
 {

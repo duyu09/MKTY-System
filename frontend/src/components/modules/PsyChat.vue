@@ -7,6 +7,7 @@ import { Promotion, Avatar, Delete, ChatDotSquare } from '@element-plus/icons-vu
 import { marked }  from "marked";
 import DOMPurify from "dompurify";
 import 'highlight.js/styles/rainbow.css';
+import "@/assets/css/rainbow_text.css"
 import hljs from 'highlight.js';
 import { errHandle, successHandle, convertTime } from "@/utils/tools";
 import { getCookie, getUserAvatar, llmInferenceGetStatus, llmInferenceSubmitTask, saveLlmSession, 
@@ -34,7 +35,8 @@ export default
           {'role': 'assistant','content': '你好，我是MKTY明康慧医大模型，我将为您解决医疗相关问题。'},
         ],
         PsyChat_LlmSessionList:[],
-        PsyChat_LlmSessionListLoading: false // 历史对话会话框加载中。
+        PsyChat_LlmSessionListLoading: false, // 历史对话会话框加载中。
+        PsyChat_AiThinkingString: 'AI正在思考...', // AI正在思考的提示字符串。
       }
     },
   methods:
@@ -46,7 +48,7 @@ export default
           const history_ChatArr = JSON.parse(JSON.stringify(this.PsyChat_ChatArr)); // 复制一份聊天记录。
           this.PsyChat_ChatArr.push({'role': 'user', 'content': this.PsyChat_Context});
           setTimeout(() => this.$refs.ChatMainDiv.scrollTo({top: this.$refs.ChatMainDiv.scrollHeight, behavior: 'smooth'}), 200);
-          this.PsyChat_ChatArr.push({'role': 'assistant', 'content': 'AI正在思考...'});
+          this.PsyChat_ChatArr.push({'role': 'assistant', 'content': this.PsyChat_AiThinkingString});
           console.log("history_ChatArr", history_ChatArr);
           console.log("PsyChat_ChatArr", this.PsyChat_ChatArr);
 
@@ -224,7 +226,8 @@ export default
                 <img src="/images/mkty_icon.png" style="width: 100%;height: 100%;border-radius: 0.2rem;">
               </div>
               <div class="PsyChat-Chat-Opposite-02">
-                <p v-html="item.content"></p>
+                <p v-if="item.content==this.PsyChat_AiThinkingString" v-html="item.content" class="rainbow_text"></p>
+                <p v-else v-html="item.content"></p>
               </div>
             </div>
           </div>

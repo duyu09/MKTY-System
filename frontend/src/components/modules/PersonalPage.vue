@@ -43,6 +43,8 @@ export default
         avatarFormVisible:false,  // 修改头像弹窗打开状态
         mailFormVisible:false,  // 查看留言弹窗打开状态
         mailToOtherFormVisible:false,  // 给TA留言弹窗打开状态
+        mailFormLoading:false,  // 留言表单加载状态
+        mailToLoading:false,  // 给TA留言表单加载状态
         backgroundImageNumber:7,  // 服务器中预设的背景图片总数量
         mailFormArray:[],  // 接收到的留言数据
         mailToArray:[],  // 发送的留言数据
@@ -391,16 +393,17 @@ export default
         }, 
         getMailFromInfo(){
           // 获取发给我的留言
-          getMailList().then(res=>{
+          getMailList().then(async (res)=>{
             if(res.data.code!==0){
               errHandle('警告：读取留言列表错误。');
             }
             else {
               // console.log(res.data);
               const tempArray=res.data.mailList;
-              tempArray.forEach((tempArray_item) => {
+              this.mailFormLoading = true;
+              for (const tempArray_item of tempArray) {
                 const mailFromUserId = parseInt(tempArray_item.mailFromUserId);
-                getUserInfo(mailFromUserId).then(res2=>{
+                const res2 = await getUserInfo(mailFromUserId);
                   if(res2.data.code!==0){
                     errHandle('警告：读取用户基本信息错误。');
                   }
@@ -441,23 +444,24 @@ export default
                         });
                     }});
                   }
-                });
-              });
+              };
+              this.mailFormLoading = false;
             }
           });
         },
         getMailToInfo(){
           // 获取发给我的留言
           this.mailToArray=[];
-          getMailList_Reverse().then(res=>{
+          getMailList_Reverse().then(async (res)=>{
             if(res.data.code!==0){
               errHandle('警告：读取留言列表错误。');
             }
             else {
               const tempArray=res.data.mailList;
-              tempArray.forEach((tempArray_item) => {
+              this.mailToLoading = true;
+              for (const tempArray_item of tempArray) {
                 const mailFromUserId = parseInt(tempArray_item.mailToUserId); // 注意这里是mailToUserId，只改这一处，其他的都不用改了
-                getUserInfo(mailFromUserId).then(res2=>{
+                const res2 = await getUserInfo(mailFromUserId)
                   if(res2.data.code!==0){
                     errHandle('警告：读取用户基本信息错误。');
                   }
@@ -500,8 +504,8 @@ export default
                         });
                     }});
                   }
-                });
-              });
+              };
+              this.mailToLoading = false;
             }
           });
         },
@@ -567,8 +571,6 @@ export default
   mounted()
   {
     this.loadPage();
-    
-
   }
 }
 </script>
@@ -584,7 +586,7 @@ export default
           </div>
         </div>
         <div id="PersonalPage-Div04">
-          <el-card style="font-size: 1rem;border-radius: 15px;"  v-loading="loading" element-loading-text="加载中..." element-loading-background="rgba(0, 0, 0, 0.2)">
+          <el-card style="font-size: 1rem;border-radius: 15px;" v-loading="loading" element-loading-text="加载中..." element-loading-background="rgba(0, 0, 0, 0.2)">
             <template #header>
               <div class="card-header">
                 <span style="font-size: large;"><b>用户个人信息清单</b></span>&nbsp;&nbsp;
@@ -758,7 +760,7 @@ export default
 
       <el-drawer v-model="mailFormVisible" title="留言查看" style="min-width: 16rem;font-size: large;font-family: noto;" @opened="this.mailActiveName='ToMe';mailTabChange();">
         <el-tabs v-model="mailActiveName" class="demo-tabs" style="height: 100%;" @tab-change="mailTabChange()">
-          <el-tab-pane label="发给我的留言" name="ToMe">
+          <el-tab-pane label="发给我的留言" name="ToMe" v-loading="this.mailToLoading" element-loading-text="加载中..." element-loading-background="rgba(0, 0, 0, 0.2)">
             <div style="display: flex;flex-direction: column;align-items: flex-start;height: 100%;overflow-y: auto; overflow-x: hidden;">
               <div v-for="item in mailFormArray" style="width: 100%;text-align: left;">
                 <div style="display: flex;align-items: center; margin-left: 0.25rem;">
@@ -793,8 +795,7 @@ export default
               </div>
             </div>
           </el-tab-pane>
-          <el-tab-pane label="我发送的留言" name="FromMe">
-
+          <el-tab-pane label="我发送的留言" name="FromMe" v-loading="this.mailFromLoading" element-loading-text="加载中..." element-loading-background="rgba(0, 0, 0, 0.2)">
             <div style="display: flex;flex-direction: column;align-items: flex-start;height: 100%;overflow-y: auto; overflow-x: hidden;">
               <div v-for="item in mailToArray" style="width: 100%;text-align: left;">
                 <div style="display: flex;align-items: center; margin-left: 0.25rem;">

@@ -3,7 +3,7 @@
 <!-- 创建日期：2025年03月10日 -->
 <!-- 修改日期：2025年04月06日 -->
 <script>
-import { Promotion, Avatar, Delete, ChatDotSquare } from '@element-plus/icons-vue';
+import { Promotion, Avatar, Delete, ChatDotSquare, Setting } from '@element-plus/icons-vue';
 import { marked }  from "marked";
 import DOMPurify from "dompurify";
 import 'highlight.js/styles/rainbow.css';
@@ -21,6 +21,7 @@ export default
       'Avatar': Avatar,
       'Delete': Delete,
       'ChatDotSquare': ChatDotSquare,
+      'Setting': Setting,
     },
     data()
     {
@@ -31,7 +32,6 @@ export default
         PsyChat_Generating: false, // 页面状态，回答是否在生成中。
         PsyChat_SessionId: -1, // 会话ID号。默认是-1（新会话为-1）。
         PsyChat_ChatArr: [  // assistant=大模型智能体；user=用户，
-          {'role': 'assistant','content': '你好，我是MKTY明康慧医大模型，我将为您解决医疗相关问题。'},
         ],
         PsyChat_LlmSessionList:[],
         PsyChat_LlmSessionListLoading: false // 历史对话会话框加载中。
@@ -235,8 +235,11 @@ export default
       <div id="PsyChat-Div06">
         <div id="PsyChat-Div07" v-loading="PsyChat_Generating" element-loading-background="rgba(0, 0, 0, 0.75)">
           <input id="PsyChat-InputBox01" placeholder="请输入疾病诊疗相关问题" v-model="PsyChat_Context" @keyup.enter="PsyChat_Send()" />
-          <div id="PsyChat-SendButtonDiv" @click="PsyChat_Send()">
-            <el-icon><Promotion /></el-icon>&nbsp;<span id="PsyChat-Span02">发送</span>
+          <div class="PsyChat-SendButtonDiv" @click="">
+            <el-icon><Setting /></el-icon>&nbsp;<span class="PsyChat-Span02">设参数</span>
+          </div>
+          <div class="PsyChat-SendButtonDiv" @click="PsyChat_Send()">
+            <el-icon><Promotion /></el-icon>&nbsp;<span class="PsyChat-Span02">发送</span>
           </div>
         </div>
       </div>
@@ -386,7 +389,7 @@ export default
   text-shadow: 1px 0.5px darkred;
   font-family: HPHS;
 }
-#PsyChat-Span02
+.PsyChat-Span02
 {
   font-weight: bold;
 }
@@ -460,7 +463,7 @@ export default
   background-color: transparent;
   border: none;
   outline: none;
-  width:85%;
+  width:72%;
   height: 100%;
   font-size: 1rem;
   text-indent: 0.75rem;
@@ -471,7 +474,7 @@ export default
   border: none;
   outline: none;
 }
-#PsyChat-SendButtonDiv
+.PsyChat-SendButtonDiv
 {
   background-color: rgba(255,165,0,0.2);
   box-shadow: 0 0 0.35rem 0.05rem rgba(0,0,0,0.4);
@@ -487,11 +490,11 @@ export default
   align-items: center;
   height: 80%;
 }
-#PsyChat-SendButtonDiv:hover
+.PsyChat-SendButtonDiv:hover
 {
   background-color: rgba(255,165,0,0.333);
 }
-#PsyChat-SendButtonDiv:active
+.PsyChat-SendButtonDiv:active
 {
   background-color: rgba(255,165,0,0.45);
 }
