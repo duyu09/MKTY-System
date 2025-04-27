@@ -196,7 +196,7 @@ export default
             <el-button type="primary" @click="pc_newSession()" :disabled="PsyChat_Generating">新建会话</el-button>
             <el-button type="primary" @click="PsyChat_HistoryDialog=true" :disabled="PsyChat_Generating">会话记录</el-button>
             <el-button type="primary" @click="" :disabled="PsyChat_Generating">选择RAG知识库</el-button>
-            <el-button type="warning" @click="" :disabled="PsyChat_Generating">大模型讨论机制</el-button>
+            <el-button type="warning" @click="this.$router.push('/main/PsyChatDM')" :disabled="PsyChat_Generating">大模型讨论机制</el-button>
          </div>
          <div id="PsyChat-NewDiv04">
             <span id="PsyChat-NewSpan01">
@@ -522,6 +522,7 @@ export default
 {
   font-weight: bold; 
   background-color: rgba(0, 0, 255, 0.3);
+  transition: background-color 0.5s ease;
 }
 .PsyChat-Chat-Me-03
 {
@@ -561,6 +562,7 @@ export default
 {
   font-weight: bold; 
   background-color: rgba(0, 0, 0, 0.2);
+  transition: background-color 0.5s ease;
 }
 .PsyChat-Chat-Opposite-03
 {
