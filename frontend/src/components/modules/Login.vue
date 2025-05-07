@@ -195,7 +195,7 @@ jQuery('.login-reg-panel input[type="radio"]').on('change', function() {
     </div>
   </div>
 
-  <center>
+  <!-- <center>
     <div>
       <div class="mobile-view">
 
@@ -211,12 +211,12 @@ jQuery('.login-reg-panel input[type="radio"]').on('change', function() {
           <a href=""><div class="forget">忘记密码?</div></a><br> <br>
           <div class="bottom">
             <div class="text">您没有注册? </div>
-            <div class="reg"><a href="./register/index.html" style="border-width: 2px;">注册账号</a></div>
+            <div class="reg"><a href="/register" style="border-width: 2px;">注册账号</a></div>
           </div>
         </div>
       </div>
     </div>
-  </center>
+  </center> -->
 
 
 

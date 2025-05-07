@@ -3,7 +3,7 @@
 <!-- 创建日期：2025年03月10日 -->
 <!-- 修改日期：2025年04月06日 -->
 <script>
-import { Promotion, Avatar, Delete, ChatDotSquare } from '@element-plus/icons-vue';
+import { Promotion, Avatar, Delete, ChatDotSquare, Clock } from '@element-plus/icons-vue';
 import { marked }  from "marked";
 import DOMPurify from "dompurify";
 import 'highlight.js/styles/rainbow.css';
@@ -22,6 +22,7 @@ export default
       'Avatar': Avatar,
       'Delete': Delete,
       'ChatDotSquare': ChatDotSquare,
+      'Clock': Clock,
     },
     data()
     {
@@ -245,7 +246,7 @@ export default
       </div>
 
 
-      <el-drawer v-model="PsyChat_HistoryDialog" title="会话历史" direction="ltr" @open="pc_getLlmSessionList()">
+      <el-drawer v-model="PsyChat_HistoryDialog" title="MKTY智慧问答 会话历史" direction="ltr" @open="pc_getLlmSessionList()">
         <el-scrollbar height="100%" style="font-size: large;" v-loading="PsyChat_LlmSessionListLoading" element-loading-text="加载中..." element-loading-background="rgba(0, 0, 0, 0.2)">
           <div v-for="item in PsyChat_LlmSessionList" class="PsyChat-SessionListItem-BG-Div">
                 <div class="PsyChat-SessionListItem" @click="pc_loadSession(item.sessionId)">
@@ -253,7 +254,9 @@ export default
                   {{ item.sessionTitle }}
                 </div>
                 <div style="text-align: right;">
-                  <span style="font-size: small;">{{ pc_conTime(item.sessionSaveTime * 1000) }}</span>&nbsp;
+                  <span style="font-size: small;">
+                    <el-icon><Clock /></el-icon>{{ pc_conTime(item.sessionSaveTime * 1000) }}
+                  </span>&nbsp;
                   <el-popconfirm title="您确定删除吗？" @confirm="pc_deleteSession(item.sessionId)" @cancel="">
                     <template #reference>
                       <el-icon size="small" color="red" style="cursor: pointer; font-weight: bold;">
@@ -303,7 +306,7 @@ export default
 }
 .PsyChat-SessionListItem
 {
-  margin: 0.75rem 0.25rem 0rem 0.25rem;
+  padding: 0.75rem 0.25rem 0rem 0.5rem;
   cursor: pointer;
 }
 .PsyChat-SessionListItem:hover
@@ -313,7 +316,9 @@ export default
 }
 .PsyChat-SessionListItem-BG-Div
 {
-  width: 100%;text-align: left;
+  width: 100%;
+  text-align: left;
+  border-radius: 9px;
 }
 .PsyChat-SessionListItem-BG-Div:hover
 {
