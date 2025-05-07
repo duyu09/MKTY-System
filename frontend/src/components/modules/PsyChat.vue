@@ -3,10 +3,11 @@
 <!-- 创建日期：2025年03月10日 -->
 <!-- 修改日期：2025年04月06日 -->
 <script>
-import { Promotion, Avatar, Delete, ChatDotSquare } from '@element-plus/icons-vue';
+import { Promotion, Avatar, Delete, ChatDotSquare, Clock } from '@element-plus/icons-vue';
 import { marked }  from "marked";
 import DOMPurify from "dompurify";
 import 'highlight.js/styles/rainbow.css';
+import "@/assets/css/rainbow_text.css"
 import hljs from 'highlight.js';
 import { errHandle, successHandle, convertTime } from "@/utils/tools";
 import { getCookie, getUserAvatar, llmInferenceGetStatus, llmInferenceSubmitTask, saveLlmSession, 
@@ -21,6 +22,7 @@ export default
       'Avatar': Avatar,
       'Delete': Delete,
       'ChatDotSquare': ChatDotSquare,
+      'Clock': Clock,
     },
     data()
     {
@@ -34,7 +36,8 @@ export default
           {'role': 'assistant','content': '你好，我是MKTY明康慧医大模型，我将为您解决医疗相关问题。'},
         ],
         PsyChat_LlmSessionList:[],
-        PsyChat_LlmSessionListLoading: false // 历史对话会话框加载中。
+        PsyChat_LlmSessionListLoading: false, // 历史对话会话框加载中。
+        PsyChat_AiThinkingString: 'AI正在思考...', // AI正在思考的提示字符串。
       }
     },
   methods:
@@ -46,7 +49,7 @@ export default
           const history_ChatArr = JSON.parse(JSON.stringify(this.PsyChat_ChatArr)); // 复制一份聊天记录。
           this.PsyChat_ChatArr.push({'role': 'user', 'content': this.PsyChat_Context});
           setTimeout(() => this.$refs.ChatMainDiv.scrollTo({top: this.$refs.ChatMainDiv.scrollHeight, behavior: 'smooth'}), 200);
-          this.PsyChat_ChatArr.push({'role': 'assistant', 'content': 'AI正在思考...'});
+          this.PsyChat_ChatArr.push({'role': 'assistant', 'content': this.PsyChat_AiThinkingString});
           console.log("history_ChatArr", history_ChatArr);
           console.log("PsyChat_ChatArr", this.PsyChat_ChatArr);
 
@@ -224,7 +227,8 @@ export default
                 <img src="/images/mkty_icon.png" style="width: 100%;height: 100%;border-radius: 0.2rem;">
               </div>
               <div class="PsyChat-Chat-Opposite-02">
-                <p v-html="item.content"></p>
+                <p v-if="item.content==this.PsyChat_AiThinkingString" v-html="item.content" class="rainbow_text"></p>
+                <p v-else v-html="item.content"></p>
               </div>
             </div>
           </div>
@@ -242,7 +246,7 @@ export default
       </div>
 
 
-      <el-drawer v-model="PsyChat_HistoryDialog" title="会话历史" direction="ltr" @open="pc_getLlmSessionList()">
+      <el-drawer v-model="PsyChat_HistoryDialog" title="MKTY智慧问答 会话历史" direction="ltr" @open="pc_getLlmSessionList()">
         <el-scrollbar height="100%" style="font-size: large;" v-loading="PsyChat_LlmSessionListLoading" element-loading-text="加载中..." element-loading-background="rgba(0, 0, 0, 0.2)">
           <div v-for="item in PsyChat_LlmSessionList" class="PsyChat-SessionListItem-BG-Div">
                 <div class="PsyChat-SessionListItem" @click="pc_loadSession(item.sessionId)">
@@ -250,7 +254,9 @@ export default
                   {{ item.sessionTitle }}
                 </div>
                 <div style="text-align: right;">
-                  <span style="font-size: small;">{{ pc_conTime(item.sessionSaveTime * 1000) }}</span>&nbsp;
+                  <span style="font-size: small;">
+                    <el-icon><Clock /></el-icon>{{ pc_conTime(item.sessionSaveTime * 1000) }}
+                  </span>&nbsp;
                   <el-popconfirm title="您确定删除吗？" @confirm="pc_deleteSession(item.sessionId)" @cancel="">
                     <template #reference>
                       <el-icon size="small" color="red" style="cursor: pointer; font-weight: bold;">
@@ -300,7 +306,7 @@ export default
 }
 .PsyChat-SessionListItem
 {
-  margin: 0.75rem 0.25rem 0rem 0.25rem;
+  padding: 0.75rem 0.25rem 0rem 0.5rem;
   cursor: pointer;
 }
 .PsyChat-SessionListItem:hover
@@ -310,7 +316,9 @@ export default
 }
 .PsyChat-SessionListItem-BG-Div
 {
-  width: 100%;text-align: left;
+  width: 100%;
+  text-align: left;
+  border-radius: 9px;
 }
 .PsyChat-SessionListItem-BG-Div:hover
 {

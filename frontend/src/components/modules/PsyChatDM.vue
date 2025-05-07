@@ -3,7 +3,7 @@
 <!-- 创建日期：2025年03月10日 -->
 <!-- 修改日期：2025年04月06日 -->
 <script>
-import { Promotion, Avatar, Delete, ChatDotSquare } from '@element-plus/icons-vue';
+import { Promotion, Avatar, Delete, ChatDotSquare, Setting, CaretRight } from '@element-plus/icons-vue';
 import { marked }  from "marked";
 import DOMPurify from "dompurify";
 import 'highlight.js/styles/rainbow.css';
@@ -11,6 +11,7 @@ import hljs from 'highlight.js';
 import { errHandle, successHandle, convertTime } from "@/utils/tools";
 import { getCookie, getUserAvatar, llmInferenceGetStatus, llmInferenceSubmitTask, saveLlmSession, 
   getLlmSessionList, getLlmSession, deleteLlmSession } from "@/api/api";
+
 
 export default
 {
@@ -21,6 +22,8 @@ export default
       'Avatar': Avatar,
       'Delete': Delete,
       'ChatDotSquare': ChatDotSquare,
+      'Setting': Setting,
+      'CaretRight': CaretRight,
     },
     data()
     {
@@ -31,73 +34,20 @@ export default
         PsyChat_Generating: false, // 页面状态，回答是否在生成中。
         PsyChat_SessionId: -1, // 会话ID号。默认是-1（新会话为-1）。
         PsyChat_ChatArr: [  // assistant=大模型智能体；user=用户，
-          {'role': 'assistant','content': '你好，我是MKTY明康慧医大模型，我将为您解决医疗相关问题。'},
         ],
         PsyChat_LlmSessionList:[],
-        PsyChat_LlmSessionListLoading: false // 历史对话会话框加载中。
+        PsyChat_LlmSessionListLoading: false, // 历史对话会话框加载中。
+
+        PsyChatDM_HyperParametersAdjustmentDialog: false, // 超参数调整对话框是否显示。
+        PsyChatDM_HyperParameters_AgentNumber: 3, // 参与讨论智能体数量。
+        PsyChatDM_HyperParameters_Epoch: 3, // 讨论回合数。
+        PsyChatDM_HyperParameters_ConvergenceThreshold: 0.80, // 收敛阈值。
       }
     },
   methods:
       {
         PsyChat_Send(){
-          if(this.PsyChat_Context==='') return;  // 聊天框为空时，不发送。
-          if(this.PsyChat_Generating) return;  // 如果正在生成中，不发送。
-          this.PsyChat_Generating=true;  // 正在生成中。
-          const history_ChatArr = JSON.parse(JSON.stringify(this.PsyChat_ChatArr)); // 复制一份聊天记录。
-          this.PsyChat_ChatArr.push({'role': 'user', 'content': this.PsyChat_Context});
-          setTimeout(() => this.$refs.ChatMainDiv.scrollTo({top: this.$refs.ChatMainDiv.scrollHeight, behavior: 'smooth'}), 200);
-          this.PsyChat_ChatArr.push({'role': 'assistant', 'content': 'AI正在思考...'});
-          console.log("history_ChatArr", history_ChatArr);
-          console.log("PsyChat_ChatArr", this.PsyChat_ChatArr);
-
-          llmInferenceSubmitTask(history_ChatArr, this.PsyChat_Context).then((res) => {
-          if(res.data.code != 0) { 
-            errHandle("未成功发送数据：" + res.data.msg);
-            this.PsyChat_Generating = false;
-            return;
-          }
-          const task_id = res.data.taskId;
-          const pc_aiIntervalId = setInterval(() => {
-            llmInferenceGetStatus(task_id).then((res2) => {
-              if(res2.data.code != 0) { 
-                clearInterval(pc_aiIntervalId);
-                errHandle("未成功获取响应：" + res2.data.msg);
-                this.PsyChat_Generating = false;
-                return;
-              }
-              if(res2.data.taskStatus == 0){
-                clearInterval(pc_aiIntervalId);
-                const task_result = res2.data.taskResult;
-                const temp_result_rendered = DOMPurify.sanitize(marked(task_result));
-                this.PsyChat_ChatArr[this.PsyChat_ChatArr.length - 1].content = temp_result_rendered;
-                this.$nextTick(()=>{
-                  setTimeout(() => this.$refs.ChatMainDiv.scrollTo({top:this.$refs.ChatMainDiv.scrollHeight,behavior:'smooth'}),350);
-                  setTimeout(() => {
-                    hljs.highlightAll();
-                  },350);
-                });
-                setTimeout(() => this.$refs.ChatMainDiv.scrollTo({top:this.$refs.ChatMainDiv.scrollHeight,behavior:'smooth'}),350);
-                this.PsyChat_Generating = false;
-                this.PsyChat_Context='';
-                // 这里写保存聊天记录的代码。
-                saveLlmSession(this.PsyChat_SessionId, this.PsyChat_ChatArr, 0).then((res3) => {
-                  if(res3.data.code!= 0) { 
-                    errHandle("未成功保存聊天记录：" + res3.data.msg); 
-                  }
-                  else {
-                    console.log("保存聊天记录成功。");
-                    this.PsyChat_SessionId = res3.data.sessionId; // 更新会话ID号。
-                  }
-                })
-              }
-            });
-          }, 2500)
-          }).catch((res) => {
-            this.PsyChat_Context='';
-            this.PsyChat_Generating = false;
-            errHandle("未成功发送数据：" + res);
-            setTimeout(() => this.$refs.ChatMainDiv.scrollTo({top:this.$refs.ChatMainDiv.scrollHeight,behavior:'smooth'}),350);
-          });
+          
         },
         pc_loadPage(){
           const userId=parseInt(getCookie('userId'));
@@ -208,35 +158,50 @@ export default
 
       <div id="PsyChat-Div04" style="margin-top: 1rem;">
         <div id="PsyChat-Div05" ref="ChatMainDiv">
-
-          <div v-for="item in PsyChat_ChatArr">
-            <div v-if="item.role==='user'" class="PsyChat-Chat-Me-01">
-              <div class="PsyChat-Chat-Me-02">
-                <p v-html="item.content"></p>
-              </div>
-              <div class="PsyChat-Chat-Me-03">
-                <img :src="PsyChat_userAvatar" style="width: 100%;height: 100%;border-radius: 0.2rem;">
-              </div>
+          <div style="margin-top: 1rem; margin-left: 1rem; justify-content: left;">
+            <div style="background-color: rgb(230,230,230); padding: 0.5rem 0.5rem 0.5rem 0.8rem; border-radius: 18px; width: 95%;">
+              <b>待研究问题：</b>xxxxxxxxxx<br>
+              <b>Agent数量：</b>3个；<b>讨论回合数：</b>3回合；<b>收敛阈值：</b>0.80；<b>状态：</b>正在分析...
             </div>
+          </div>
 
-            <div v-if="item.role==='assistant'" class="PsyChat-Chat-Opposite-01">
-              <div class="PsyChat-Chat-Opposite-03">
-                <img src="/images/mkty_icon.png" style="width: 100%;height: 100%;border-radius: 0.2rem;">
+          <div style="margin-top: 1rem; margin-left: 1rem;">
+          <el-steps
+          style="width: 100%; font-family: HPHS; font-weight: bold;"
+          :space="100"
+          :active="2"
+          finish-status="success"
+          >
+            <el-step title="Done" />
+            <el-step title="Processing" />
+            <el-step title="Step 3" />
+            <el-step title="Step 4" />
+            <el-step title="Step 5" />
+          </el-steps>
+          </div>
+
+          <div style="display: flex; justify-content: center; margin-top: 2rem;">
+            <div style="width: 88%;">
+              <div style="margin-bottom: 0.25rem; font-weight: bold;">
+                分析结果实时展示：
               </div>
-              <div class="PsyChat-Chat-Opposite-02">
-                <p v-html="item.content"></p>
-              </div>
+                <el-collapse style="font-family: HPHS;">
+                <el-collapse-item title="&nbsp;&nbsp;智能体01" name="1">123123</el-collapse-item>
+                <el-collapse-item title="&nbsp;&nbsp;智能体02" name="2">123123</el-collapse-item>
+              </el-collapse>
             </div>
           </div>
 
         </div>
-
       </div>
       <div id="PsyChat-Div06">
         <div id="PsyChat-Div07" v-loading="PsyChat_Generating" element-loading-background="rgba(0, 0, 0, 0.75)">
-          <input id="PsyChat-InputBox01" placeholder="请输入疾病诊疗相关问题" v-model="PsyChat_Context" @keyup.enter="PsyChat_Send()" />
-          <div id="PsyChat-SendButtonDiv" @click="PsyChat_Send()">
-            <el-icon><Promotion /></el-icon>&nbsp;<span id="PsyChat-Span02">发送</span>
+          <input id="PsyChat-InputBox01" placeholder="请输入需要深度研究分析的医学问题" v-model="PsyChat_Context" @keyup.enter="PsyChat_Send()" />
+          <div class="PsyChat-SendButtonDiv" @click="this.PsyChatDM_HyperParametersAdjustmentDialog=true;">
+            <el-icon><Setting /></el-icon>&nbsp;<span class="PsyChat-Span02">设参数</span>
+          </div>
+          <div class="PsyChat-SendButtonDiv" @click="PsyChat_Send()">
+            <el-icon><Promotion /></el-icon>&nbsp;<span class="PsyChat-Span02">发送</span>
           </div>
         </div>
       </div>
@@ -265,21 +230,40 @@ export default
         </el-scrollbar>
       </el-drawer>
 
+      <el-dialog title="MKTY大模型讨论机制 超参数设置面板" v-model="this.PsyChatDM_HyperParametersAdjustmentDialog">
+        <div style="">
+          <div>
+            <div class="PsyChat-HP-Setting-items-label">
+              <b><el-icon><CaretRight /></el-icon>智能体个数：</b>{{ PsyChatDM_HyperParameters_AgentNumber  }} 个
+            </div>
+            <div style="width: 70%; margin-left: 1.5rem;">
+              <el-slider v-model="PsyChatDM_HyperParameters_AgentNumber" :step="1" show-stops :max="4" :min="1" :marks="{1:'1',2:'2',3:'3',4:'4'}" :show-tooltip="false" />
+            </div>
+          </div>
+          <div style="padding-top: 1.5rem;">
+            <div class="PsyChat-HP-Setting-items-label">
+              <b><el-icon><CaretRight /></el-icon>讨论回合数：</b>{{ PsyChatDM_HyperParameters_Epoch }} 轮
+            </div>
+            <div style="width: 70%; margin-left: 1.5rem;">
+              <el-slider v-model="PsyChatDM_HyperParameters_Epoch" :step="1" show-stops :max="4" :min="1" :marks="{1:'1',2:'2',3:'3',4:'4'}" :show-tooltip="false" />
+            </div>
+          </div>
+          <div style="padding-top: 1.5rem;">
+            <div class="PsyChat-HP-Setting-items-label">
+              <b><el-icon><CaretRight /></el-icon>余弦相似度 判敛阈值：</b>{{ PsyChatDM_HyperParameters_ConvergenceThreshold.toFixed(2) }}
+            </div>
+            <div style="width: 70%; margin-left: 1.5rem; margin-bottom: 1.5rem;">
+              <el-slider v-model="PsyChatDM_HyperParameters_ConvergenceThreshold" :step="0.01" :max="1.00" :min="0.20" :marks="{0.2:'0.20',0.4:'0.40',0.6:'0.60',0.8:'0.80',1:'1.00'}" :show-tooltip="false" />
+            </div>
+          </div>
+          <div style="display: flex; justify-content: right;">
+            <el-button type="primary" @click="this.PsyChatDM_HyperParametersAdjustmentDialog=false">确定</el-button>
+          </div>
+        </div>
+      </el-dialog>
+
       
-     <!-- <div id="PsyChat-NewDiv01">
-       <div id="PsyChat-NewDiv02">
-         <div id="PsyChat-NewDiv03">
-            <el-button type="primary" @click="">会话记录</el-button>
-            <el-button type="primary" @click="">请选择RAG知识库</el-button>
-            <el-button type="warning" @click="">切换到大模型讨论机制</el-button>
-         </div>
-         <div id="PsyChat-NewDiv04">
-            <span id="PsyChat-NewSpan01">
-             “明康慧医智慧问答”基于MKTY-3B-Chat大语言模型，该LLM发表的言论仅供参考，不具有绝对的真实性与可靠性。
-           </span>
-         </div>
-       </div>
-     </div> -->
+     
     </div>
 </template>
 <style scoped>
@@ -297,6 +281,12 @@ export default
 {
   font-family: HPHS;
   src: url("/fonts/HPHS.woff");
+}
+.PsyChat-HP-Setting-items-label
+{
+  background-color: rgb(230,230,230); 
+  padding: 0.5rem 0.5rem 0.5rem 0.8rem; 
+  border-radius: 18px;
 }
 .PsyChat-SessionListItem
 {
@@ -386,7 +376,7 @@ export default
   text-shadow: 1px 0.5px darkred;
   font-family: HPHS;
 }
-#PsyChat-Span02
+.PsyChat-Span02
 {
   font-weight: bold;
 }
@@ -426,7 +416,7 @@ export default
 #PsyChat-Div05
 {
   width:87.5%;
-  text-align: center;
+  /* text-align: center; */
   box-shadow: 0 0 0.8rem 0.25rem rgba(0,0,0,0.5);
   border-radius: 10px;
   background-color: rgba(255,255,255,60%);
@@ -460,7 +450,7 @@ export default
   background-color: transparent;
   border: none;
   outline: none;
-  width:85%;
+  width:72%;
   height: 100%;
   font-size: 1rem;
   text-indent: 0.75rem;
@@ -471,7 +461,7 @@ export default
   border: none;
   outline: none;
 }
-#PsyChat-SendButtonDiv
+.PsyChat-SendButtonDiv
 {
   background-color: rgba(255,165,0,0.2);
   box-shadow: 0 0 0.35rem 0.05rem rgba(0,0,0,0.4);
@@ -487,11 +477,11 @@ export default
   align-items: center;
   height: 80%;
 }
-#PsyChat-SendButtonDiv:hover
+.PsyChat-SendButtonDiv:hover
 {
   background-color: rgba(255,165,0,0.333);
 }
-#PsyChat-SendButtonDiv:active
+.PsyChat-SendButtonDiv:active
 {
   background-color: rgba(255,165,0,0.45);
 }

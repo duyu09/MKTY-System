@@ -16,7 +16,7 @@ export default
 </script>
 
 <template>
-  <RouterView></RouterView>
+  <RouterView style="font-family: noto_serif_cjk;"></RouterView>
 </template>
 
 <style>
