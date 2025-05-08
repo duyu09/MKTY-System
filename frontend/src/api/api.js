@@ -15,7 +15,9 @@ export
     deleteMailItem, addMailItem, multimodalDiagnosisSubmitTask, multimodalDiagnosisGetStatus, getCurrentTime,
     getImportantList, addImportantItem, deleteImportantItem, finishImportantItem, llmInferenceGetStatus, llmInferenceSubmitTask, 
     saveLlmSession, getLlmSession, getLlmSessionList, deleteLlmSession, addForum, getForumList, deleteForum, 
-    modifyForumType, sendPost, getPostList, getPostContent, praisePost, deletePost, getForumInfo, 
+    modifyForumType, sendPost, getPostList, getPostContent, praisePost, deletePost, getForumInfo, exportChatToPDF,
+
+
     setUserInformation, updataInformation, setAvatar, addFlag, showFlag, deleteFlag, showOrg, deleteOrg, creatForum, createOrg, releaseItem, showForum, showItem, deleteItem, showPsy, signIn, readSignInContext, readStudyRoom, startStudy, readStudyStatus, dredgePsy, skillTest, upvote, upload, showFile, downloadFile, getMusicList
 }
 
@@ -392,6 +394,14 @@ function getForumInfo(forumId)
     return axios.post(baseURL+'/getForumInfo',{
         'forumId': forumId
     },{headers: {'Authorization': getToken()}});
+}
+
+// 35. 导出聊天记录到PDF
+function exportChatToPDF(sessionId)
+{
+    return axios.post(baseURL+'/exportChatToPDF',{
+        'sessionId': sessionId
+    },{headers: {'Authorization': getToken()}, responseType: 'blob'});
 }
 
 
