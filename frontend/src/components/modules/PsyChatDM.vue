@@ -11,6 +11,7 @@ import hljs from 'highlight.js';
 import { errHandle, successHandle, convertTime } from "@/utils/tools";
 import { getCookie, getUserAvatar, llmInferenceGetStatus, llmInferenceSubmitTask, saveLlmSession, 
   getLlmSessionList, getLlmSession, deleteLlmSession } from "@/api/api";
+import PsyChat from './PsyChat.vue';
 
 
 export default
@@ -33,10 +34,27 @@ export default
         PsyChat_HistoryDialog: false, // 历史对话会话框是否显示。
         PsyChat_Generating: false, // 页面状态，回答是否在生成中。
         PsyChat_SessionId: -1, // 会话ID号。默认是-1（新会话为-1）。
-        PsyChat_ChatArr: [  // assistant=大模型智能体；user=用户，
-        ],
+
         PsyChat_LlmSessionList:[],
         PsyChat_LlmSessionListLoading: false, // 历史对话会话框加载中。
+        PsyChatDM_StepList:[  // 讨论步骤列表。
+          { "title":"第1轮", "desc": "智能体A讨论" }, 
+          { "title":"第1轮", "desc": "智能体B讨论"}, 
+          { "title":"第1轮", "desc": "主持人总结"}, 
+          { "title":"第2轮", "desc": "智能体A讨论"}, 
+          { "title":"第2轮", "desc": "智能体B讨论"}, 
+          { "title":"第2轮", "desc": "主持人总结"}, 
+          { "title":"第3轮", "desc": "智能体A讨论"}, 
+          { "title":"第3轮", "desc": "智能体B讨论"},
+          { "title":"第3轮", "desc": "主持人总结"},
+          { "title":"判敛", "desc": "计算共识度"},
+        ], 
+        PsyChatDM_CurrentStep: 0, // 当前讨论步骤。
+        PsyChatDM_Context_AgentA:[],
+        PsyChatDM_Context_AgentB:[],
+        PsyChatDM_Context_AgentC:[],
+        PsyChatDM_Context_AgentD:[],
+        
 
         PsyChatDM_HyperParametersAdjustmentDialog: false, // 超参数调整对话框是否显示。
         PsyChatDM_HyperParameters_AgentNumber: 3, // 参与讨论智能体数量。
@@ -44,7 +62,18 @@ export default
         PsyChatDM_HyperParameters_ConvergenceThreshold: 0.80, // 收敛阈值。
       }
     },
-  methods:
+    computed:
+    {
+      PsyChatContextDisplay(){
+        if(this.PsyChat_Context===''){
+          return '用户暂未输入';
+        }
+        else {
+          return this.PsyChat_Context; 
+        }
+      }
+    },
+    methods:
       {
         PsyChat_Send(){
           
@@ -83,10 +112,8 @@ export default
 
         },
         pc_newSession(){
-          this.PsyChat_SessionId=-1; // 新会话。
-          this.PsyChat_ChatArr=[]; // 清空聊天记录。
-          this.PsyChat_ChatArr.push({'role': 'assistant','content': '你好，我是MKTY明康慧医大模型，我将为您解决医疗相关问题。'}); 
-          successHandle('已新建会话');
+          
+          
         },
         pc_conTime(unixTime){
           return convertTime(unixTime);
@@ -160,7 +187,7 @@ export default
         <div id="PsyChat-Div05" ref="ChatMainDiv">
           <div style="margin-top: 1rem; margin-left: 1rem; justify-content: left;">
             <div style="background-color: rgb(230,230,230); padding: 0.5rem 0.5rem 0.5rem 0.8rem; border-radius: 18px; width: 95%;">
-              <b>待研究问题：</b>xxxxxxxxxx<br>
+              <b>待研究问题：</b>{{ PsyChatContextDisplay }}<br>
               <b>Agent数量：</b>3个；<b>讨论回合数：</b>3回合；<b>收敛阈值：</b>0.80；<b>状态：</b>正在分析...
             </div>
           </div>
@@ -168,26 +195,25 @@ export default
           <div style="margin-top: 1rem; margin-left: 1rem;">
           <el-steps
           style="width: 100%; font-family: HPHS; font-weight: bold;"
-          :space="100"
           :active="2"
           finish-status="success"
           >
-            <el-step title="Done" />
-            <el-step title="Processing" />
-            <el-step title="Step 3" />
-            <el-step title="Step 4" />
-            <el-step title="Step 5" />
+            <el-step v-for="(item, index) in PsyChatDM_StepList" :title="item.title" :description="item.desc" />
           </el-steps>
           </div>
 
           <div style="display: flex; justify-content: center; margin-top: 2rem;">
-            <div style="width: 88%;">
+            <div style="width: 88%; background-color: rgb(230,230,230); padding: 1rem 1rem 1rem 1rem; border-radius: 18px;">
               <div style="margin-bottom: 0.25rem; font-weight: bold;">
                 分析结果实时展示：
               </div>
                 <el-collapse style="font-family: HPHS;">
-                <el-collapse-item title="&nbsp;&nbsp;智能体01" name="1">123123</el-collapse-item>
-                <el-collapse-item title="&nbsp;&nbsp;智能体02" name="2">123123</el-collapse-item>
+                <el-collapse-item title="&nbsp;&nbsp;智能体01" name="1">
+                  <div style="margin-left: 1rem;">123123</div>
+                </el-collapse-item>
+                <el-collapse-item title="&nbsp;&nbsp;智能体02" name="2">
+                  123123
+                </el-collapse-item>
               </el-collapse>
             </div>
           </div>
@@ -201,7 +227,7 @@ export default
             <el-icon><Setting /></el-icon>&nbsp;<span class="PsyChat-Span02">设参数</span>
           </div>
           <div class="PsyChat-SendButtonDiv" @click="PsyChat_Send()">
-            <el-icon><Promotion /></el-icon>&nbsp;<span class="PsyChat-Span02">发送</span>
+            <el-icon><Promotion /></el-icon>&nbsp;<span class="PsyChat-Span02">提交</span>
           </div>
         </div>
       </div>

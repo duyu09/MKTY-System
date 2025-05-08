@@ -3,7 +3,7 @@
 <!-- 创建日期：2025年03月10日 -->
 <!-- 修改日期：2025年04月06日 -->
 <script>
-import { Promotion, Avatar, Delete, ChatDotSquare, Clock } from '@element-plus/icons-vue';
+import { Promotion, Avatar, Delete, ChatDotSquare, Clock, Download } from '@element-plus/icons-vue';
 import { marked }  from "marked";
 import DOMPurify from "dompurify";
 import 'highlight.js/styles/rainbow.css';
@@ -11,7 +11,7 @@ import "@/assets/css/rainbow_text.css"
 import hljs from 'highlight.js';
 import { errHandle, successHandle, convertTime } from "@/utils/tools";
 import { getCookie, getUserAvatar, llmInferenceGetStatus, llmInferenceSubmitTask, saveLlmSession, 
-  getLlmSessionList, getLlmSession, deleteLlmSession } from "@/api/api";
+  getLlmSessionList, getLlmSession, deleteLlmSession, exportChatToPDF } from "@/api/api";
 
 export default
 {
@@ -23,6 +23,7 @@ export default
       'Delete': Delete,
       'ChatDotSquare': ChatDotSquare,
       'Clock': Clock,
+      'Download': Download,
     },
     data()
     {
@@ -172,6 +173,28 @@ export default
               successHandle('已删除会话记录'); 
             }
           }) 
+        },
+        pc_exportChatToPDF(sessionId){
+          exportChatToPDF(sessionId).then(response => {
+            // 从Content-Disposition头解析文件名
+            const contentDisposition = response.headers['content-disposition'];
+            let fileName = 'chat_history.pdf'; // 默认文件名
+            if (contentDisposition) {
+              const fileNameMatch = contentDisposition.match(/filename="?(.+)"?/);
+              if (fileNameMatch && fileNameMatch[1]) {
+                fileName = fileNameMatch[1];
+                // 处理可能的UTF-8编码文件名（如中文）
+                fileName = decodeURIComponent(fileName);
+              }
+            }
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', fileName); // 或使用后端返回的文件名
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+          });
         }
       },
   mounted()
@@ -256,12 +279,20 @@ export default
                 <div style="text-align: right;">
                   <span style="font-size: small;">
                     <el-icon><Clock /></el-icon>{{ pc_conTime(item.sessionSaveTime * 1000) }}
+                    &nbsp;
+                    <span style="font-size: small; color: blue; cursor: pointer; font-weight: bold;" @click="pc_exportChatToPDF(item.sessionId);">
+                      <el-icon color="blue" size="small">
+                        <Download />
+                      </el-icon>导出
+                    </span>
                   </span>&nbsp;
                   <el-popconfirm title="您确定删除吗？" @confirm="pc_deleteSession(item.sessionId)" @cancel="">
                     <template #reference>
-                      <el-icon size="small" color="red" style="cursor: pointer; font-weight: bold;">
+                      <span style="font-size: small; color: red; cursor: pointer; font-weight: bold;">
+                      <el-icon size="small" color="red">
                         <Delete />
-                      </el-icon>
+                      </el-icon>删除
+                    </span>
                     </template>
                   </el-popconfirm>
                   &nbsp;&nbsp;

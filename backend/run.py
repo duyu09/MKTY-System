@@ -6,11 +6,11 @@
 '''
 import os
 import json
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_file
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from util import util_file2base64, util_base642file, util_uuid, util_current_time, info_print, start_print, getDataBaseConnectionPool, getCursor
-from util import util_encrypt_password, util_verify_password, RpcClient, save_base64_image
+from util import util_encrypt_password, util_verify_password, RpcClient, save_base64_image, export_chat_to_pdf
 from gevent.pywsgi import WSGIServer
 
 # 全局变量配置
@@ -1270,6 +1270,41 @@ def praise_post(cursor):
             return jsonify({'code': 0,'msg': '点赞成功！'})
     except Exception as e:
         return jsonify({'code': 1,'msg': '数据库修改失败:'+ str(e)})
+    
+    
+@app.route('/api/exportChatToPDF', methods=['POST'])
+@jwt_required()
+@getCursor(conn_pool)
+def export_chat2pdf(cursor):
+    '''
+    - API功能：导出指定会话ID的聊天记录为PDF文件。
+    - 负责人：杜宇
+    - 请求参数：
+      - `sessionId`: 会话ID（`int`）
+    - 响应参数：
+      - `None`，直接发送PDF文件二进制数据，供客户端下载。
+    '''
+    user_id = get_jwt_identity()
+    session_data = request.json
+    session_id = session_data.get('sessionId')
+    cursor.execute("SELECT * FROM llmhistory WHERE sessionId=%s AND sessionUserId=%s", (session_id, user_id))
+    result = cursor.fetchall()
+    cursor.execute("SELECT * FROM userinfo WHERE userId=%s", (user_id,))
+    result_user_info = cursor.fetchall()
+    if len(result) == 0:
+        return jsonify({'code': 1,'msg': '会话不存在或您无权导出该ID会话内容。'})
+    elif len(result_user_info) == 0:
+        return jsonify({'code': 1,'msg': '读取用户信息意外错误。'})
+    else:
+        session_content = result[0]['sessionContent']
+        session_content = json.loads(session_content)
+        is_session_dm = result[0]['isSessionDM']  # 0=普通会话，1=LLM研讨机制
+        username = result_user_info[0]['userName']
+        if is_session_dm == 0:
+            pdf_file_io_stream, pdf_filename = export_chat_to_pdf(username, session_content)
+        else:
+            pass
+        return send_file(pdf_file_io_stream, as_attachment=True, download_name=pdf_filename, mimetype='application/pdf')
     
     
 if __name__ == '__main__':

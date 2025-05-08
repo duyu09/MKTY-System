@@ -23,6 +23,8 @@ from rich.console import Console
 from rich.rule import Rule
 from functools import wraps
 from argon2 import PasswordHasher, exceptions
+from markdown import markdown
+from weasyprint import HTML
 
 # 定义常用文件扩展名及其对应的 MIME 类型
 common_mime_types = {
@@ -344,4 +346,109 @@ def save_base64_image(base64_str: str, output_file: str) -> str | None:
         return None
     except Exception as e:
         return f"发生错误: {str(e)}"
+
+def export_chat_to_pdf(username: str, messages: list[dict]):
+    """
+    - 函数功能：将聊天记录导出为有一定美观度的PDF文件
+    - 负责人：杜宇
+    - 输入参数：username, messages
+      - `username`（`str`，用户名称，其作为导出时渲染显示的名称）
+      - `messages`（`list[dict]`，聊天记录，其格式为：[{"role": "user", "content": "用户消息内容"}, {"role": "assistant", "content": "模型回复内容"}]）
+    - 返回参数：
+      - `pdf_io`: (`io.BytesIO`, 导出的PDF文件的字节流)
+      - `pdf_filename`: (`str`, 导出的PDF文件的文件名)
+    """
+    # 生成带样式的HTML内容
+    html_content = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <style>
+            body {{ 
+                font-family: 'Segoe UI', Arial, sans-serif;
+                margin: 40px;
+                background-color: RGB(239,239,239);
+                border-radius: 15px;
+            }}
+            .header {{
+                text-align: center;
+                color: #2c3e50;
+                border-bottom: 2px solid #3498db;
+                padding-bottom: 15px;
+                margin-bottom: 30px;
+            }}
+            .message-container {{
+                margin: 20px 0;
+                display: flex;
+                flex-direction: column;
+                gap: 25px;
+            }}
+            .message {{
+                max-width: 75%;
+                padding: 15px 25px;
+                border-radius: 15px;
+                line-height: 1.6;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            }}
+            .user-message {{
+                background: linear-gradient(to right, rgb(0, 135, 255), rgb(0, 0, 108));
+                color: white;
+                margin-left: auto;
+            }}
+            .assistant-message {{
+                background: linear-gradient(to right, rgb(196, 74, 236), DarkRed);
+                color: white;
+                margin-right: auto;
+            }}
+            .message-header {{
+                font-weight: 600;
+                font-size: 0.9em;
+                margin-bottom: 8px;
+                opacity: 0.9;
+            }}
+            .message-content {{
+                font-size: 1em;
+            }}
+            .message-content p {{
+                margin: 8px 0;
+            }}
+            .timestamp {{
+                text-align: center;
+                color: #7f8c8d;
+                font-size: 0.9em;
+                margin: 30px 0;
+            }}
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <h2>MKTY明康慧医大模型对话记录</h2>
+            <h3>用户：{ username }</h3>
+        </div>
+        <div class="timestamp">
+            生成时间：{ datetime.now().strftime("%Y-%m-%d %H:%M:%S") }
+        </div>
+        <div class="message-container">
+    """
+    for msg in messages:  # 处理每条消息
+        role = msg['role']
+        content = markdown(msg['content'])  # 转换Markdown为HTML
+        sender = "明康慧医(MKTY)大模型" if role == "assistant" else username
+        
+        html_content += f"""
+        <div class="message {'user-message' if role == 'user' else 'assistant-message'}">
+            <div class="message-header">{ sender }</div>
+            <div class="message-content">{ content }</div>
+        </div>
+        """
+    html_content += """
+        </div>
+    </body>
+    </html>
+    """
+    pdf_bytes = HTML(string=html_content).write_pdf()  # 生成PDF文件
+    pdf_io = io.BytesIO(pdf_bytes)
+    filename = f"MKTY对话记录_{username}_{datetime.now().strftime('%Y%m%d%H%M')}.pdf"
+    return pdf_io, filename
 
