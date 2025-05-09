@@ -76,8 +76,14 @@ export default
     methods:
       {
         PsyChat_Send(){
+          if(this.PsyChat_Context===''){
+           errHandle('待探讨问题不可为空'); 
+           return;
+          }
+          
           
         },
+        
         pc_loadPage(){
           const userId=parseInt(getCookie('userId'));
           if(userId!==undefined && userId!==0 && userId!==null){

@@ -15,7 +15,7 @@ export
     deleteMailItem, addMailItem, multimodalDiagnosisSubmitTask, multimodalDiagnosisGetStatus, getCurrentTime,
     getImportantList, addImportantItem, deleteImportantItem, finishImportantItem, llmInferenceGetStatus, llmInferenceSubmitTask, 
     saveLlmSession, getLlmSession, getLlmSessionList, deleteLlmSession, addForum, getForumList, deleteForum, 
-    modifyForumType, sendPost, getPostList, getPostContent, praisePost, deletePost, getForumInfo, exportChatToPDF,
+    modifyForumType, sendPost, getPostList, getPostContent, praisePost, deletePost, getForumInfo, exportChatToPDF, sendEmail,
 
 
     setUserInformation, updataInformation, setAvatar, addFlag, showFlag, deleteFlag, showOrg, deleteOrg, creatForum, createOrg, releaseItem, showForum, showItem, deleteItem, showPsy, signIn, readSignInContext, readStudyRoom, startStudy, readStudyStatus, dredgePsy, skillTest, upvote, upload, showFile, downloadFile, getMusicList
@@ -402,6 +402,16 @@ function exportChatToPDF(sessionId)
     return axios.post(baseURL+'/exportChatToPDF',{
         'sessionId': sessionId
     },{headers: {'Authorization': getToken()}, responseType: 'blob'});
+}
+
+// 36. 发送邮件
+function sendEmail(content, receiver, subject)
+{
+    return axios.post(baseURL+'/sendEmail',{
+        'content': content,
+        'receiver': receiver,
+        'subject': subject
+    },{headers: {'Authorization': getToken()}});
 }
 
 

@@ -4,15 +4,17 @@
 <!-- 修改日期：2025年03月29日 -->
 <script>
 import ListHeader from "./ListHeader.vue";
-import { ChatDotRound, Opportunity, Clock, InfoFilled, Aim, Finished, Delete, Flag, Refresh } from "@element-plus/icons-vue";
+import { ChatDotRound, Opportunity, Clock, InfoFilled, Aim, 
+  Finished, Delete, Flag, Refresh, Message } from "@element-plus/icons-vue";
 import { getCurrentTime, getImportantList, addImportantItem, deleteImportantItem, finishImportantItem,
-  llmInferenceGetStatus, llmInferenceSubmitTask
+  llmInferenceGetStatus, llmInferenceSubmitTask, sendEmail
  } from "@/api/api";
 import { convertTime, errHandle, successHandle, convertTimeChinese } from "@/utils/tools";
 import "@/assets/css/colorful_div.css";
 import "@/assets/css/rainbow_text.css";
 import { marked } from 'marked';
 import DOMPurify from "dompurify";
+import MarkdownEditor from '@/components/modules/MarkdownEditorComponents.vue';
 
 export default
 {
@@ -28,7 +30,9 @@ export default
         "Finished":Finished,
         "Delete":Delete,
         "Flag": Flag,
-        "Refresh":Refresh
+        "Refresh":Refresh,
+        "Message":Message,
+        "MarkdownEditor":MarkdownEditor,
       },
   data()
   {
@@ -58,7 +62,11 @@ export default
       il_itemDialogPriority:"",  // 优先级（“一般事项”、“紧急事项”）
       il_itemDialogWeek:"", // 周（“星期一”）
       il_itemIsFinished:"", // 完成情况（“已完成”、“未完成”）
-      il_itemTimeStatus:""  // 时间状态（“已到时间”、“未到时间”、“已超时”）
+      il_itemTimeStatus:"",  // 时间状态（“已到时间”、“未到时间”、“已超时”）
+      il_sendEmailDialogVisible:false,  // 发送邮件对话框
+      il_email_title:"",  // 邮件标题
+      il_email_content:"",  // 邮件内容
+      il_email_receiver:"",  // 邮件接收人
     }
   },
   computed:
@@ -287,8 +295,16 @@ export default
           this.il_aiAncillaryAnalysisLoading = false;
           this.il_aiAncillaryAnalysisDialogVisible = false; 
         })
-
-
+      },
+      il_sendEmail()
+      {
+        const content = "<html>" + this.il_email_content + "</html>"
+        sendEmail(content, this.il_email_receiver, this.il_email_title).then((res) => {
+          if (res.data.code == 0) {
+            successHandle("邮件发送成功！");
+            this.il_sendEmailDialogVisible = false;
+          }
+        });
       }
   },
   beforeUnmount()
@@ -388,7 +404,6 @@ export default
                 <el-button @click="il_itemDialogVisible = false" type="primary">关闭</el-button>
               </div>
             </el-dialog>
-
           </div>
         </div>
       </div>
@@ -396,13 +411,18 @@ export default
         <div id="Aims-Div19">
           <div id="Aims-Div20">
             <div id="PsyChat-Div06">
-              <div id="PsyChat-Div07" style="margin-right: 1rem;">
-                <div id="PsyChat-SendButtonDiv" @click="il_addItemDialogVisible=true;">
+              <div class="PsyChat-Div07" style="margin-right: 1rem;">
+                <div class="PsyChat-SendButtonDiv" @click="il_addItemDialogVisible=true;">
                   <el-icon><Aim /></el-icon>&nbsp;<span class="PsyChat-Span02">添加事项</span>
                 </div>
               </div>
-              <div id="PsyChat-Div07" class="colorful-div-common">
-                <div id="PsyChat-SendButtonDiv" @click="il_aiAncillaryAnalysis()">
+              <div class="PsyChat-Div07" style="margin-right: 1rem;">
+                <div class="PsyChat-SendButtonDiv" @click="il_sendEmailDialogVisible=true;">
+                  <el-icon><Message /></el-icon>&nbsp;<span class="PsyChat-Span02">医患互联</span>
+                </div>
+              </div>
+              <div class="PsyChat-Div07 colorful-div-common">
+                <div class="PsyChat-SendButtonDiv" @click="il_aiAncillaryAnalysis()">
                   <el-icon><Opportunity /></el-icon>&nbsp;<span class="PsyChat-Span02">AI辅助分析</span>
                 </div>
               </div>
@@ -434,7 +454,7 @@ export default
     </el-card>
     <div style="margin-top: 0.75rem; display: flex; justify-content: flex-end;">
       <el-button type="primary" @click="il_aiAncillaryAnalysis()">
-        <el-icon><Refresh /></el-icon> 重新生成
+        <el-icon><Refresh /></el-icon>&nbsp;重新生成
       </el-button>
     </div>
     </div>
@@ -483,6 +503,33 @@ export default
       <el-button type="primary" @click="il_addItem();il_addItemDialogVisible=false">添加</el-button>
     </span>
   </el-drawer>
+
+  <el-dialog title="医患互联 - 邮件发送" v-model="il_sendEmailDialogVisible" width="60%">
+    <div style="font-size: medium;padding: 0.8rem; margin-bottom: 1.25rem; border-radius: 9px; background-color: rgb(238,238,238);">
+      您可向医师/患者发送邮件，询问医疗计划安排是否合理或医嘱是否执行到位。<br>
+      <i>此邮件编辑器支持Markdown语法。</i>
+    </div>
+    <el-scrollbar height="300px" always="true">
+      <el-form>
+        <el-form-item label="邮件主标题">
+          <el-input v-model="il_email_title"></el-input>
+        </el-form-item>
+        <el-form-item label="接收者邮箱">
+          <el-input v-model="il_email_receiver"></el-input>
+        </el-form-item>
+      </el-form>
+      <MarkdownEditor v-model="il_email_content"></MarkdownEditor>
+      <br>
+      <div style="text-align: right; width: 100%;">
+        <el-button @click="il_sendEmailDialogVisible=false;">
+          取消
+        </el-button>
+        <el-button type="primary" @click="il_sendEmail();">
+          发送邮件
+        </el-button>
+      </div>
+    </el-scrollbar>
+  </el-dialog>
   
 </template>
 <style scoped>
@@ -693,7 +740,7 @@ export default
   justify-content: center;
   margin-top: 1rem;
 }
-#PsyChat-Div07
+.PsyChat-Div07
 {
   box-shadow: 0 0 0.8rem 0.075rem rgba(0,0,0,0.5);
   background-color: rgba(255,255,255,0.8);
@@ -735,7 +782,7 @@ export default
   border: none;
   outline: none;
 }
-#PsyChat-SendButtonDiv
+.PsyChat-SendButtonDiv
 {
   background-color: rgb(255, 237, 204);
   box-shadow: 0 0 0.35rem 0.05rem rgba(0,0,0,0.4);
@@ -749,11 +796,11 @@ export default
   justify-content: center;
   align-items: center;
 }
-#PsyChat-SendButtonDiv:hover
+.PsyChat-SendButtonDiv:hover
 {
   background-color: rgb(255, 225, 170);
 }
-#PsyChat-SendButtonDiv:active
+.PsyChat-SendButtonDiv:active
 {
   background-color: rgb(255, 225, 130);
 }
@@ -772,15 +819,13 @@ export default
   {
     display: none;
   }
-
-  #PsyChat-SendButtonDiv {
+  .PsyChat-SendButtonDiv {
     display: flex;
     justify-content: center;
     align-items: center;
     padding-top: 0;
   }
-
-  #PsyChat-Div07 {
+  .PsyChat-Div07 {
     margin-bottom: 2rem;
   }
 }
