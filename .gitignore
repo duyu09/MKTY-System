@@ -7,6 +7,7 @@ lerna-debug.log*
 *.log
 
 node_modules/
+admin_frontend/node_modules/
 .DS_Store
 frontend/dist/
 frontend/dist-ssr/
