@@ -10,7 +10,7 @@ from flask import Flask, jsonify, request, send_file
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from util import util_file2base64, util_base642file, util_uuid, util_current_time, info_print, start_print, getDataBaseConnectionPool, getCursor
-from util import util_encrypt_password, util_verify_password, RpcClient, save_base64_image, export_chat_to_pdf
+from util import util_encrypt_password, util_verify_password, RpcClient, save_base64_image, export_chat_to_pdf, send_email
 from gevent.pywsgi import WSGIServer
 
 # 全局变量配置
@@ -21,6 +21,10 @@ VERSION = 'v1.1.0'  # 版本号
 PORT = 5555  # 后端服务端口
 HOST = '0.0.0.0'  # 后端服务主机地址
 STRONG_PASSWORD = 'DUYU09'  # 强密码，用于加密token
+EMAIL_SENDER = "qluduyu09@163.com"  # 邮件发送者
+EMAIL_SENDER_AUTHORIZATION = "WVFB37t4fBzWninG"  # 邮件发送者授权码
+EMAIL_SENDER_SMTP_SERVER = "smtp.163.com"  # 邮件发送者SMTP服务器地址
+EMAIL_SENDER_SMTP_PORT = 465  # 邮件发送者SMTP服务器端口
 MD_MQ_CONNECTION_PARAMETERS = {  # 多模态辅诊端MQ连接参数
     'host': 'localhost',
     'port': 5672,
@@ -1305,6 +1309,53 @@ def export_chat2pdf(cursor):
         else:
             pass
         return send_file(pdf_file_io_stream, as_attachment=True, download_name=pdf_filename, mimetype='application/pdf')
+
+
+@app.route('/api/sendEmail', methods=['POST'])
+@jwt_required()
+@getCursor(conn_pool)
+def send_email_request(cursor):
+    '''
+    - API功能：发送指定内容到指定邮箱。暂未考虑防攻击措施。
+    - 负责人：杜宇
+    - 请求参数：
+      - `content`: 邮件文本内容（`str`，可以是纯文本，也可以是`HTML`）
+      - `receiver`: 收件人邮箱地址（`str`）
+      - `subject`: 邮件标题（`str`）
+    - 响应参数：
+      - `code`: 执行状态（`int`，`0`=发送成功，`1`=发送失败）
+      - `msg`: 自然语言提示信息（`str`）
+    '''
+    user_id = get_jwt_identity()
+    session_data = request.json
+    content = session_data.get('content')
+    receiver = session_data.get('receiver')
+    subject = session_data.get('subject')
+    username = "明康慧医用户" + str(user_id)
+    if content is None or content == "":
+        return jsonify({'code': 1,'msg': '邮件内容不可为空'})
+    if receiver is None or receiver == "":
+        return jsonify({'code': 1,'msg': '收件人邮箱地址不可为空'})
+    cursor.execute("SELECT * FROM userinfo WHERE userId=%s", (user_id,))
+    result_user_info = cursor.fetchall()
+    if len(result_user_info) == 0:
+        return jsonify({'code': 1,'msg': '读取用户信息意外错误。'})
+    else:
+        username = result_user_info[0]['userName']
+    result = send_email(
+    sender_email=EMAIL_SENDER,
+    sender_name="明康慧医用户：" + str(username),
+    recipient_email=receiver,
+    subject="【明康慧医】" + str(subject),
+    message_body=str(content),
+    smtp_server=EMAIL_SENDER_SMTP_SERVER,
+    smtp_port=EMAIL_SENDER_SMTP_PORT,
+    password=EMAIL_SENDER_AUTHORIZATION
+    )
+    if result:
+        return jsonify({'code': 0,'msg': '发送成功！'})
+    else:
+        return jsonify({'code': 1,'msg': '发送失败！'})
     
     
 if __name__ == '__main__':

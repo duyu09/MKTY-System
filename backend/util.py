@@ -26,6 +26,14 @@ from argon2 import PasswordHasher, exceptions
 from markdown import markdown
 from weasyprint import HTML
 
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.header import Header
+
+from email.mime.base import MIMEBase
+from email import encoders
+
 # 定义常用文件扩展名及其对应的 MIME 类型
 common_mime_types = {
     '.webp': 'image/webp',
@@ -452,3 +460,73 @@ def export_chat_to_pdf(username: str, messages: list[dict]):
     filename = f"MKTY对话记录_{username}_{datetime.now().strftime('%Y%m%d%H%M')}.pdf"
     return pdf_io, filename
 
+def send_email(sender_email: str, sender_name: str=None, 
+               recipient_email: str|list=None, subject: str=None, 
+               message_body: str=None, smtp_server: str=None, 
+               smtp_port: int=None, use_ssl: bool=True, 
+               password: str=None, attachments: list=None) -> bool:
+    """
+    - 函数功能：发送电子邮件
+    - 负责人：杜宇
+    - 输入参数:
+      - `sender_email` (`str`): 发件人邮箱地址
+      - `sender_name` (`str`, 可选添加): 发件人显示名称，默认为None(使用邮箱地址)
+      - `recipient_email` (`str`或`list`): 收件人邮箱地址(单个或多个)
+      - `subject` (`str`): 邮件主题
+      - `message_body` (`str`): 邮件正文(支持HTML)
+      - `smtp_server` (`str`): SMTP服务器地址
+      - `smtp_port` (`int`): SMTP服务器端口
+      - `use_ssl` (`bool`): 是否使用SSL加密，默认为True
+      - `password` (`str`): 邮箱密码/授权码(如果为None会提示输入)
+      - `attachments` (`list`, 可选添加): 附件路径列表，默认为None
+    - 返回参数:
+        `bool`: 邮件发送成功返回True，失败返回False
+    """
+    
+    if password is None:
+        info_print("发送方邮箱密码或授权码未设置", level="error")
+    msg = MIMEMultipart()  # 创建邮件对象
+    if sender_name:  # 设置发件人
+        msg['From'] = Header(f"{sender_name} <{sender_email}>")
+    else:
+        msg['From'] = sender_email
+    if isinstance(recipient_email, list):  # 设置收件人
+        msg['To'] = ', '.join(recipient_email)
+    else:
+        msg['To'] = recipient_email
+    msg['Subject'] = Header(subject, 'utf-8')  # 设置主题
+    if message_body:  # 添加邮件正文
+        # 判断是否是HTML内容
+        if '<html>' in message_body.lower() or '<body>' in message_body.lower():
+            msg.attach(MIMEText(message_body, 'html', 'utf-8'))
+        else:
+            msg.attach(MIMEText(message_body, 'plain', 'utf-8'))
+    if attachments:  # 添加附件
+        for attachment_path in attachments:
+            try:
+                with open(attachment_path, 'rb') as attachment:
+                    part = MIMEBase('application', 'octet-stream')
+                    part.set_payload(attachment.read())
+                encoders.encode_base64(part)
+                part.add_header(
+                    'Content-Disposition',
+                    f'attachment; filename="{Header(attachment_path, "utf-8").encode()}"'
+                )
+                msg.attach(part)
+            except Exception as e:
+                print(f"添加附件失败: {e}")
+                continue
+    try:  # 创建SMTP连接
+        if use_ssl:
+            server = smtplib.SMTP_SSL(smtp_server, smtp_port)
+        else:
+            server = smtplib.SMTP(smtp_server, smtp_port)
+            server.starttls()  # 启用TLS加密
+        server.login(sender_email, password)  # 登录邮箱
+        server.sendmail(sender_email, recipient_email, msg.as_string())  # 发送邮件
+        server.quit()  # 关闭连接
+        return True
+    except Exception as e:
+        info_print(f"邮件发送失败: {e}", level="error")
+        return False
+    
