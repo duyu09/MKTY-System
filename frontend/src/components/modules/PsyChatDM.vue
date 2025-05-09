@@ -3,7 +3,7 @@
 <!-- 创建日期：2025年03月10日 -->
 <!-- 修改日期：2025年04月06日 -->
 <script>
-import { Promotion, Avatar, Delete, ChatDotSquare, Setting, CaretRight } from '@element-plus/icons-vue';
+import { Promotion, Avatar, Delete, ChatDotSquare, Setting, CaretRight, Loading } from '@element-plus/icons-vue';
 import { marked }  from "marked";
 import DOMPurify from "dompurify";
 import 'highlight.js/styles/rainbow.css';
@@ -25,6 +25,7 @@ export default
       'ChatDotSquare': ChatDotSquare,
       'Setting': Setting,
       'CaretRight': CaretRight,
+      'Loading': Loading,
     },
     data()
     {
@@ -38,24 +39,22 @@ export default
         PsyChat_LlmSessionList:[],
         PsyChat_LlmSessionListLoading: false, // 历史对话会话框加载中。
         PsyChatDM_StepList:[  // 讨论步骤列表。
-          { "title":"第1轮", "desc": "智能体A讨论" }, 
-          { "title":"第1轮", "desc": "智能体B讨论"}, 
-          { "title":"第1轮", "desc": "主持人总结"}, 
-          { "title":"第2轮", "desc": "智能体A讨论"}, 
-          { "title":"第2轮", "desc": "智能体B讨论"}, 
-          { "title":"第2轮", "desc": "主持人总结"}, 
-          { "title":"第3轮", "desc": "智能体A讨论"}, 
-          { "title":"第3轮", "desc": "智能体B讨论"},
-          { "title":"第3轮", "desc": "主持人总结"},
-          { "title":"判敛", "desc": "计算共识度"},
+          // { "title":"第1轮", "desc": "智能体A讨论" }, 
+          // { "title":"第1轮", "desc": "智能体B讨论"}, 
+          // { "title":"第1轮", "desc": "主持人总结"}, 
+          // { "title":"第2轮", "desc": "智能体A讨论"}, 
+          // { "title":"第2轮", "desc": "智能体B讨论"}, 
+          // { "title":"第2轮", "desc": "主持人总结"}, 
+          // { "title":"第3轮", "desc": "智能体A讨论"}, 
+          // { "title":"第3轮", "desc": "智能体B讨论"},
+          // { "title":"第3轮", "desc": "主持人总结"},
+          // { "title":"判敛", "desc": "计算共识度"},
         ], 
+        PsyChatDM_StepResultList:[
+          // { "title":"第1轮 智能体1讨论", "content": "具体讨论内容......" },
+        ], // 讨论步骤结果列表。
         PsyChatDM_CurrentStep: 0, // 当前讨论步骤。
-        PsyChatDM_Context_AgentA:[],
-        PsyChatDM_Context_AgentB:[],
-        PsyChatDM_Context_AgentC:[],
-        PsyChatDM_Context_AgentD:[],
-        
-
+        PsyChatDM_Context_AgentN:[[], [], [], []],
         PsyChatDM_HyperParametersAdjustmentDialog: false, // 超参数调整对话框是否显示。
         PsyChatDM_HyperParameters_AgentNumber: 3, // 参与讨论智能体数量。
         PsyChatDM_HyperParameters_Epoch: 3, // 讨论回合数。
@@ -75,21 +74,86 @@ export default
     },
     methods:
       {
-        PsyChat_Send(){
-          if(this.PsyChat_Context===''){
+        async PsyChat_Send(){
+          if(this.PsyChat_Context === ''){
            errHandle('待探讨问题不可为空'); 
            return;
           }
-          
-          
+          this.PsyChat_Generating=true; // 开始生成
+          this.PsyChatDM_Context_AgentN=[[], [], [], []]; // 清空上下文。
+          this.PsyChatDM_StepList=[]; // 清空步骤列表。
+          this.PsyChatDM_CurrentStep=0; // 重置当前步骤。
+          for(let i=0;i<this.PsyChatDM_HyperParameters_Epoch;i++){
+            for(let j=0;j<this.PsyChatDM_HyperParameters_AgentNumber;j++){
+              this.PsyChatDM_StepList.push({ "title":"第"+(i+1)+"轮", "desc": "智能体"+(j+1)+"讨论"});
+            }
+            this.PsyChatDM_StepList.push({ "title":"第"+(i+1)+"轮", "desc": "主持人总结"});
+          }
+          this.PsyChatDM_StepList.push({ "title":"判敛", "desc": "计算共识度"});
+          // 开始讨论
+
+          var moderator_opinion = "暂无"  // 上轮主持人意见
+          for(let i=0;i<this.PsyChatDM_HyperParameters_Epoch;i++){ // 讨论轮次
+            var result_summary = "";
+            for(let j=0;j<this.PsyChatDM_HyperParameters_AgentNumber;j++){ // 智能体
+              var prompt_per_round = "- 问题：\n" + this.PsyChat_Context + "\n\n - 上轮讨论主持人意见：\n" + moderator_opinion + "\n\n - 请你结合主持人意见，对上述医疗或医学专业的问题发表详细观点，可以质疑并说明理由。\n";
+              const result=await this.PsyChatDM_LlmInference(this.PsyChatDM_Context_AgentN[j], this.PsyChat_Context);
+              if(!result){
+                errHandle('智能体'+(j+1)+'生成出现错误，系统暂停讨论。');
+                this.PsyChat_Generating=false;
+                return;
+              }
+              this.PsyChatDM_Context_AgentN[j].push({ "role": "user", "content": prompt_per_round }); // 加入用户问题。
+              this.PsyChatDM_Context_AgentN[j].push({ "role": "assistant", "content": result }); // 加入智能体回答。
+              this.PsyChatDM_StepResultList.push({ "title":"第"+(i+1)+"轮 智能体"+(j+1)+"讨论", "content": result }); // 加入讨论步骤结果。
+              result_summary += "- LLM "+(j+1)+"观点：\n"+result+"\n\n"; // 加入总结。
+              this.PsyChatDM_CurrentStep++; // 增加当前步骤。
+            }
+            var moderator_prompt = "- 问题：\n" + this.PsyChat_Context + "\n\n" + result_summary + "对于给定的医疗相关问题，请综合各LLM观点，结合自身知识，得出你自己的判断，尽可能详尽，全部都分析到位，还要充分说明理由。\n";
+            const moderator_result=await this.PsyChatDM_LlmInference([], moderator_prompt); // 主持人
+            if(!moderator_result){
+              errHandle('主持人智能体生成出现错误，系统暂停讨论。');
+              this.PsyChat_Generating=false;
+              return;
+            }
+            this.PsyChatDM_CurrentStep++; // 增加当前步骤。
+            moderator_opinion = moderator_result; // 保存主持人意见。
+            this.PsyChatDM_StepResultList.push({ "title":"第"+(i+1)+"轮 主持人总结", "content": moderator_opinion }); // 加入讨论步骤结果。
+          }
+          // 判敛 （以后写）
+
+          this.PsyChat_Generating=false;
         },
-        
+        async PsyChatDM_LlmInference(history_ChatArr, content, interval=2555){
+          const submit_result = await llmInferenceSubmitTask(history_ChatArr, content); // 提交任务。
+          if(submit_result.data.code!==0){
+            errHandle('提交任务失败：'+submit_result.data.msg);
+            return new Promise((resolve) => {
+              resolve(false);
+            });
+          }
+          const task_id = submit_result.data.taskId;
+          return new Promise((resolve) => {
+            const timer = setInterval(async () => {
+              const result = await llmInferenceGetStatus(task_id);
+              if(result.data.code !== 0) {
+                errHandle('获取任务状态失败，暂停讨论：' + result.data.msg);
+                clearInterval(timer);
+                resolve(false);
+              }
+              if (result.data.taskStatus == 0) {
+                clearInterval(timer);
+                resolve(result.data.taskResult);
+              }
+            }, interval);
+          });
+        },
         pc_loadPage(){
           const userId=parseInt(getCookie('userId'));
           if(userId!==undefined && userId!==0 && userId!==null){
             getUserAvatar(userId).then(res=>{
               if(res.data.code!==0){
-                errHandle('授权错误，未能获取您的头像。'); 
+                errHandle('授权错误，未能获取您的头像。');
                 return;
               }
               else { 
@@ -194,14 +258,24 @@ export default
           <div style="margin-top: 1rem; margin-left: 1rem; justify-content: left;">
             <div style="background-color: rgb(230,230,230); padding: 0.5rem 0.5rem 0.5rem 0.8rem; border-radius: 18px; width: 95%;">
               <b>待研究问题：</b>{{ PsyChatContextDisplay }}<br>
-              <b>Agent数量：</b>3个；<b>讨论回合数：</b>3回合；<b>收敛阈值：</b>0.80；<b>状态：</b>正在分析...
+              <b>Agent数量：</b>{{ PsyChatDM_HyperParameters_AgentNumber }}个；
+              <b>讨论回合数：</b>{{ PsyChatDM_HyperParameters_Epoch }}回合；
+              <b>收敛阈值：</b>{{ PsyChatDM_HyperParameters_ConvergenceThreshold }}；
+              <b>状态：</b>
+              <span style="color: darkgreen; font-weight: bold;" v-if="this.PsyChat_Generating">
+                <el-icon class="is-loading"><Loading /></el-icon>
+                正在分析，请稍候...
+              </span>
+              <span style="color: brown; font-weight: bold;" v-else>
+                空闲状态
+              </span>
             </div>
           </div>
 
           <div style="margin-top: 1rem; margin-left: 1rem;">
           <el-steps
           style="width: 100%; font-family: HPHS; font-weight: bold;"
-          :active="2"
+          :active="PsyChatDM_CurrentStep"
           finish-status="success"
           >
             <el-step v-for="(item, index) in PsyChatDM_StepList" :title="item.title" :description="item.desc" />
@@ -213,12 +287,12 @@ export default
               <div style="margin-bottom: 0.25rem; font-weight: bold;">
                 分析结果实时展示：
               </div>
-                <el-collapse style="font-family: HPHS;">
-                <el-collapse-item title="&nbsp;&nbsp;智能体01" name="1">
-                  <div style="margin-left: 1rem;">123123</div>
-                </el-collapse-item>
-                <el-collapse-item title="&nbsp;&nbsp;智能体02" name="2">
-                  123123
+              <div style="width: 100%; text-align: center;" v-if="PsyChatDM_StepResultList.length==0">
+                <span style="font-weight: bold; color: brown;">---&nbsp;结果暂为空&nbsp;---</span>
+              </div>
+              <el-collapse style="font-family: HPHS;">
+                <el-collapse-item :title="'&nbsp;&nbsp;'+item.title" :name="index+1" v-for="(item, index) in PsyChatDM_StepResultList">
+                  <div style="margin-left: 1rem;">{{ item.content }}</div>
                 </el-collapse-item>
               </el-collapse>
             </div>
