@@ -13,6 +13,7 @@ import mimetypes
 import time
 import pika
 import ast
+import smtplib
 import traceback
 import mysql.connector.cursor
 import mysql.connector
@@ -25,12 +26,9 @@ from functools import wraps
 from argon2 import PasswordHasher, exceptions
 from markdown import markdown
 from weasyprint import HTML
-
-import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.header import Header
-
 from email.mime.base import MIMEBase
 from email import encoders
 
