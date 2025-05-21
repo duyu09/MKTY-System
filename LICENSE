@@ -369,21 +369,21 @@ You may add additional accurate notices of copyright ownership.
 Exhibit B - "Incompatible With Secondary Licenses" Notice
 ---------------------------------------------------------
 
-This Source Code Form is "Incompatible With Secondary Licenses", as
-defined by the Mozilla Public License, v. 2.0.
+  This Source Code Form is "Incompatible With Secondary Licenses", as
+  defined by the Mozilla Public License, v. 2.0.
 
-
+---------------------------------------------------------
 
 This project is licensed under the Mozilla Public License 2.0.
 
-**Additional Terms**:
+**Additional Terms**
 
 1. If any part of this code is used in another project (modified or unmodified), the corresponding files must be made open source under the MPL-2.0 or a compatible license.
 
 2. You must clearly acknowledge the use of this software in the documentation, README, or About page of your product. This includes:
 
-  * The name of this project;
-  * A link to the official repository;
-  * The name or pseudonym of the original author.
+  - The name of this project;
+  - A link to the official repository;
+  - The name or pseudonym of the original author.
 
 3. You may not obfuscate, remove, or conceal the fact that this software is open source and that it is used in your project.
