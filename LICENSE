@@ -369,21 +369,54 @@ You may add additional accurate notices of copyright ownership.
 Exhibit B - "Incompatible With Secondary Licenses" Notice
 ---------------------------------------------------------
 
-  This Source Code Form is "Incompatible With Secondary Licenses", as
-  defined by the Mozilla Public License, v. 2.0.
+This Source Code Form is "Incompatible With Secondary Licenses", as
+defined by the Mozilla Public License, v. 2.0.
 
----------------------------------------------------------
+==Appendix==
 
-This project is licensed under the Mozilla Public License 2.0.
+Additional Terms
+----------------
 
-**Additional Terms**
+The following Additional Terms are hereby incorporated into this License, in accordance with Section 3.0 of the Mozilla Public License, Version 2.0 (MPL-2.0). These terms apply to all copies and Derivative Works of the Covered Software:
 
-1. If any part of this code is used in another project (modified or unmodified), the corresponding files must be made open source under the MPL-2.0 or a compatible license.
+1. **Reciprocal Licensing**
+   If any part of this code is used in another project (whether modified or unmodified), the corresponding files must be made open source under the MPL-2.0 or a license compatible with it.
 
-2. You must clearly acknowledge the use of this software in the documentation, README, or About page of your product. This includes:
+2. **Attribution Requirement**
+   You must clearly acknowledge the use of this software in the documentation, README file, or About page of your product. The acknowledgment must include:
 
-  - The name of this project;
-  - A link to the official repository;
-  - The name or pseudonym of the original author.
+   * The name of this project;
+   * A link to the official repository;
+   * The name or pseudonym of the original author.
 
-3. You may not obfuscate, remove, or conceal the fact that this software is open source and that it is used in your project.
+3. **Transparency of Open Source Use**
+   You may not obfuscate, remove, or conceal the fact that this software is open source and is used in your project.
+
+4. **Multilingual Attribution Requirement**
+   To ensure accurate and transparent attribution, the following multilingual requirements apply unless otherwise exempted under Section 4.3:
+
+   4.1 **Language Coverage Requirement**
+   Attribution must be provided in both:
+
+   * (i) At least one legally recognized official language of the user's country of nationality (or the de facto common language if no official language exists); and
+   * (ii) At least one of: Simplified Chinese, Traditional Chinese, English, or Vietnamese.
+
+   4.2 **Proper Noun Translation Standards**
+   For names of individuals, organizations, or creative works relating to this project, the standard translations provided in this project's README (in Chinese, English, or Vietnamese) must be used as a priority. If translated into other languages, the following order of precedence applies:
+
+   * (i) Mandatory legal requirements in the target jurisdiction;
+   * (ii) Relevant ISO standards;
+   * (iii) International diplomatic or cultural naming conventions.
+
+   4.3 **Language Exemption Conditions**
+   The multilingual attribution requirement is waived if:
+
+   * The user's official or common language is already Chinese (Simplified/Traditional), English, or Vietnamese;
+   * The region where the software is distributed imposes stricter language or attribution regulations.
+
+   4.4 **Consequences of Noncompliance**
+   Noncompliance with the above requirements will be interpreted as an attempt to obscure or misrepresent:
+
+   * The open-source nature of this software; and
+   * The fact that this open-source project is incorporated in your product.
+
