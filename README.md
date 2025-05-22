@@ -330,46 +330,15 @@ python -m http.server 8092
 
 ## 💻 系统前端UI效果
 
-#### 第一组
+下列表格展示了部分系统前端UI效果，请放大图片查看。
 
-<img alt="login" src="./image/ui_image/login.jpg" style="width:31%;" />
-<img alt="admin_inner" src="./image/ui_image/admin_inner.jpg" style="width:31%;" />
-<img alt="admin_inner_02" src="./image/ui_image/admin_inner_02.jpg" style="width:31%;" />
-<img alt="admin_inner_03" src="./image/ui_image/admin_inner_03.jpg" style="width:31%;" />
-<img alt="admin_login" src="./image/ui_image/admin_login.jpg" style="width:31%;" />
-<img alt="forum" src="./image/ui_image/forum.jpg" style="width:31%;" />
-
-#### 第二组
-
-<img alt="forum_02" src="./image/ui_image/forum_02.jpg" style="width:31%;" />
-<img alt="forum_03" src="./image/ui_image/forum_03.jpg" style="width:31%;" />
-<img alt="forum_04" src="./image/ui_image/forum_04.jpg" style="width:31%;" />
-<img alt="forum_05" src="./image/ui_image/forum_05.jpg" style="width:31%;" />
-<img alt="homepage" src="./image/ui_image/homepage.jpg" style="width:31%;" />
-<img alt="homepage_02" src="./image/ui_image/homepage_02.jpg" style="width:31%;" />
-
-#### 第三组
-
-<img alt="homepage_03" src="./image/ui_image/homepage_03.jpg" style="width:31%;" />
-<img alt="medcial_list" src="./image/ui_image/medcial_list.jpg" style="width:31%;" />
-<img alt="medcial_list_02" src="./image/ui_image/medcial_list_02.jpg" style="width:31%;" />
-<img alt="medcial_list_03" src="./image/ui_image/medcial_list_03.jpg" style="width:31%;" />
-<img alt="mkty_chat" src="./image/ui_image/mkty_chat.jpg" style="width:31%;" />
-<img alt="mkty_chat_02" src="./image/ui_image/mkty_chat_02.jpg" style="width:31%;" />
-
-#### 第四组
-
-<img alt="mkty_chat_03" src="./image/ui_image/mkty_chat_03.jpg" style="width:31%;" />
-<img alt="mkty_chat_04" src="./image/ui_image/mkty_chat_04.jpg" style="width:31%;" />
-<img alt="mkty_chat_05" src="./image/ui_image/mkty_chat_05.jpg" style="width:31%;" />
-<img alt="multimodal_diagnosis" src="./image/ui_image/multimodal_diagnosis.jpg" style="width:31%;" />
-<img alt="multimodal_diagnosis_02" src="./image/ui_image/multimodal_diagnosis_02.jpg" style="width:31%;" />
-<img alt="multimodal_diagnosis_03" src="./image/ui_image/multimodal_diagnosis_03.jpg" style="width:31%;" />
-
-#### 第五组
-
-<img alt="welcome_page" src="./image/ui_image/welcome_page.jpg" style="width:31%;" />
-<img alt="welcome_page_02" src="./image/ui_image/welcome_page_02.jpg" style="width:31%;" />
+| | | | |
+| ----- | ----- | ----- | ----- |
+| <img alt="forum_04" src="./image/ui_image/forum_04.jpg"/> | <img alt="forum_05" src="./image/ui_image/forum_05.jpg"/> | <img alt="homepage" src="./image/ui_image/homepage.jpg"/> | <img alt="homepage_02" src="./image/ui_image/homepage_02.jpg"/> |
+| <img alt="homepage_03" src="./image/ui_image/homepage_03.jpg"/> | <img alt="medcial_list" src="./image/ui_image/medcial_list.jpg"/> | <img alt="medcial_list_02" src="./image/ui_image/medcial_list_02.jpg"/> | <img alt="medcial_list_03" src="./image/ui_image/medcial_list_03.jpg"/> |
+| <img alt="mkty_chat" src="./image/ui_image/mkty_chat.jpg"/> | <img alt="mkty_chat_02" src="./image/ui_image/mkty_chat_02.jpg"/> | <img alt="mkty_chat_03" src="./image/ui_image/mkty_chat_03.jpg"/> | <img alt="mkty_chat_04" src="./image/ui_image/mkty_chat_04.jpg"/> |
+| <img alt="mkty_chat_05" src="./image/ui_image/mkty_chat_05.jpg"/> | <img alt="multimodal_diagnosis" src="./image/ui_image/multimodal_diagnosis.jpg"/> | <img alt="multimodal_diagnosis_02" src="./image/ui_image/multimodal_diagnosis_02.jpg"/> | <img alt="multimodal_diagnosis_03" src="./image/ui_image/multimodal_diagnosis_03.jpg"/> |
+| <img alt="welcome_page" src="./image/ui_image/welcome_page.jpg"/> | <img alt="welcome_page_02" src="./image/ui_image/welcome_page_02.jpg"/> |  |  |
 
 ## 🎓 项目作者及著作权声明
 
