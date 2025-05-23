@@ -1,7 +1,7 @@
 <p align="center">
   <br>
-  <img src="./image/mkty_cn_dark.svg#gh-dark-mode-only" style="width:60%;">
-  <img src="./image/mkty_cn_light.svg#gh-light-mode-only" style="width:60%;">
+  <img src="./image/mkty_en_dark.svg#gh-dark-mode-only" style="width:60%;">
+  <img src="./image/mkty_en_light.svg#gh-light-mode-only" style="width:60%;">
 </p>
 <br>
 
