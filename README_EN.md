@@ -11,7 +11,7 @@
 
 <p style="display: flex;align-items: center;">
   <img src="./image/PRC_flag.svg" alt="PRC" style="height: 1em;" /> 
-  &nbsp;<a href="./README.md"><b>Simplified Chinese (简体中文)</b></a>&nbsp;|&nbsp;
+  &nbsp;<a href="./README.md"><b>Chinese Simplified (简体中文)</b></a>&nbsp;|&nbsp;
   <img src="./image/USA_flag.svg" alt="USA" style="height: 1em;" /> 
   &nbsp;<a href="./README_EN.md"><b>English</b></a>&nbsp;|&nbsp;
   <img src="./image/SRV_flag.svg" alt="SRV" style="height: 1em;" /> 
@@ -20,7 +20,7 @@
 
 > Please note that both the English and Vietnamese versions of this document are LLM-translated from the original Chinese version. While manually proofread, inconsistencies may exist. In case of any discrepancies, the Chinese version shall prevail.
 
-**Full Project Title:** Minh Khoe Tue Y (_Simplified Chinese: 明康慧医_; _Traditional Chinese: 明康慧醫_; _Vietnamese: Minh Khỏe Tuệ Y_) — Design and Implementation of a Health Management and Diagnostic Assistance System Based on LLMs and Multimodal Artificial Intelligence
+**Full Project Title:** Minh Khoe Tue Y (_Chinese Simplified: 明康慧医_; _Chinese Traditional: 明康慧醫_; _Vietnamese: Minh Khỏe Tuệ Y_) — Design and Implementation of a Health Management and Diagnostic Assistance System Based on LLMs and Multimodal Artificial Intelligence
 **Abbreviation:** MKTY Smart Healthcare System
 
 ## 📖 Project Overview
@@ -70,7 +70,7 @@ This project utilizes the following libraries, components, and open-source techn
 
 &nbsp;&nbsp;&nbsp;&nbsp;**The MKTY-3B-Chat Large-scale Language Model** (Chinese Simplified: _明康慧医大模型_; Vietnamese: _MKTY-3B-Chat Mô hình Ngôn ngữ Quy mô Lớn_) is a core component of this project and was developed as the undergraduate capstone project for the Faculty of Computer Science and Technology, Grade 2025, at Qilu University of Technology (Shandong Academy of Sciences).
 
-&nbsp;&nbsp;&nbsp;&nbsp;With a parameter size of `3.09B` and quantization precision of `BF16`, the model has been fine-tuned and optimized specifically for domains such as medicine, healthcare, and biology, demonstrating superior performance compared to its base model, `Qwen2.5-3B-Instruct`. Fine-tuning was conducted using the LoRA (Low-Rank Adaptation) algorithm, focusing exclusively on Chinese language tasks. The process involved both incremental pretraining and supervised fine-tuning (SFT), implemented in two alternating rounds (i.e., one round of pretraining followed by one round of SFT, repeated once more). This design addresses the limitation of small-scale base models in absorbing domain-specific knowledge and mitigates the problem of catastrophic forgetting after a single SFT round.
+&nbsp;&nbsp;&nbsp;&nbsp;With a parameter size of `3.09B` and quantization precision of `BF16`, the model has been fine-tuned and optimized specifically for domains such as medicine, healthcare, and biology, demonstrating superior performance compared to its base model, `Qwen2.5-3B-Instruct` (Chinese Simplified: _通义千问_). Fine-tuning was conducted using the LoRA (Low-Rank Adaptation) algorithm, focusing exclusively on Chinese language tasks. The process involved both incremental pretraining and supervised fine-tuning (SFT), implemented in two alternating rounds (i.e., one round of pretraining followed by one round of SFT, repeated once more). This design addresses the limitation of small-scale base models in absorbing domain-specific knowledge and mitigates the problem of catastrophic forgetting after a single SFT round.
 
 **Training Data**:
 &nbsp;&nbsp;&nbsp;&nbsp;The training corpus includes diverse biomedical texts, diagnostic and Q\&A datasets, medical exam multiple-choice questions, and self-awareness prompts. MKTY’s main application scenarios in this project are: medical Q\&A, in-depth model discussions, treatment plan summarization, and diagnosis and drug recommendation based on medical records. To support these use cases, domain-specific datasets were curated:
