@@ -20,7 +20,7 @@
 
 > Please note that both the English and Vietnamese versions of this document are LLM-translated from the original Chinese version. While manually proofread, inconsistencies may exist. In case of any discrepancies, the Chinese version shall prevail.
 
-**Full Project Title:** Minh Khoe Tue Y (_Chinese Simplified: 明康慧医_; _Chinese Traditional: 明康慧醫_; _Vietnamese: Minh Khỏe Tuệ Y_) — Design and Implementation of a Health Management and Diagnostic Assistance System Based on LLMs and Multimodal Artificial Intelligence
+**Full Project Title:** Minh Khoe Tue Y (_Chinese Simplified: 明康慧医_; _Vietnamese: Minh Khỏe Tuệ Y_; _Nom Script: 明劸慧醫_ ) — Design and Implementation of a Health Management and Diagnostic Assistance System Based on LLMs and Multimodal Artificial Intelligence
 **Abbreviation:** MKTY Smart Healthcare System
 
 ## 📖 Project Overview

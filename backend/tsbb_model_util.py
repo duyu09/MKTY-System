@@ -1,5 +1,5 @@
 '''
-- 文件描述：明康慧医MKTY智慧医疗系统智能服务层大模型推理端（大规模模型推理队列MQ消费者端）工具函数模块
+- 文件描述：明康慧医MKTY智慧医疗系统智能服务层时间序列预测模型推理与BigBird模型推理端（tsbb级联模型推理队列MQ消费者端）工具函数模块
 - 总负责人：齐鲁工业大学（山东省科学院）计算机科学与技术学部 软件工程（软件开发）21-1班 杜宇 (@duyu09, <202103180009@stu.qlu.edu.cn>)
 - 文件名：large_model_util.py
 - 著作权声明：Copyright (c) 2025 DuYu (https://github.com/duyu09/MKTY-System)
@@ -12,8 +12,7 @@ import ast
 from rich.console import Console
 from rich.rule import Rule
 from datetime import datetime
-from transformers import AutoModelForCausalLM, AutoTokenizer
-
+from transformers import BigBirdPegasusForConditionalGeneration, AutoTokenizer, MarianMTModel
 
 console = Console(markup=False)
 
@@ -42,7 +41,7 @@ def info_print(msg: str, level: str="info") -> None:
         
 def start_print(version: str) -> None:
     '''
-    - 函数功能：大规模模型推理端程序启动时打印欢迎信息。欢迎信息包括：本系统英文简称`M.K.T.Y.`的艺术字，以及系统名称、著作权信息、GitHub开源地址、版本号等initial日志。
+    - 函数功能：模型推理端程序启动时打印欢迎信息。欢迎信息包括：本系统英文简称`M.K.T.Y.`的艺术字，以及系统名称、著作权信息、GitHub开源地址、版本号等initial日志。
     - 负责人：杜宇
     - 输入参数：`version`（`str`，版本号字符串，例如：`v1.1.0`）
     - 返回参数：`None`
@@ -56,13 +55,13 @@ def start_print(version: str) -> None:
     console.print(r"██ | \_/ ██ |██\ ██ | \██\ ██\  ██ |██\     ██ |██\ ", style="bold blue", highlight=False)
     console.print(r"\__|     \__|\__|\__|  \__|\__| \__|\__|    \__|\__|", style="bold blue", highlight=False)
     console.print(Rule(style="bold blue"))
-    console.print("明康慧医(MKTY)智慧医疗系统 大语言模型(MKTY-3B-Chat)推理高性能服务器端", style="bold blue", justify="center", highlight=False)
+    console.print("明康慧医(MKTY)智慧医疗系统 BigBird模型与医学时间序列预测模型推理端", style="bold blue", justify="center", highlight=False)
     console.print(Rule(style="bold blue"))
-    info_print("Minh Khoe Tue Y Smart Healthcare System Large-scale Model Inference High-performance Server Module", level="initial")
+    info_print("Minh Khoe Tue Y Smart Healthcare System BigBird Model and Medical Time Series Prediction Model Inference Module", level="initial")
     info_print("COPYRIGHT (c) 2025 DuYu (No.202103180009), Faculty of Computer Science and Technology, Qilu University of Technology (Shandong Academy of Sciences)", level="initial")
     info_print(r"https://github.com/duyu09/MKTY-System", level="initial")
     info_print(f"Version: {version}", level="initial")
-
+    
 def get_mq_channel(mq_connection_parameters: dict, callback: callable, callback_parameters: dict, queue_name: str = "task_queue", durable: bool = True) -> pika.adapters.blocking_connection.BlockingChannel:
     '''
     - 函数功能：连接到RabbitMQ服务器并返回一个通道对象
@@ -94,9 +93,9 @@ def get_mq_channel(mq_connection_parameters: dict, callback: callable, callback_
     info_print(f'已连接到RabbitMQ服务器: {mq_connection_parameters["host"]}:{mq_connection_parameters["port"]}，队列名: {queue_name}')
     return channel
 
-def load_model_and_tokenizer_mkty3b(model_dir: str):
+def load_model_and_tokenizer_bigbird(model_dir: str):
     '''
-    - 函数功能：加载`MKTY-3B-Chat`大模型及其分词器。
+    - 函数功能：加载`BigBird`大模型及其分词器。
     - 负责人：杜宇
     - 输入参数：model_dir
       - `model_dir`（`str`，模型目录路径）
@@ -104,15 +103,49 @@ def load_model_and_tokenizer_mkty3b(model_dir: str):
       - `model`（模型对象）
       - `tokenizer`（分词器对象）
     '''
+    info_print(f"正在加载BigBird模型和分词器，目录路径: {model_dir}")
     model_dir = os.path.abspath(model_dir)
-    info_print(f"正在加载MKTY大模型和分词器，目录路径: {model_dir}")
-    model = AutoModelForCausalLM.from_pretrained(
-        model_dir,
-        torch_dtype="auto",
-        device_map="auto"
-    )
     tokenizer = AutoTokenizer.from_pretrained(model_dir)
-    info_print(f"MKTY大模型加载完成")
+    model = BigBirdPegasusForConditionalGeneration.from_pretrained(model_dir)
+    info_print(f"BigBird模型加载完成")
     return model, tokenizer
 
+def load_model_and_tokenizer_ts(model_dir: str):
+    return None
+    pass
 
+def load_model_and_tokenizer_MarianMT(src: str = "zh", trg: str = "en"):
+    '''
+    - 函数功能：加载MarianMT翻译模型和分词器
+    - 负责人：杜宇
+    - 输入参数：src, trg
+      - `src`（`str`，源语言代码，默认为`zh`中文）
+      - `trg`（`str`，目标语言代码，默认为`en`英文）
+    - 返回参数：model, tokenizer
+      - model（模型对象）
+      - tokenizer（分词器对象）
+    '''
+    info_print(f"正在加载MarianMT翻译模型和分词器")
+    model_name = f"Helsinki-NLP/opus-mt-{src}-{trg}"
+    model = MarianMTModel.from_pretrained(model_name)
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    info_print(f"MarianMT翻译模型和分词器加载完成")
+    return model, tokenizer
+
+def translate(model, tokenizer, src_text_list: str) -> list:
+    '''
+    - 函数功能：翻译文本（语言种类取决于传入的模型）
+    - 负责人：杜宇
+    - 输入参数：model, tokenizer, src_text
+      - `model`（模型对象）
+      - `tokenizer`（分词器对象）
+      - `src_text_list`（`str`，源文本列表，列表中每个元素必须均为字符串）
+    - 返回参数：（`list`, 翻译后的对应目标文本列表）
+    '''
+    result_list = []
+    for text in src_text_list:
+        batch = tokenizer([text], return_tensors="pt")
+        generated_ids = model.generate(**batch)
+        result = tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
+        result_list.append(result)
+    return result_list
