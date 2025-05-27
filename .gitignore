@@ -15,6 +15,7 @@ frontend/coverage
 *.local
 
 backend/BiomedCLIP-PubMedBERT_256-vit_base_patch16_224/
+backend/bigbird-pegasus-large-pubmed/
 backend/data/
 __pycache__/
 *.spec

@@ -6,6 +6,7 @@
 '''
 import os
 import json
+import math
 from flask import Flask, jsonify, request, send_file
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
@@ -37,6 +38,12 @@ LLM_MQ_CONNECTION_PARAMETERS = {  # 大规模模型推理端MQ连接参数
     'heartbeat': 0
 }
 LLM_QUEUE_NAME = 'large_model_inference'  # 大规模模型推理端MQ队列名称
+TSBB_MQ_CONNECTION_PARAMETERS = {  # TSBB端MQ连接参数
+    'host': 'localhost',
+    'port': 5672,
+    'heartbeat': 0
+}
+TSBB_QUEUE_NAME = 'tsbb_model_inference'  # TSBB端MQ队列名称
 DATABASE_CONNECTION_POOL_PARAMETERS = {  # 数据库连接池参数
     'host': 'localhost',
     'user': 'root',
@@ -53,9 +60,10 @@ info_print("正在初始化后端服务")
 # 建立数据库连接池
 conn_pool = getDataBaseConnectionPool(**DATABASE_CONNECTION_POOL_PARAMETERS)
 
-# 通过MQ分别与MKTY-3B-Chat大语言模型推理端以及多模态智能辅诊端建立连接
+# 通过MQ分别与智能服务层各端建立连接
 llm_rpc_client = RpcClient(LLM_MQ_CONNECTION_PARAMETERS, LLM_QUEUE_NAME)
 md_rpc_client = RpcClient(MD_MQ_CONNECTION_PARAMETERS, MD_QUEUE_NAME)
+tsbb_rpc_client = RpcClient(TSBB_MQ_CONNECTION_PARAMETERS, TSBB_QUEUE_NAME)
 
 # 初始化Flask后台服务应用
 app = Flask(__name__)
@@ -890,8 +898,8 @@ def add_forum(cursor):
     forum_type = data.get('forumType')
     forum_perm = data.get('forumPermission')
 
-    if not all([forum_name, forum_type in {0,1}, forum_perm in {0,1,2}]):
-        return jsonify({'code':1, 'msg':'参数格式错误'})
+    if not all([forum_name, forum_type in {0, 1}, forum_perm in {0, 1, 2}]):
+        return jsonify({'code': 1, 'msg': '参数格式错误'})
 
     try:
         create_time = util_current_time()
@@ -909,7 +917,7 @@ def add_forum(cursor):
         })
     except Exception as e:
         info_print(f"论坛创建失败：{str(e)}", "error")
-        return jsonify({'code':1, 'msg':'操作失败：' + str(e)})
+        return jsonify({'code': 1, 'msg': '操作失败：' + str(e)})
 
 
 @app.route('/api/getForumList', methods=['POST'])
@@ -1355,9 +1363,86 @@ def send_email_request(cursor):
     if result:
         return jsonify({'code': 0,'msg': '发送成功！'})
     else:
-        return jsonify({'code': 1,'msg': '发送失败！'})
-    
-    
+        return jsonify({'code': 1, 'msg': '发送失败！'})
+
+
+@app.route('/api/tsbbModelSubmitTask', methods=['POST'])
+@jwt_required()
+@getCursor(conn_pool)
+def tsbb_model_submit_task(cursor):
+    '''
+    - API功能：医学时间序列预测模型和BigBird模型推理任务提交（大模型讨论判敛和时序预测均通过此接口提交推理任务）
+    - 负责人：杜宇
+    - 请求参数：
+      - `taskType`: 任务类型（`int`，0=医学时间序列预测，1=BigBird模型推理）
+      - `taskLanguage`: 任务自然语言类型（`str`，仅支持中英文，`zh`=中文，`en`=英文）
+      - `taskData`: 任务数据（`any`，当`taskType`为0时，其为JSON，键为“timeSeries”（时间序列浮点数数组）和“text”（医学文本字符串）；当`taskType`为1时，其为数组，元素为待推理文本字符串）
+    - 响应参数：
+      - `code`: 执行状态（`int`，`0`=提交成功，`1`=提交失败）
+      - `msg`: 自然语言提示信息（`str`）
+      - `taskId`: 任务ID（`str`，是一个GUID字符串）
+    '''
+    user_id = get_jwt_identity()
+    session_data = request.json
+    task_type = session_data.get('taskType')
+    task_language = session_data.get('taskLanguage')
+    task_data = session_data.get('taskData')
+    if task_type is None:
+        return jsonify({'code': 1,'msg': '任务类型不可为空'})
+    if task_type not in [0, 1]:
+        return jsonify({'code': 1,'msg': '任务类型参数不可读取'})
+    if task_language not in ['zh', 'en']:
+        return jsonify({'code': 1,'msg': '任务语言参数不可读取'})
+    task_submit_data = {
+        "taskType": task_type,
+        "taskLanguage": task_language
+    }
+    try:
+        if task_type == 0:
+            time_series = task_data.get("timeSeries")
+            text = task_data.get("text")
+            time_series = map(lambda x: float(x) if not math.isnan(x) else 0.0, time_series)
+            task_submit_data["timeSeries"] = list(time_series)
+            task_submit_data["text"] = text
+        elif task_type == 1:
+            texts_list = list(map(str, task_data))
+            task_submit_data["textsList"] = texts_list
+        task_id = tsbb_rpc_client.call(task_submit_data)
+        return jsonify({'code': 0,'msg': '任务提交成功！', 'taskId': task_id})
+    except Exception as e:
+        return jsonify({'code': 1,'msg': '任务提交失败:'+ str(e)})
+
+
+@app.route('/api/tsbbInferenceGetStatus', methods=['POST'])
+@jwt_required()
+@getCursor(conn_pool)
+def tsbb_inference_get_status(cursor):
+    '''
+    - API功能：获取指定任务的推理结果
+    - 负责人：杜宇
+    - 请求参数：
+      - `taskId`: 任务ID（`str`，GUID字符串）
+    - 响应参数：
+      - `code`: 执行状态（`int`，`0`=获取成功，`1`=获取失败）
+      - `msg`: 自然语言提示信息（`str`）
+      - `taskStatus`: 任务状态（`int`，`0`=任务完成，`1`=任务进行中，`2`=任务失败）
+      - `taskResult`: 任务结果（`any`，具体结构视任务类型而定）
+    '''
+    user_id = get_jwt_identity()
+    session_data = request.json
+    task_id = session_data.get('taskId')
+    if task_id is None or task_id == "":
+        return jsonify({'code': 1,'msg': '任务ID不可读取'})
+    try:
+        result = tsbb_rpc_client.get_response(task_id)
+        if result is None:
+            return jsonify({'code': 0,'msg': '任务正在进行', 'taskStatus': 1})
+        else:
+            return jsonify({'code': 0,'msg': '获取成功！', 'taskResult': result, 'taskStatus': 0})
+    except Exception as e:
+        return jsonify({'code': 1,'msg': '获取失败：' + str(e), 'taskStatus': 2})
+
+
 if __name__ == '__main__':
     info_print(f"正在启动后端服务(Port:{PORT};Host:{HOST})")
     if MODE == 'prod':

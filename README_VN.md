@@ -20,7 +20,7 @@
 
 > Lưu Ý: Phiên bản tiếng Anh và tiếng Việt của tài liệu này được dịch tự động từ bản gốc tiếng Trung bởi LLM, đã qua hiệu đính thủ công nhưng không tránh khỏi sai sót. Trong trường hợp có sự khác biệt giữa các phiên bản, bản tiếng Trung là bản chính xác nhất.
 
-**Tên đầy đủ dự án:** Minh Khỏe Tuệ Y (Tiếng Trung Giản Thể: _明康慧医_; Tiếng Trung Phồn Thể: _明康慧醫_; Tiếng Anh: _Minh Khoe Tue Y_) – Thiết kế và triển khai hệ thống quản lý sức khỏe và hỗ trợ chẩn đoán y tế dựa trên LLM và trí tuệ nhân tạo đa mô thức ( **Tên viết tắt:** Minh Khỏe Tuệ Y – Hệ Thống Y Liệu Trí Tuệ )
+**Tên đầy đủ dự án:** Minh Khỏe Tuệ Y (Tiếng Trung Giản Thể: _明康慧医_; Chữ Nôm: _明劸慧醫_; Tiếng Anh: _Minh Khoe Tue Y_) – Thiết kế và triển khai hệ thống quản lý sức khỏe và hỗ trợ chẩn đoán y tế dựa trên LLM và trí tuệ nhân tạo đa mô thức ( **Tên viết tắt:** Minh Khỏe Tuệ Y – Hệ Thống Y Liệu Trí Tuệ )
 
 ## 📖 Giới Thiệu Dự Án
 
