@@ -10,7 +10,7 @@ import 'highlight.js/styles/rainbow.css';
 import hljs from 'highlight.js';
 import { errHandle, successHandle, convertTime } from "@/utils/tools";
 import { getCookie, getUserAvatar, llmInferenceGetStatus, llmInferenceSubmitTask, saveLlmSession, 
-  getLlmSessionList, getLlmSession, deleteLlmSession } from "@/api/api";
+  getLlmSessionList, getLlmSession, deleteLlmSession, tsbbModelSubmitTask, tsbbInferenceGetStatus } from "@/api/api";
 import PsyChat from './PsyChat.vue';
 
 
@@ -91,7 +91,6 @@ export default
           }
           this.PsyChatDM_StepList.push({ "title":"判敛", "desc": "计算共识度"});
           // 开始讨论
-
           var moderator_opinion = "暂无"  // 上轮主持人意见
           for(let i=0;i<this.PsyChatDM_HyperParameters_Epoch;i++){ // 讨论轮次
             var result_summary = "";
@@ -121,8 +120,33 @@ export default
             this.PsyChatDM_StepResultList.push({ "title":"第"+(i+1)+"轮 主持人总结", "content": moderator_opinion }); // 加入讨论步骤结果。
           }
           // 判敛 （以后写）
-
+          // 任务类型=1；任务语言=“zh”
+          var s001 = this.PsyChatDM_StepResultList;
+          s001 = s001.slice(-(this.PsyChatDM_HyperParameters_AgentNumber + 1));
+          var textList = s001.map(item => item.content);
+          //tsbbModelSubmitTask(1, "zh", textList);
+          const convergence_score = await this.PsyChatDM_ttbsInference(textList, 2567);
+          const convergence_score_percentage = (convergence_score * 100).toFixed(2) + '%';
+          if(convergence_score < this.PsyChatDM_HyperParameters_ConvergenceThreshold) {
+            this.PsyChatDM_StepResultList.push({ "title": "判敛结果：讨论不收敛（" + convergence_score_percentage + "）", "content": "智能体讨论结束，若干智能体未达成共识，最后一轮收敛指标：" + convergence_score + "（约为" + convergence_score_percentage + "）" + "，小于您设置的阈值。" });
+          }
+          else {
+            this.PsyChatDM_StepResultList.push({ "title": "判敛结果：讨论收敛（" + convergence_score_percentage + "）", "content": "智能体讨论结束，若干智能体已达成共识，最后一轮收敛指标：" + convergence_score + "（约为" + convergence_score_percentage + "）" + "，不小于您设置的阈值。" });
+          }
+          this.PsyChatDM_CurrentStep++;
+          var s002 = this.PsyChatDM_StepResultList.slice();
+          s002.unshift(this.PsyChat_Context);
+          saveLlmSession(-1, s002, 1).then((res3) => {
+            if(res3.data.code!= 0) { 
+              errHandle("未成功保存聊天记录：" + res3.data.msg); 
+            }
+            else {
+              console.log("保存聊天记录成功。");
+              // res3.data.sessionId; // 更新会话ID号。
+            }
+          });
           this.PsyChat_Generating=false;
+          successHandle("智能体讨论已完成。");
         },
         async PsyChatDM_LlmInference(history_ChatArr, content, interval=2555){
           const submit_result = await llmInferenceSubmitTask(history_ChatArr, content); // 提交任务。
@@ -148,6 +172,31 @@ export default
             }, interval);
           });
         },
+        async PsyChatDM_ttbsInference(textList, interval=2555)
+        {
+          const submit_result = await tsbbModelSubmitTask(1, "zh", textList); // 提交任务。
+          if(submit_result.data.code!==0) {
+            errHandle('提交任务失败：' + submit_result.data.msg);
+            return new Promise((resolve) => {
+              resolve(false);
+            });
+          }
+          const task_id = submit_result.data.taskId;
+          return new Promise((resolve) => {
+            const timer = setInterval(async () => {
+              const result = await tsbbInferenceGetStatus(task_id);
+              if(result.data.code !== 0) {
+                errHandle('获取任务状态失败，暂停讨论：' + result.data.msg);
+                clearInterval(timer);
+                resolve(false);
+              }
+              if (result.data.taskStatus == 0) {
+                clearInterval(timer);
+                resolve(result.data.taskResult);
+              }
+            }, interval);
+          });
+        },
         pc_loadPage(){
           const userId=parseInt(getCookie('userId'));
           if(userId!==undefined && userId!==0 && userId!==null){
@@ -156,7 +205,7 @@ export default
                 errHandle('授权错误，未能获取您的头像。');
                 return;
               }
-              else { 
+              else {
                 this.PsyChat_userAvatar=res.data.userAvatar; 
               }
             }).catch(res=>{

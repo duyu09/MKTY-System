@@ -16,6 +16,7 @@ export
     getImportantList, addImportantItem, deleteImportantItem, finishImportantItem, llmInferenceGetStatus, llmInferenceSubmitTask, 
     saveLlmSession, getLlmSession, getLlmSessionList, deleteLlmSession, addForum, getForumList, deleteForum, 
     modifyForumType, sendPost, getPostList, getPostContent, praisePost, deletePost, getForumInfo, exportChatToPDF, sendEmail,
+    tsbbModelSubmitTask, tsbbInferenceGetStatus, 
 
 
     setUserInformation, updataInformation, setAvatar, addFlag, showFlag, deleteFlag, showOrg, deleteOrg, creatForum, createOrg, releaseItem, showForum, showItem, deleteItem, showPsy, signIn, readSignInContext, readStudyRoom, startStudy, readStudyStatus, dredgePsy, skillTest, upvote, upload, showFile, downloadFile, getMusicList
@@ -413,6 +414,27 @@ function sendEmail(content, receiver, subject)
         'subject': subject
     },{headers: {'Authorization': getToken()}});
 }
+
+// 37. 提交判敛任务或时序预测模型推理任务
+function tsbbModelSubmitTask(taskType, taskLanguage, taskData)
+{
+    return axios.post(baseURL+'/tsbbModelSubmitTask',{
+        'taskType': taskType,
+        'taskLanguage': taskLanguage,
+        'taskData': taskData
+    },{headers: {'Authorization': getToken()}});
+}
+
+// 38. 判敛/时序预测任务状态查询
+function tsbbInferenceGetStatus(taskId)
+{
+    return axios.post(baseURL+'/tsbbInferenceGetStatus',{
+        'taskId': taskId
+    },{headers: {'Authorization': getToken()}});
+}
+
+
+
 
 
 

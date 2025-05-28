@@ -18,6 +18,8 @@ import traceback
 import mysql.connector.cursor
 import mysql.connector
 import mysql.connector.pooling
+import numpy as np
+from itertools import combinations
 from PIL import Image
 from datetime import datetime
 from rich.console import Console
@@ -528,3 +530,30 @@ def send_email(sender_email: str, sender_name: str=None,
         info_print(f"邮件发送失败: {e}", level="error")
         return False
     
+def average_cosine_similarity(vectors_list: list) -> float:
+    """
+    - 函数功能：计算一组向量的平均余弦相似度
+    - 负责人：杜宇
+    - 输入参数：
+      - `vectors_list`（`list`）：向量列表，每个向量为一个可迭代对象（如列表或numpy数组）
+    - 返回参数：
+      - `float`：平均余弦相似度
+    """
+    if not vectors_list:
+        return 0.0
+    vectors = np.array(vectors_list)  # 转换为numpy数组便于计算
+    if len(set(len(v) for v in vectors)) != 1:
+        raise ValueError("所有向量的长度必须相同")
+    similarities = []
+    for v1, v2 in combinations(vectors, 2):  # 计算所有向量两两组合的余弦相似度
+        dot_product = np.dot(v1, v2)
+        norm_v1 = np.linalg.norm(v1)
+        norm_v2 = np.linalg.norm(v2)
+        if norm_v1 == 0 or norm_v2 == 0:
+            similarity = 0.0
+        else:
+            similarity = dot_product / (norm_v1 * norm_v2)
+        similarities.append(similarity)
+    if not similarities:
+        return 0.0
+    return np.mean(similarities)

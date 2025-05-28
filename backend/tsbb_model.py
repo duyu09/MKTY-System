@@ -47,20 +47,24 @@ def predict(message: dict, bigbird_tokenizer, bigbird_model, ts_model, mt_model,
             outputs = model.model.encoder(**inputs)
         last_hidden_state = outputs.last_hidden_state
         cls_token_embedding = last_hidden_state[0][0]  # 获取 [CLS] token 对应的嵌入
-        # sentence_embedding = last_hidden_state.mean(dim=1)[0]  # 对所有 token 嵌入求均值，得到句子的全局表示
-        return cls_token_embedding # sentence_embedding
+        sentence_embedding = last_hidden_state.mean(dim=1)[0]  # 对所有 token 嵌入求均值，得到句子的全局表示
+        # return cls_token_embedding # sentence_embedding
+        return sentence_embedding
     task_type = message.get("taskType")
     task_language = message.get("taskLanguage")
     if task_type == 0:
         time_series = message.get("timeSeries")
         text = message.get("text")
+        return_data = {"taskType": 0, "data": None}
+        
         pass
     elif task_type == 1:
         texts_list = message.get("textsList", [])
         if task_language == "zh":
             texts_list = translate(mt_model, mt_tokenizer, texts_list)
         text_features = [get_text_feature(text, bigbird_tokenizer, bigbird_model).numpy().tolist() for text in texts_list]
-        return text_features
+        return_data = {"taskType": 1, "data": text_features}
+        return return_data
 
 bb_model, bb_tokenizer = load_model_and_tokenizer_bigbird(BB_MODEL_PATH)
 ts_model = load_model_and_tokenizer_ts(TS_MODEL_PATH)

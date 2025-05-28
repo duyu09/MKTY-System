@@ -11,7 +11,7 @@ from flask import Flask, jsonify, request, send_file
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from util import util_file2base64, util_base642file, util_uuid, util_current_time, info_print, start_print, getDataBaseConnectionPool, getCursor
-from util import util_encrypt_password, util_verify_password, RpcClient, save_base64_image, export_chat_to_pdf, send_email
+from util import util_encrypt_password, util_verify_password, RpcClient, save_base64_image, export_chat_to_pdf, send_email, average_cosine_similarity
 from gevent.pywsgi import WSGIServer
 
 # 全局变量配置
@@ -1341,13 +1341,13 @@ def send_email_request(cursor):
     subject = session_data.get('subject')
     username = "明康慧医用户" + str(user_id)
     if content is None or content == "":
-        return jsonify({'code': 1,'msg': '邮件内容不可为空'})
+        return jsonify({'code': 1, 'msg': '邮件内容不可为空'})
     if receiver is None or receiver == "":
-        return jsonify({'code': 1,'msg': '收件人邮箱地址不可为空'})
+        return jsonify({'code': 1, 'msg': '收件人邮箱地址不可为空'})
     cursor.execute("SELECT * FROM userinfo WHERE userId=%s", (user_id,))
     result_user_info = cursor.fetchall()
     if len(result_user_info) == 0:
-        return jsonify({'code': 1,'msg': '读取用户信息意外错误。'})
+        return jsonify({'code': 1, 'msg': '读取用户信息意外错误。'})
     else:
         username = result_user_info[0]['userName']
     result = send_email(
@@ -1361,7 +1361,7 @@ def send_email_request(cursor):
     password=EMAIL_SENDER_AUTHORIZATION
     )
     if result:
-        return jsonify({'code': 0,'msg': '发送成功！'})
+        return jsonify({'code': 0, 'msg': '发送成功！'})
     else:
         return jsonify({'code': 1, 'msg': '发送失败！'})
 
@@ -1388,11 +1388,11 @@ def tsbb_model_submit_task(cursor):
     task_language = session_data.get('taskLanguage')
     task_data = session_data.get('taskData')
     if task_type is None:
-        return jsonify({'code': 1,'msg': '任务类型不可为空'})
+        return jsonify({'code': 1, 'msg': '任务类型不可为空'})
     if task_type not in [0, 1]:
-        return jsonify({'code': 1,'msg': '任务类型参数不可读取'})
+        return jsonify({'code': 1, 'msg': '任务类型参数不可读取'})
     if task_language not in ['zh', 'en']:
-        return jsonify({'code': 1,'msg': '任务语言参数不可读取'})
+        return jsonify({'code': 1, 'msg': '任务语言参数不可读取'})
     task_submit_data = {
         "taskType": task_type,
         "taskLanguage": task_language
@@ -1408,9 +1408,9 @@ def tsbb_model_submit_task(cursor):
             texts_list = list(map(str, task_data))
             task_submit_data["textsList"] = texts_list
         task_id = tsbb_rpc_client.call(task_submit_data)
-        return jsonify({'code': 0,'msg': '任务提交成功！', 'taskId': task_id})
+        return jsonify({'code': 0, 'msg': '任务提交成功！', 'taskId': task_id})
     except Exception as e:
-        return jsonify({'code': 1,'msg': '任务提交失败:'+ str(e)})
+        return jsonify({'code': 1, 'msg': '任务提交失败:'+ str(e)})
 
 
 @app.route('/api/tsbbInferenceGetStatus', methods=['POST'])
@@ -1432,15 +1432,20 @@ def tsbb_inference_get_status(cursor):
     session_data = request.json
     task_id = session_data.get('taskId')
     if task_id is None or task_id == "":
-        return jsonify({'code': 1,'msg': '任务ID不可读取'})
+        return jsonify({'code': 1, 'msg': '任务ID不可读取'})
     try:
         result = tsbb_rpc_client.get_response(task_id)
         if result is None:
-            return jsonify({'code': 0,'msg': '任务正在进行', 'taskStatus': 1})
+            return jsonify({'code': 0, 'msg': '任务正在进行', 'taskStatus': 1})
         else:
-            return jsonify({'code': 0,'msg': '获取成功！', 'taskResult': result, 'taskStatus': 0})
+            task_type = result.get("taskType")
+            if task_type == 0:
+                pass
+            elif task_type == 1:
+                avg_similarity = average_cosine_similarity(result.get("data", []))
+                return jsonify({'code': 0, 'msg': '获取成功！', 'taskResult': avg_similarity, 'taskStatus': 0})
     except Exception as e:
-        return jsonify({'code': 1,'msg': '获取失败：' + str(e), 'taskStatus': 2})
+        return jsonify({'code': 1, 'msg': '获取失败：' + str(e), 'taskStatus': 2})
 
 
 if __name__ == '__main__':
