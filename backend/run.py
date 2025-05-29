@@ -843,7 +843,10 @@ def get_llm_session_list(cursor):
     try:
         cursor.execute(f"SELECT * FROM llmhistory WHERE isSessionDM={is_session_dm} AND sessionUserId={user_id}")
         result = cursor.fetchall()
-        result_return = [{'sessionId': item['sessionId'], 'sessionSaveTime': item['sessionSaveTime'], 'sessionTitle': json.loads(item['sessionContent'])[1]['content'][:16]} for item in result]
+        if is_session_dm == 0:
+            result_return = [{'sessionId': item['sessionId'], 'sessionSaveTime': item['sessionSaveTime'], 'sessionTitle': json.loads(item['sessionContent'])[1]['content'][:16]} for item in result]
+        elif is_session_dm == 1:
+            result_return = [{'sessionId': item['sessionId'], 'sessionSaveTime': item['sessionSaveTime'], 'sessionTitle': json.loads(item['sessionContent'])[0][:16]} for item in result]
         return jsonify({'code': 0,'msg': '获取成功','sessionList': result_return})
     except Exception as e:
         return jsonify({'code': 1,'msg': '未能成功获取会话列表：'+ str(e)})

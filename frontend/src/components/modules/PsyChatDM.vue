@@ -3,7 +3,7 @@
 <!-- 创建日期：2025年03月10日 -->
 <!-- 修改日期：2025年04月06日 -->
 <script>
-import { Promotion, Avatar, Delete, ChatDotSquare, Setting, CaretRight, Loading } from '@element-plus/icons-vue';
+import { Promotion, Avatar, Delete, ChatDotSquare, Setting, CaretRight, Loading, Clock, Notebook } from '@element-plus/icons-vue';
 import { marked }  from "marked";
 import DOMPurify from "dompurify";
 import 'highlight.js/styles/rainbow.css';
@@ -26,6 +26,8 @@ export default
       'Setting': Setting,
       'CaretRight': CaretRight,
       'Loading': Loading,
+      'Clock': Clock,
+      'Notebook': Notebook
     },
     data()
     {
@@ -75,6 +77,7 @@ export default
     methods:
       {
         async PsyChat_Send(){
+          this.pc_clear();
           if(this.PsyChat_Context === ''){
            errHandle('待探讨问题不可为空'); 
            return;
@@ -98,14 +101,15 @@ export default
               var prompt_per_round = "- 问题：\n" + this.PsyChat_Context + "\n\n - 上轮讨论主持人意见：\n" + moderator_opinion + "\n\n - 请你结合主持人意见，对上述医疗或医学专业的问题发表详细观点，可以质疑并说明理由。\n";
               const result=await this.PsyChatDM_LlmInference(this.PsyChatDM_Context_AgentN[j], this.PsyChat_Context);
               if(!result){
-                errHandle('智能体'+(j+1)+'生成出现错误，系统暂停讨论。');
+                errHandle('智能体' + (j + 1) + '生成出现错误，系统暂停讨论。');
                 this.PsyChat_Generating=false;
                 return;
               }
               this.PsyChatDM_Context_AgentN[j].push({ "role": "user", "content": prompt_per_round }); // 加入用户问题。
               this.PsyChatDM_Context_AgentN[j].push({ "role": "assistant", "content": result }); // 加入智能体回答。
-              this.PsyChatDM_StepResultList.push({ "title":"第"+(i+1)+"轮 智能体"+(j+1)+"讨论", "content": result }); // 加入讨论步骤结果。
-              result_summary += "- LLM "+(j+1)+"观点：\n"+result+"\n\n"; // 加入总结。
+              const result_html = DOMPurify.sanitize(marked(result));
+              this.PsyChatDM_StepResultList.push({ "title":"第" + (i + 1) + "轮 智能体" + (j + 1) + "讨论", "content": result_html }); // 加入讨论步骤结果。
+              result_summary += "- LLM " + (j + 1) + "观点：\n" + result + "\n\n"; // 加入总结。
               this.PsyChatDM_CurrentStep++; // 增加当前步骤。
             }
             var moderator_prompt = "- 问题：\n" + this.PsyChat_Context + "\n\n" + result_summary + "对于给定的医疗相关问题，请综合各LLM观点，结合自身知识，得出你自己的判断，尽可能详尽，全部都分析到位，还要充分说明理由。\n";
@@ -119,7 +123,7 @@ export default
             moderator_opinion = moderator_result; // 保存主持人意见。
             this.PsyChatDM_StepResultList.push({ "title":"第"+(i+1)+"轮 主持人总结", "content": moderator_opinion }); // 加入讨论步骤结果。
           }
-          // 判敛 （以后写）
+          // 判敛
           // 任务类型=1；任务语言=“zh”
           var s001 = this.PsyChatDM_StepResultList;
           s001 = s001.slice(-(this.PsyChatDM_HyperParameters_AgentNumber + 1));
@@ -216,7 +220,7 @@ export default
         pc_getLlmSessionList(){
           this.PsyChat_LlmSessionListLoading=true;
           this.PsyChat_LlmSessionList=[];
-          getLlmSessionList(0).then(res=>{
+          getLlmSessionList(1).then(res=>{
             if(res.data.code!==0){
               errHandle('获取会话列表失败：'+res.data.msg);
               this.PsyChat_LlmSessionListLoading=false;
@@ -231,8 +235,6 @@ export default
 
         },
         pc_newSession(){
-          
-          
         },
         pc_conTime(unixTime){
           return convertTime(unixTime);
@@ -244,10 +246,10 @@ export default
               return;
             }
             else {
-              this.PsyChat_ChatArr=JSON.parse(res.data.sessionContent); // 加载聊天记录。
-              // console.log("this.PsyChat_ChatArr", this.PsyChat_ChatArr);
+              const arr = JSON.parse(res.data.sessionContent); // 加载聊天记录。
+              this.PsyChat_Context = arr[0];
+              this.PsyChatDM_StepResultList = arr.slice(1);
               setTimeout(() => this.$refs.ChatMainDiv.scrollTo({top:this.$refs.ChatMainDiv.scrollHeight,behavior:'smooth'}),350);
-              this.PsyChat_SessionId=sessionId; // 新会话Id。
               this.PsyChat_HistoryDialog=false; // 关闭历史对话会话框。
               successHandle('已加载会话记录');
             }  
@@ -265,6 +267,15 @@ export default
               successHandle('已删除会话记录'); 
             }
           }) 
+        },
+        pc_clear()
+        {
+          this.PsyChat_Generating = false;
+          this.PsyChat_SessionId = -1;
+          this.PsyChatDM_StepList = [];
+          this.PsyChatDM_StepResultList = [];
+          this.PsyChatDM_CurrentStep = 0;
+          this.PsyChatDM_Context_AgentN = [[], [], [], []];
         }
       },
   mounted()
@@ -289,7 +300,7 @@ export default
       <div id="PsyChat-NewDiv01">
        <div id="PsyChat-NewDiv02">
          <div id="PsyChat-NewDiv03">
-            <el-button type="primary" @click="pc_newSession()" :disabled="PsyChat_Generating">新建会话</el-button>
+            <el-button type="primary" @click="pc_clear()" :disabled="PsyChat_Generating">清空会话</el-button>
             <el-button type="primary" @click="PsyChat_HistoryDialog=true" :disabled="PsyChat_Generating">会话记录</el-button>
             <el-button type="primary" @click="" :disabled="PsyChat_Generating">选择RAG知识库</el-button>
             <el-button type="warning" @click="this.$router.push('/main/PsyChat')" :disabled="PsyChat_Generating">智慧问答模式</el-button>
@@ -306,7 +317,16 @@ export default
         <div id="PsyChat-Div05" ref="ChatMainDiv">
           <div style="margin-top: 1rem; margin-left: 1rem; justify-content: left;">
             <div style="background-color: rgb(230,230,230); padding: 0.5rem 0.5rem 0.5rem 0.8rem; border-radius: 18px; width: 95%;">
-              <b>待研究问题：</b>{{ PsyChatContextDisplay }}<br>
+              <div style="display: flex;">
+                <div style="align-items: center; display: flex; flex-direction: row;">
+                  <b>
+                    <el-icon><Notebook /></el-icon>待研究问题：
+                  </b>
+                </div>
+                <div style="margin-left: 0.5rem;">
+                  {{ PsyChatContextDisplay }}
+                </div>
+              </div>
               <b>Agent数量：</b>{{ PsyChatDM_HyperParameters_AgentNumber }}个；
               <b>讨论回合数：</b>{{ PsyChatDM_HyperParameters_Epoch }}回合；
               <b>收敛阈值：</b>{{ PsyChatDM_HyperParameters_ConvergenceThreshold }}；
@@ -341,11 +361,12 @@ export default
               </div>
               <el-collapse style="font-family: HPHS;">
                 <el-collapse-item :title="'&nbsp;&nbsp;'+item.title" :name="index+1" v-for="(item, index) in PsyChatDM_StepResultList">
-                  <div style="margin-left: 1rem;">{{ item.content }}</div>
+                  <div style="margin-left: 1rem;" v-html="item.content"></div>
                 </el-collapse-item>
               </el-collapse>
             </div>
           </div>
+          <br>
 
         </div>
       </div>
@@ -370,12 +391,16 @@ export default
                   {{ item.sessionTitle }}
                 </div>
                 <div style="text-align: right;">
-                  <span style="font-size: small;">{{ pc_conTime(item.sessionSaveTime * 1000) }}</span>&nbsp;
+                  <span style="font-size: small;">
+                    <el-icon><Clock /></el-icon>{{ pc_conTime(item.sessionSaveTime * 1000) }}
+                  </span>&nbsp;
                   <el-popconfirm title="您确定删除吗？" @confirm="pc_deleteSession(item.sessionId)" @cancel="">
                     <template #reference>
-                      <el-icon size="small" color="red" style="cursor: pointer; font-weight: bold;">
+                      <span style="font-size: small; color: red; cursor: pointer; font-weight: bold;">
+                      <el-icon size="small" color="red">
                         <Delete />
-                      </el-icon>
+                      </el-icon>删除
+                    </span>
                     </template>
                   </el-popconfirm>
                   &nbsp;&nbsp;
