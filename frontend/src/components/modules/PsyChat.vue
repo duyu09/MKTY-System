@@ -157,7 +157,7 @@ export default
               setTimeout(() => this.$refs.ChatMainDiv.scrollTo({top:this.$refs.ChatMainDiv.scrollHeight,behavior:'smooth'}),350);
               this.PsyChat_SessionId=sessionId; // 新会话Id。
               this.PsyChat_HistoryDialog=false; // 关闭历史对话会话框。
-              successHandle('已加载会话记录'); 
+              successHandle('已加载会话记录');
             }  
           }) 
         },
