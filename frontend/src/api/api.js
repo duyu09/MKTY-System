@@ -17,7 +17,9 @@ export
     saveLlmSession, getLlmSession, getLlmSessionList, deleteLlmSession, addForum, getForumList, deleteForum, 
     modifyForumType, sendPost, getPostList, getPostContent, praisePost, deletePost, getForumInfo, exportChatToPDF, sendEmail,
     tsbbModelSubmitTask, tsbbInferenceGetStatus, 
-
+    
+    // 知识库管理相关API
+    createKnowledgeEntity, searchKnowledgeEntities, downloadKnowledgeEntity, favoriteKnowledgeEntity, getUserFavorites, searchKnowledgePieces,
 
     setUserInformation, updataInformation, setAvatar, addFlag, showFlag, deleteFlag, showOrg, deleteOrg, creatForum, createOrg, releaseItem, showForum, showItem, deleteItem, showPsy, signIn, readSignInContext, readStudyRoom, startStudy, readStudyStatus, dredgePsy, skillTest, upvote, upload, showFile, downloadFile, getMusicList
 }
@@ -708,4 +710,75 @@ function downloadFile(id)
 function getMusicList(context)
 {
     return axios.get('https://autumnfish.cn/search?keywords='+context);
+}
+
+
+
+
+
+
+
+
+
+
+// 知识库管理相关API函数
+
+// 创建知识实体
+function createKnowledgeEntity(keName, keAbstract, fileContent, fileType) {
+    return axios.post(baseURL + '/knowledge/create', {
+        keName: keName,
+        keAbstract: keAbstract,
+        fileContent: fileContent,
+        fileType: fileType
+    }, {headers: {'Authorization': getToken()}});
+}
+
+// 搜索知识实体
+function searchKnowledgeEntities(keyword) {
+    return axios.post(baseURL + '/knowledge/search', {
+        keyword: keyword
+    }, {
+        headers: {
+            'Authorization': getToken()
+        }
+    });
+}
+
+// 下载知识实体文件
+function downloadKnowledgeEntity(keId) {
+    const token = getToken();
+    window.open(baseURL + '/knowledge/download/' + keId + '?token=' + token, '_blank');
+}
+
+// 收藏知识实体
+function favoriteKnowledgeEntity(keId) {
+    return axios.post(baseURL + '/knowledge/favorite', {
+        keId: keId
+    }, {
+        headers: {
+            'Authorization': getToken()
+        }
+    });
+}
+
+// 获取用户收藏的知识实体
+function getUserFavorites() {
+    return axios.get(baseURL + '/knowledge/favorites', {
+        headers: {
+            'Authorization': getToken()
+        }
+    });
+}
+
+// 搜索知识实体片段
+function searchKnowledgePieces(keId, queryText, topK = 3) {
+    return axios.post(baseURL + '/knowledge/search_pieces', {
+        keId: keId,
+        queryText: queryText,
+        topK: topK
+    }, {
+        headers: {
+            'Authorization': getToken()
+        }
+    });
 }

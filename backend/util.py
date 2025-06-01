@@ -15,10 +15,12 @@ import pika
 import ast
 import smtplib
 import traceback
+import warnings
 import mysql.connector.cursor
 import mysql.connector
 import mysql.connector.pooling
 import numpy as np
+import jieba
 from itertools import combinations
 from PIL import Image
 from datetime import datetime
@@ -30,9 +32,21 @@ from markdown import markdown
 from weasyprint import HTML
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
+from email import encoders
+from email.header import Header
+from docx import Document
+from pptx import Presentation
+from PyPDF2 import PdfReader
+from email.mime.multipart import MIMEMultipart
 from email.header import Header
 from email.mime.base import MIMEBase
 from email import encoders
+from docx import Document
+from pptx import Presentation
+from PyPDF2 import PdfReader
+from rank_bm25 import BM25Okapi
+from typing import List, Dict, Tuple, Union
 
 # 定义常用文件扩展名及其对应的 MIME 类型
 common_mime_types = {
@@ -65,6 +79,8 @@ common_mime_types = {
     '.xls': 'application/vnd.ms-excel',
     '.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
 }
+
+warnings.filterwarnings("ignore", category=UserWarning)  # 抑制BM25的稀疏矩阵警告
 
 for ext, mime in common_mime_types.items():
     mimetypes.add_type(mime, ext)
@@ -557,3 +573,147 @@ def average_cosine_similarity(vectors_list: list) -> float:
     if not similarities:
         return 0.0
     return np.mean(similarities)
+
+
+def extract_text_from_file(file_path: str, ext: str) -> str:
+    '''
+    - 函数功能：从文件中提取纯文本内容
+    - 负责人：杜宇（与Copilot人机协作编辑）
+    - 输入参数：
+      - `file_path`（`str`，文件路径）
+      - `ext`（`str`，文件扩展名，前面可以带点号，也可以不带）
+    - 返回参数：`text`（`str`，提取的纯文本内容）
+    '''
+    if not isinstance(file_path, str):
+        raise TypeError("file_path must be a string")
+    if not os.path.isfile(file_path):
+        raise FileNotFoundError(f"File not found: {file_path}")
+
+    ext = ext.lower()
+    if ext[0] != '.':
+        ext = '.' + ext
+
+    if ext == '.txt':
+        with open(file_path, 'r', encoding='utf-8') as f:
+            return f.read()
+    elif ext == '.docx':
+        doc = Document(file_path)
+        return '\n'.join(paragraph.text for paragraph in doc.paragraphs)
+    elif ext == '.pptx':
+        ppt = Presentation(file_path)
+        return '\n'.join(
+            shape.text for slide in ppt.slides for shape in slide.shapes if hasattr(shape, "text")
+        )
+    elif ext == '.pdf':
+        reader = PdfReader(file_path)
+        return '\n'.join(page.extract_text() or '' for page in reader.pages)
+    else:
+        raise ValueError(f"Unsupported file type: {ext}")
+
+
+def split_text_into_pieces(text: str, piece_length: int) -> list:
+    '''
+    - 函数功能：将文本切分为固定长度的片段
+    - 负责人：杜宇（与Copilot人机协作编辑）
+    - 输入参数：
+      - `text`（`str`，原始文本），`piece_length`（`int`，片段长度）
+    - 返回参数：`pieces`（`list`，文本片段列表）
+    '''
+    pieces = []
+    for i in range(0, len(text), piece_length):
+        pieces.append(text[i:i + piece_length])
+    return pieces
+
+
+def compute_tfidf_features(pieces: List[str]) -> Tuple[np.ndarray, object]:
+    '''
+    - 函数功能：计算文本片段的TF-IDF特征并返回向量化器（已改为计算中文文本的BM25特征，保持接口兼容）
+    - 负责人：杜宇
+    - 输入参数：
+      - `pieces`（`list`，文本片段列表）
+    - 返回参数：(features, vectorizer)（`tuple`，TF-IDF特征矩阵和训练好的向量化器）
+    - 修改点：
+      1. 使用jieba进行中文分词
+      2. 返回的features改为BM25的文档词频矩阵（稠密化）
+      3. vectorizer实际为BM25模型
+    '''
+    if not pieces:
+        return np.array([]), None
+    
+    # 1. 中文分词（将jieba.cut生成器转为list）
+    def chinese_tokenizer(text: str) -> List[str]:
+        return list(jieba.cut(text))  # 关键修复：强制转为list
+    
+    tokenized_corpus = [chinese_tokenizer(doc) for doc in pieces]
+    
+    # 2. 初始化BM25
+    vectorizer = BM25Okapi(tokenized_corpus)
+    
+    # 3. 生成占位特征矩阵（使用相同的分词器）
+    from sklearn.feature_extraction.text import CountVectorizer
+    count_vec = CountVectorizer(
+        tokenizer=chinese_tokenizer,  # 使用修复后的分词函数
+        ngram_range=(1, 2),
+        min_df=1,
+        max_df=0.95
+    )
+    try:
+        features = count_vec.fit_transform(pieces).toarray()
+    except Exception as e:
+        print(f"特征矩阵生成失败（仅占位不影响BM25）: {str(e)}")
+        features = np.zeros((len(pieces), 1))  # 生成空矩阵保持接口兼容
+    
+    return features, vectorizer
+
+
+def search_similar_pieces(
+    query_text: str, 
+    features: np.ndarray, 
+    vectorizer: object, 
+    top_k: int = 3
+) -> List[Dict[str, Union[int, float]]]:
+    '''
+    - 函数功能：使用TF-IDF特征搜索相似的文本片段（已改为使用BM25搜索中文文本，带归一化）
+    - 负责人：杜宇
+    - 输入参数：
+      - `query_text`（`str`，查询文本）
+      - `features`（`ndarray`，预计算的TF-IDF特征矩阵）
+      - `vectorizer`（`TfidfVectorizer`，训练好的向量化器）
+      - `top_k`（`int`，返回前k个结果，默认为3）
+    - 返回参数：results（`list`，相似片段索引及其相似度）
+    - 修改点：
+      1. 查询文本中文分词
+      2. BM25评分归一化到[0,1]
+      3. 过滤相似度=0的结果（可选）
+    '''
+    if not isinstance(vectorizer, BM25Okapi) or not query_text.strip():
+        return []
+    
+    try:
+        # 1. 中文分词（使用与compute函数相同的分词逻辑）
+        def chinese_tokenizer(text: str) -> List[str]:
+            return list(jieba.cut(text))
+        
+        query_terms = chinese_tokenizer(query_text)
+        if not query_terms:
+            return []
+        
+        # 2. 获取评分并归一化
+        raw_scores = np.array(vectorizer.get_scores(query_terms))
+        if len(raw_scores) == 0:
+            return []
+        
+        # 归一化到[0,1]（防止除零）
+        #scores = (raw_scores - raw_scores.min()) / (raw_scores.max() - raw_scores.min() + 1e-6)
+        scores = raw_scores
+        
+        # 3. 返回结果（保持原始格式）
+        top_indices = np.argsort(scores)[::-1][:top_k]
+        return [
+            {"piece_index": int(idx), "similarity": float(scores[idx])}
+            for idx in top_indices if scores[idx] > 0
+        ]
+    
+    except Exception as e:
+        print(f"搜索失败: {str(e)}")
+        return []

@@ -7,12 +7,33 @@
 import os
 import json
 import math
+import pickle
+import numpy as np
 from flask import Flask, jsonify, request, send_file
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
-from util import util_file2base64, util_base642file, util_uuid, util_current_time, info_print, start_print, getDataBaseConnectionPool, getCursor
-from util import util_encrypt_password, util_verify_password, RpcClient, save_base64_image, export_chat_to_pdf, send_email, average_cosine_similarity
 from gevent.pywsgi import WSGIServer
+from util import (
+    util_uuid,
+    util_current_time,
+    extract_text_from_file,
+    split_text_into_pieces,
+    compute_tfidf_features,
+    util_base642file,
+    util_file2base64,
+    search_similar_pieces,
+    info_print,
+    start_print,
+    getDataBaseConnectionPool,
+    getCursor,
+    util_encrypt_password,
+    util_verify_password,
+    RpcClient,
+    save_base64_image,
+    export_chat_to_pdf,
+    send_email,
+    average_cosine_similarity
+)
 
 # 全局变量配置
 MODE = 'dev'  # 运行模式（dev=开发模式，prod=生产模式）
@@ -52,6 +73,7 @@ DATABASE_CONNECTION_POOL_PARAMETERS = {  # 数据库连接池参数
     'pool_size': 5,
     'pool_name': 'mkty'
 }
+KE_PIECE_LENGTH = 1024  # 知识实体分片长度
 
 # 程序启动，首先打印必要信息
 start_print(VERSION)
@@ -1449,6 +1471,366 @@ def tsbb_inference_get_status(cursor):
                 return jsonify({'code': 0, 'msg': '获取成功！', 'taskResult': avg_similarity, 'taskStatus': 0})
     except Exception as e:
         return jsonify({'code': 1, 'msg': '获取失败：' + str(e), 'taskStatus': 2})
+
+
+@app.route('/api/knowledge/create', methods=['POST'])
+@jwt_required()
+@getCursor(conn_pool)
+def create_knowledge_entity(cursor):
+    '''
+    - API功能：创建知识实体
+    - 负责人：杜宇（与Copilot人机协作编辑）
+    - 请求参数：
+      - `keName`（`str`，知识实体名称）
+      - `keAbstract`（`str`，知识实体摘要）
+      - `fileContent`（`str`，文件内容，base64编码）
+      - `fileType`（`str`，文件类型）
+    - 响应参数：
+      - `code`（`int`，响应状态，`0`=成功，`1`=失败）
+      - `msg`（`str`，提示信息）
+      - `keGUID`（`str`，知识实体唯一标识符）
+    '''
+    user_id = get_jwt_identity()
+    data = request.json
+        
+    # 获取请求参数
+    ke_name = data.get('keName')
+    ke_abstract = data.get('keAbstract', '')
+    file_content = data.get('fileContent')  # base64编码的文件内容
+    file_type = data.get('fileType')  # 文件MIME类型
+        
+    if not ke_name or not file_content or not file_type:
+        return jsonify({'code': 1, 'msg': '参数不完整'})
+        
+    # 生成GUID
+    ke_guid = util_uuid()
+        
+    # 创建知识实体目录
+    knowledge_dir = os.path.join(DATA_DIR, 'knowledge')
+    if not os.path.exists(knowledge_dir):
+        os.makedirs(knowledge_dir)
+        
+    entity_dir = os.path.join(knowledge_dir, ke_guid)
+    os.makedirs(entity_dir)
+        
+    # 保存文件
+    file_path = os.path.join(entity_dir, 'file')
+    util_base642file(file_content, file_path)
+        
+    # 提取文本内容
+    extension_map = {
+        'text/plain': '.txt',
+        'application/pdf': '.pdf',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document': '.docx',
+        'application/msword': '.doc',
+        'application/vnd.openxmlformats-officedocument.presentationml.presentation': '.pptx',
+        'application/vnd.ms-powerpoint': '.ppt'
+    }
+    ext_file = extension_map.get(file_type, '')
+    text_content = extract_text_from_file(file_path, ext_file)
+
+    # 切分文本
+    pieces = split_text_into_pieces(text_content, KE_PIECE_LENGTH)
+        
+    # 创建pieces目录并保存片段
+    pieces_dir = os.path.join(entity_dir, 'pieces')
+    os.makedirs(pieces_dir)
+        
+    for i, piece in enumerate(pieces):
+        piece_path = os.path.join(pieces_dir, str(i))
+        with open(piece_path, 'w', encoding='utf-8') as f:
+            f.write(piece)
+        # 计算TF-IDF特征
+    if pieces:
+        features, vectorizer = compute_tfidf_features(pieces)
+            
+        # 保存特征矩阵
+        feature_path = os.path.join(entity_dir, 'feature.npy')
+        np.save(feature_path, features)
+            
+        # 保存向量化器
+        if vectorizer is not None:
+            vectorizer_path = os.path.join(entity_dir, 'vectorizer.pkl')
+            with open(vectorizer_path, 'wb') as f:
+                pickle.dump(vectorizer, f)
+        
+    # 写入数据库
+    current_time = str(util_current_time())
+    insert_sql = """
+    INSERT INTO knowledgeentity (keGUID, keFileType, keName, keCreateTime, keAbstract) 
+    VALUES (%s, %s, %s, %s, %s)
+    """
+    cursor.execute(insert_sql, (ke_guid, file_type, ke_name, current_time, ke_abstract))
+    
+    return jsonify({'code': 0, 'msg': '知识实体创建成功', 'keGUID': ke_guid})
+        
+
+
+@app.route('/api/knowledge/search', methods=['POST'])
+@jwt_required()
+@getCursor(conn_pool)
+def search_knowledge_entities(cursor):
+    '''
+    - API功能：搜索知识实体
+    - 负责人：杜宇（与Copilot人机协作编辑）
+    - 请求参数：
+      - `keyword`（`str`，搜索关键词）
+    - 响应参数：
+      - `code`（`int`，响应状态，`0`=成功，`1`=失败）
+      - `msg`（`str`，提示信息）
+      - `entities`（`list`，搜索到的知识实体列表）
+    '''
+    try:
+        data = request.json
+        keyword = data.get('keyword')
+
+
+        if keyword:
+            # 搜索包含关键词的实体
+            search_sql = """
+            SELECT keId, keGUID, keFileType, keName, keCreateTime, keAbstract 
+            FROM knowledgeentity 
+            WHERE keName LIKE %s
+            ORDER BY keCreateTime DESC
+            """
+            cursor.execute(search_sql, (f'%{keyword}%',))
+        else:
+            # 获取所有实体
+            search_sql = """
+            SELECT keId, keGUID, keFileType, keName, keCreateTime, keAbstract 
+            FROM knowledgeentity 
+            ORDER BY keCreateTime DESC
+            """
+            cursor.execute(search_sql)
+
+        results = cursor.fetchall()
+        entities = []
+        
+        for row in results:
+            entities.append({
+                'keId': row['keId'],
+                'keGUID': row['keGUID'],
+                'keFileType': row['keFileType'],
+                'keName': row['keName'],
+                'keCreateTime': row['keCreateTime'],
+                'keAbstract': row['keAbstract']
+            })
+        return jsonify({'code': 0, 'msg': '搜索成功', 'entities': entities})
+        
+    except Exception as e:
+        return jsonify({'code': 1, 'msg': '搜索失败：' + str(e)})
+
+
+@app.route('/api/knowledge/download/<int:ke_id>', methods=['GET', 'POST'])
+@getCursor(conn_pool)
+def download_knowledge_entity(cursor, ke_id):
+    '''
+    - API功能：下载知识实体文件，公开资料无需登录即可下载
+    - 负责人：杜宇（与Copilot人机协作编辑）
+    - 请求参数：
+      - `ke_id`（`int`，知识实体ID）
+    - 响应参数：
+      - `code`（`int`，响应状态，`0`=成功，`1`=失败）
+      - `msg`（`str`，提示信息）
+      - `file`（`file`，下载的文件（触发浏览器直接下载））
+    '''
+    try:
+        # 获取实体信息
+        query_sql = "SELECT keGUID, keName, keFileType FROM knowledgeentity WHERE keId = %s"
+        cursor.execute(query_sql, (ke_id,))
+        result = cursor.fetchone()
+        
+        if not result:
+            return jsonify({'code': 1, 'msg': '知识实体不存在'})
+
+        ke_guid, ke_name, ke_file_type = result['keGUID'], result['keName'], result['keFileType']
+
+        # 构建文件路径
+        file_path = os.path.join(DATA_DIR, 'knowledge', ke_guid, 'file')
+        info_print(file_path)
+        
+        if not os.path.exists(file_path):
+            return jsonify({'code': 1, 'msg': '文件不存在'})
+        
+        # 根据文件类型确定扩展名
+        extension_map = {
+            'text/plain': '.txt',
+            'application/pdf': '.pdf',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document': '.docx',
+            'application/msword': '.doc',
+            'application/vnd.openxmlformats-officedocument.presentationml.presentation': '.pptx',
+            'application/vnd.ms-powerpoint': '.ppt'
+        }
+        
+        extension = extension_map.get(ke_file_type, '')
+        download_name = f"{ke_name}{extension}"
+        
+        return send_file(file_path, as_attachment=True, download_name=download_name)
+        
+    except Exception as e:
+        return jsonify({'code': 1, 'msg': '下载失败：' + str(e)})
+
+
+@app.route('/api/knowledge/favorite', methods=['POST'])
+@jwt_required()
+@getCursor(conn_pool)
+def favorite_knowledge_entity(cursor):
+    '''
+    - API功能：收藏知识实体
+    - 负责人：杜宇（与Copilot人机协作编辑）
+    - 请求参数：
+      - `keId`（`int`，知识实体ID）
+    - 响应参数：
+      - `code`（`int`，响应状态，`0`=成功，`1`=失败）
+      - `msg`（`str`，提示信息）
+    '''
+    try:
+        user_id = get_jwt_identity()
+        data = request.get_json()
+        ke_id = data.get('keId')
+        
+        if not ke_id:
+            return jsonify({'code': 1, 'msg': '参数不完整'})
+        
+        # 检查是否已收藏
+        check_sql = "SELECT recId FROM usercollectionke WHERE userId = %s AND keId = %s"
+        cursor.execute(check_sql, (user_id, ke_id))
+        
+        if cursor.fetchone():
+            return jsonify({'code': 1, 'msg': '已经收藏过该知识实体'})
+        
+        # 添加收藏
+        insert_sql = "INSERT INTO usercollectionke (userId, keId) VALUES (%s, %s)"
+        cursor.execute(insert_sql, (user_id, ke_id))
+        
+        return jsonify({'code': 0, 'msg': '收藏成功'})
+        
+    except Exception as e:
+        return jsonify({'code': 1, 'msg': '收藏失败：' + str(e)})
+
+
+@app.route('/api/knowledge/favorites', methods=['GET'])
+@jwt_required()
+@getCursor(conn_pool)
+def get_user_favorites(cursor):
+    '''
+    - API功能：获取用户收藏的知识实体
+    - 负责人：杜宇（与Copilot人机协作编辑）
+    - 请求参数：
+      - `userId`（`int`，用户ID）
+    - 响应参数：
+      - `code`（`int`，响应状态，`0`=成功，`1`=失败）
+      - `msg`（`str`，提示信息）
+      - `favorites`（`list`，用户收藏的知识实体列表）
+    '''
+    try:
+        user_id = get_jwt_identity()
+        
+        # 获取用户收藏的知识实体
+        query_sql = """
+        SELECT ke.keId, ke.keGUID, ke.keFileType, ke.keName, ke.keCreateTime, ke.keAbstract
+        FROM usercollectionke uc
+        JOIN knowledgeentity ke ON uc.keId = ke.keId
+        WHERE uc.userId = %s
+        ORDER BY uc.recId DESC
+        """
+        cursor.execute(query_sql, (user_id,))
+        results = cursor.fetchall()
+        
+        favorites = []
+        for row in results:
+            favorites.append({
+                'keId': row['keId'],
+                'keGUID': row['keGUID'],
+                'keFileType': row['keFileType'],
+                'keName': row['keName'],
+                'keCreateTime': row['keCreateTime'],
+                'keAbstract': row['keAbstract']
+            })
+        
+        return jsonify({'code': 0, 'msg': '获取成功', 'favorites': favorites})
+        
+    except Exception as e:
+        return jsonify({'code': 1, 'msg': '获取失败：' + str(e)})
+
+
+@app.route('/api/knowledge/search_pieces', methods=['POST'])
+@jwt_required()
+@getCursor(conn_pool)
+def search_knowledge_pieces(cursor):
+    '''
+    - API功能：使用TF-IDF搜索知识实体片段
+    - 负责人：杜宇（与Copilot人机协作编辑）
+    - 输入参数：
+      - `keId`（`int`，知识实体ID）
+      - `queryText`（`str`，查询文本）
+      - `topK`（`int`，返回前K个结果，默认为3）
+    - 响应参数：
+      - `code`（`int`，响应状态，`0`=成功，`1`=失败）
+      - `msg`（`str`，提示信息）
+      - `results`（`list`，搜索结果列表）
+    '''
+    try:
+        data = request.get_json()
+        ke_id = data.get('keId')
+        query_text = data.get('queryText')
+        top_k = data.get('topK', 3)
+        
+        if not ke_id or not query_text:
+            return jsonify({'code': 1, 'msg': '参数不完整'})
+        
+        # 获取知识实体GUID
+        query_sql = "SELECT keGUID FROM knowledgeentity WHERE keId = %s"
+        cursor.execute(query_sql, (ke_id,))
+        result = cursor.fetchone()
+        
+        if not result:
+            return jsonify({'code': 1, 'msg': '知识实体不存在'})
+        
+        ke_guid = result['keGUID']
+          # 构建实体目录路径
+        entity_dir = os.path.join(DATA_DIR, 'knowledge', ke_guid)
+        feature_path = os.path.join(entity_dir, 'feature.npy')
+        vectorizer_path = os.path.join(entity_dir, 'vectorizer.pkl')
+        pieces_dir = os.path.join(entity_dir, 'pieces')
+        
+        if not os.path.exists(feature_path) or not os.path.exists(vectorizer_path) or not os.path.exists(pieces_dir):
+            return jsonify({'code': 1, 'msg': '知识实体数据不完整'})
+        
+        # 加载TF-IDF特征
+        features = np.load(feature_path)
+        
+        # 加载向量化器
+        with open(vectorizer_path, 'rb') as f:
+            vectorizer = pickle.load(f)
+        
+        # 加载文本片段（用于返回内容）
+        pieces = []
+        piece_files = sorted([f for f in os.listdir(pieces_dir) if f.isdigit()], key=int)
+        
+        for piece_file in piece_files:
+            piece_path = os.path.join(pieces_dir, piece_file)
+            with open(piece_path, 'r', encoding='utf-8') as f:
+                pieces.append(f.read())
+        
+        # 搜索相似片段
+        search_results = search_similar_pieces(query_text, features, vectorizer, top_k)
+        
+        # 添加片段内容到结果中
+        results = []
+        for result in search_results:
+            piece_index = result['piece_index']
+            if piece_index < len(pieces):
+                results.append({
+                    'piece_index': piece_index,
+                    'content': pieces[piece_index],
+                    'similarity': result['similarity']
+                })
+        
+        return jsonify({'code': 0, 'msg': '搜索成功', 'results': results})
+        
+    except Exception as e:
+        return jsonify({'code': 1, 'msg': '搜索失败：' + str(e)})
 
 
 if __name__ == '__main__':

@@ -14,13 +14,11 @@ create table knowledgeentity
 (
 	keId bigint auto_increment comment '知识实体ID，唯一标识知识库实体。'
 		primary key,
+	keGUID text not null comment '知识实体GUID，用于命名知识实体存储目录。',
 	keFileType text not null comment '知识实体源文件类型，文件的MIME格式。',
 	keName text not null comment '知识实体名称，展示时的标题。',
 	keCreateTime text not null comment '上传时间，Unix时间戳，精确到秒，服务器时间。',
-	keAbstract text null comment '知识实体概要。',
-	isKeMultimodal tinyint(1) not null comment '是否为多模态实体，True=是。',
-	keTextEigenVectors json null comment '知识实体各文本特征。',
-	keResList json null comment '知识实体资源列表，解析出的资源ID。'
+	keAbstract text null comment '知识实体概要。'
 )
 comment '知识实体表' charset=utf8mb3;
 

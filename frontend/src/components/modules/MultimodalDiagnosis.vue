@@ -5,8 +5,6 @@ import "@/assets/css/file_input.css";
 import "@/assets/css/colorful_div.css";
 import { getUserInfo, getCookie, multimodalDiagnosisGetStatus, multimodalDiagnosisSubmitTask } from '@/api/api';
 import { errHandle } from  "@/utils/tools";
-
-
 import * as echarts from 'echarts/core';
 import {
   TitleComponent,

@@ -89,9 +89,9 @@ export default
             <el-icon><Flag /></el-icon>
             诊疗事项
           </div>
-          <div class="MainView-MenuItem" @click="() => this.$router.push('/main/Resources')">
+          <div class="MainView-MenuItem" @click="() => this.$router.push('/main/KnowledgeOverview')">
             <el-icon><FolderOpened /></el-icon>
-            资源中心
+            知识中心
           </div>
         </div>
         

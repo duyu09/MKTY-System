@@ -78,6 +78,14 @@ const router = createRouter({
           component: () => import('@/components/modules/ImportantList.vue'),
         },
         {
+          path: 'KnowledgeOverview',
+          name: 'KnowledgeOverview',
+          meta: {
+            title: '知识库管理 - 明康慧医系统'
+          },
+          component: () => import('@/components/modules/KnowledgeOverview.vue'),
+        },
+        {
           path: 'HomePage',
           name: 'PersonPage',
           meta: {
