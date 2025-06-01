@@ -147,8 +147,16 @@ export default
         <div style="z-index: 10;position: relative;width:100%;">
         <div id="HomePage-Div01">
           <div id="HomePage-Div02">
-            <div style="margin-bottom: 1rem;">
+            <!-- <div style="margin-bottom: 1rem;">
               <img src="/images/mkty_cn_light.svg" style="width: 30vw;" />
+            </div> -->
+            <div style="padding-bottom: 3rem;">
+              <el-carousel motion-blur height="40vh" interval="3456" style="border-radius: 20px; background-color: rgb(207, 202, 194);">
+                <el-carousel-item v-for="item in 4" :key="item">
+                  <!-- <h3 class="small justify-center" text="2xl">{{ item }}</h3> -->
+                  <el-image style="width: 100%; height: 100%" :src="`/images/homepage_carousel/0${item}.jpg`" fit="cover"></el-image>
+                </el-carousel-item>
+              </el-carousel>
             </div>
             <span><nobr>
               <span style="text-shadow: 2px 2px grey;">
@@ -301,12 +309,12 @@ export default
 }
 #HomePage-Div02
 {
-    margin-top: 2.25rem;
-    padding-top: 1.25rem;
-    padding-bottom: 1.25rem;
+    /* margin-top: 2.25rem;
+    padding-top: 1.25rem; */
+    /* padding-bottom: 1rem; */
     font-weight: 500;
     text-align: center;
-    width: 70%;
+    width: 93%;
     font-family: xinwei, serif;
     font-size: 2.75rem;
     color: black;

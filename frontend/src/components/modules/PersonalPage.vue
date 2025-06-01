@@ -849,7 +849,7 @@ export default
             </div>
           </template>
           <div>
-            <el-input v-model="mailSendContent" clearable placeholder="请输入留言" autosize type="textarea" style="font-family: noto;"></el-input>
+            <el-input v-model="mailSendContent" clearable placeholder="请输入留言" type="textarea" style="font-family: noto;" :rows="4"></el-input>
           </div>
           <div style="margin-top: 1rem;text-align: left;font-size: small;color: brown;">
             请文明用语，不得发送非法言论，不得频繁发送骚扰内容，平台将严查此类行为。
