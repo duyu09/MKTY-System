@@ -11,7 +11,6 @@ import hljs from 'highlight.js';
 import { errHandle, successHandle, convertTime } from "@/utils/tools";
 import { getCookie, getUserAvatar, llmInferenceGetStatus, llmInferenceSubmitTask, saveLlmSession, 
   getLlmSessionList, getLlmSession, deleteLlmSession, tsbbModelSubmitTask, tsbbInferenceGetStatus } from "@/api/api";
-import PsyChat from './PsyChat.vue';
 
 
 export default
@@ -302,7 +301,7 @@ export default
          <div id="PsyChat-NewDiv03">
             <el-button type="primary" @click="pc_clear()" :disabled="PsyChat_Generating">清空会话</el-button>
             <el-button type="primary" @click="PsyChat_HistoryDialog=true" :disabled="PsyChat_Generating">会话记录</el-button>
-            <el-button type="primary" @click="" :disabled="PsyChat_Generating">选择RAG知识库</el-button>
+            <!-- <el-button type="primary" @click="" :disabled="PsyChat_Generating">选择RAG知识库</el-button> -->
             <el-button type="warning" @click="this.$router.push('/main/PsyChat')" :disabled="PsyChat_Generating">智慧问答模式</el-button>
          </div>
          <div id="PsyChat-NewDiv04">
@@ -320,17 +319,17 @@ export default
               <div style="display: flex;">
                 <div style="align-items: center; display: flex; flex-direction: row;">
                   <b>
-                    <el-icon><Notebook /></el-icon>待研究问题：
+                    📒待研究问题：
                   </b>
                 </div>
                 <div style="margin-left: 0.5rem;">
                   {{ PsyChatContextDisplay }}
                 </div>
               </div>
-              <b>Agent数量：</b>{{ PsyChatDM_HyperParameters_AgentNumber }}个；
-              <b>讨论回合数：</b>{{ PsyChatDM_HyperParameters_Epoch }}回合；
-              <b>收敛阈值：</b>{{ PsyChatDM_HyperParameters_ConvergenceThreshold }}；
-              <b>状态：</b>
+              <b>🤖Agent数量：</b>{{ PsyChatDM_HyperParameters_AgentNumber }}个&nbsp;
+              <b>💭讨论回合数：</b>{{ PsyChatDM_HyperParameters_Epoch }}回合&nbsp;
+              <b>🎚️收敛阈值：</b>{{ PsyChatDM_HyperParameters_ConvergenceThreshold }}&nbsp;
+              <b>📺状态：</b>
               <span style="color: darkgreen; font-weight: bold;" v-if="this.PsyChat_Generating">
                 <el-icon class="is-loading"><Loading /></el-icon>
                 正在分析，请稍候...
@@ -480,7 +479,9 @@ export default
 }
 .PsyChat-SessionListItem-BG-Div
 {
-  width: 100%;text-align: left;
+  width: 100%;
+  text-align: left;
+  border-radius: 10px;
 }
 .PsyChat-SessionListItem-BG-Div:hover
 {
@@ -508,7 +509,7 @@ export default
 {
   display: flex;
   align-items: center;
-  max-width: 30rem;
+  max-width: 40rem;
   margin-left: 0.5rem;
 }
 #PsyChat-NewSpan01

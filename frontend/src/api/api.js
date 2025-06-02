@@ -6,7 +6,7 @@
 */
 import axios from "axios";
 import Cookies from 'js-cookie';
-import { errHandle, msgHandle } from "../utils/tools";
+import { errHandle, msgHandle } from "@/utils/tools";
 const baseURL='http://localhost:5555/api';
 export
 {

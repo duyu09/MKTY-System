@@ -3,6 +3,7 @@
 - 总负责人：齐鲁工业大学（山东省科学院）计算机科学与技术学部 软件工程（软件开发）21-1班 杜宇 (@duyu09, 202103180009@stu.qlu.edu.cn)
 - 文件名：Knowledge.vue
 - 著作权声明：Copyright (c) 2025 DuYu (https://github.com/duyu09/MKTY-System)
+- 该文件由Copilot协作人机合作完成。
 -->
 
 <template>
@@ -134,7 +135,7 @@
 
     <!-- 我的收藏板块 -->
     <div v-if="currentTab === 'favorites'">
-      <div style="margin-bottom: 1rem; background-color: rgb(210,210,210); text-align: center; padding-top: 0.75rem; padding-bottom: 0.75rem; border-radius: 10px;">
+      <div class="collection-header">
         <h3><el-icon><Collection /></el-icon> {{ this.userName }} 的个人资源收藏夹</h3>
       </div>
       
@@ -147,10 +148,10 @@
           <div class="entity-header">
             <h3 @click="showEntityDetail(entity)" class="entity-title">{{ entity.keName }}</h3>
             <div class="entity-meta">
-              <span class="create-time">{{ formatTime(entity.keCreateTime) }}</span>
+              <span><el-icon><Clock /></el-icon>创建时间：{{ formatTime(entity.keCreateTime) }}</span>
             </div>
           </div>
-          <div class="entity-abstract">{{ entity.keAbstract || '暂无描述' }}</div>
+          <div class="entity-abstract"><el-icon><EditPen /></el-icon>{{ entity.keAbstract || '暂无描述' }}</div>
           <div class="entity-actions">
             <button @click="showEntityDetail(entity)" class="action-btn detail-btn">查看详情</button>
             <button @click="downloadEntity(entity.keId)" class="action-btn download-btn">下载</button>
@@ -610,7 +611,8 @@ export default {
 }
 
 .entity-card:hover {
-  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+  background-color: rgb(245, 245, 245);
 }
 
 .entity-header {
@@ -951,4 +953,19 @@ export default {
   font-size: 16px;
   margin: 0;
 }
+
+.collection-header {
+  margin-bottom: 1rem; 
+  background-color: rgb(210,210,210); 
+  text-align: center; 
+  padding-top: 0.75rem; 
+  padding-bottom: 0.75rem; 
+  border-radius: 10px;
+}
+
+.collection-header:hover{
+  background-color: rgb(180,180,180);
+  transition: background-color 0.3s ease;
+}
+
 </style>
