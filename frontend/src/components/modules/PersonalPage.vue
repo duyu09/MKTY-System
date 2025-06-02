@@ -762,7 +762,7 @@ export default
         <el-tabs v-model="mailActiveName" class="demo-tabs" style="height: 100%;" @tab-change="mailTabChange()">
           <el-tab-pane label="发给我的留言" name="ToMe" v-loading="this.mailToLoading" element-loading-text="加载中..." element-loading-background="rgba(0, 0, 0, 0.2)">
             <div style="display: flex;flex-direction: column;align-items: flex-start;height: 100%;overflow-y: auto; overflow-x: hidden;">
-              <div v-for="item in mailFormArray" style="width: 100%;text-align: left;">
+              <div v-for="item in mailFormArray" class="mail-item-subdiv">
                 <div style="display: flex;align-items: center; margin-left: 0.25rem;">
                   <el-avatar :src="item.mailFromUserAvatar" size="small" style="cursor: pointer;"></el-avatar>
                   <div style="font-size: medium;margin-left: 0.4rem;font-weight: bold;cursor: pointer;" @click="pp_openNewTab('/main/PersonalPage?userId='+item.mailFromUserId)">
@@ -797,7 +797,7 @@ export default
           </el-tab-pane>
           <el-tab-pane label="我发送的留言" name="FromMe" v-loading="this.mailFromLoading" element-loading-text="加载中..." element-loading-background="rgba(0, 0, 0, 0.2)">
             <div style="display: flex;flex-direction: column;align-items: flex-start;height: 100%;overflow-y: auto; overflow-x: hidden;">
-              <div v-for="item in mailToArray" style="width: 100%;text-align: left;">
+              <div v-for="item in mailToArray" class="mail-item-subdiv">
                 <div style="display: flex;align-items: center; margin-left: 0.25rem;">
                   <el-avatar :src="item.mailFromUserAvatar" size="small" style="cursor: pointer;"></el-avatar>
                   <div style="font-size: medium;margin-left: 0.4rem;font-weight: bold;cursor: pointer;" @click="pp_openNewTab('/main/PersonalPage?userId='+item.mailFromUserId)">
@@ -901,6 +901,12 @@ export default
 {
   background-color: rgba(0,0,0,0.15);
 }
+.PersonalPage-TableItem:hover
+{
+  background-color: rgba(0,0,0,0.35);
+  transition: background-color 0.22s ease-in-out;
+  font-weight: bold;
+}
 #PersonalPage-MainDiv
 {
     width: 100%;
@@ -1002,7 +1008,17 @@ export default
 {
   color: red;
 }
-
+.mail-item-subdiv
+{
+  width: 100%;
+  text-align: left;
+  border-radius: 10px;
+}
+.mail-item-subdiv:hover
+{
+  background-color: rgba(0,0,0,0.1);
+  transition: background-color 0.3s ease;
+}
 @media screen and (max-width:40rem)
 {
     #PersonalPage-Div01

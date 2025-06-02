@@ -1,17 +1,17 @@
 <!-- Copyright (c) 2023~2025 DuYu (202103180009@stu.qlu.edu.cn, https://github.com/duyu09/MKTY-System), Faculty of Computer Science and Technology, Qilu University of Technology (Shandong Academy of Sciences) -->
 <!-- 该文件为“明康慧医MKTY”智慧医疗系统“MKTY大模型智慧医疗问答”页面Vue文件。该文件为MKTY系统的重要组成部分。 -->
 <!-- 创建日期：2025年03月10日 -->
-<!-- 修改日期：2025年04月06日 -->
+<!-- 修改日期：2025年06月02日 -->
 <script>
-import { Promotion, Avatar, Delete, ChatDotSquare, Clock, Download } from '@element-plus/icons-vue';
+import { Promotion, Avatar, Delete, ChatDotSquare, Clock, Download, Management } from '@element-plus/icons-vue';
 import { marked }  from "marked";
 import DOMPurify from "dompurify";
 import 'highlight.js/styles/rainbow.css';
 import "@/assets/css/rainbow_text.css"
 import hljs from 'highlight.js';
-import { errHandle, successHandle, convertTime } from "@/utils/tools";
+import { errHandle, successHandle, convertTime, msgHandle } from "@/utils/tools";
 import { getCookie, getUserAvatar, llmInferenceGetStatus, llmInferenceSubmitTask, saveLlmSession, 
-  getLlmSessionList, getLlmSession, deleteLlmSession, exportChatToPDF } from "@/api/api";
+  getLlmSessionList, getLlmSession, deleteLlmSession, exportChatToPDF, getUserFavorites, searchKnowledgePieces } from "@/api/api";
 
 export default
 {
@@ -24,6 +24,7 @@ export default
       'ChatDotSquare': ChatDotSquare,
       'Clock': Clock,
       'Download': Download,
+      'Management': Management
     },
     data()
     {
@@ -39,11 +40,15 @@ export default
         PsyChat_LlmSessionList:[],
         PsyChat_LlmSessionListLoading: false, // 历史对话会话框加载中。
         PsyChat_AiThinkingString: 'AI正在思考...', // AI正在思考的提示字符串。
+        pc_RAGKnowledgeDialogVisible: false, // RAG知识库选择对话框是否显示
+        pc_RAGKnowledgeList: [], // RAG知识库列表
+        pc_keId: -1,
+        pc_keName: '不使用RAG',
       }
     },
   methods:
       {
-        PsyChat_Send(){
+        async PsyChat_Send(){
           if(this.PsyChat_Context==='') return;  // 聊天框为空时，不发送。
           if(this.PsyChat_Generating) return;  // 如果正在生成中，不发送。
           this.PsyChat_Generating=true;  // 正在生成中。
@@ -54,6 +59,24 @@ export default
           console.log("history_ChatArr", history_ChatArr);
           console.log("PsyChat_ChatArr", this.PsyChat_ChatArr);
 
+          // 读取RAG片段
+          if(this.pc_keId != -1){
+            const r_result = await searchKnowledgePieces(this.pc_keId, this.PsyChat_Context, 1);
+            const r_result_data = r_result.data;
+            if(r_result_data.code != 0){
+              errHandle("因请求失败，未能获取RAG片段：");
+            }
+            else{
+              if(r_result_data.results.length > 0) {
+                const rag_text = r_result_data.results[0].content;
+                history_ChatArr.push({'role': 'knowledge_base', 'content': rag_text});
+                successHandle("已使用知识片段：" + this.pc_keName + "（匹配分数：" + r_result_data.results[0].similarity.toFixed(4) + "）");
+              }
+              else {
+                errHandle("由于未找到相关知识片段，RAG未使用。");
+              }
+            }
+          }
           llmInferenceSubmitTask(history_ChatArr, this.PsyChat_Context).then((res) => {
           if(res.data.code != 0) { 
             errHandle("未成功发送数据：" + res.data.msg);
@@ -112,7 +135,7 @@ export default
                 return;
               }
               else { 
-                this.PsyChat_userAvatar=res.data.userAvatar; 
+                this.PsyChat_userAvatar=res.data.userAvatar;
               }
             }).catch(res=>{
               errHandle('未能获取您的头像：'+res);
@@ -195,11 +218,21 @@ export default
             link.click();
             link.remove();
           });
-        }
+        },
+        getRAGKnowledgeList() {
+          getUserFavorites().then(res => {
+            if (res.data.code !== 0) {
+              errHandle('获取RAG知识库列表失败：' + res.data.msg);
+              return;
+            }
+            this.pc_RAGKnowledgeList = res.data.favorites;
+          });
+        },
       },
   mounted()
   {
     this.pc_loadPage();
+    this.getRAGKnowledgeList();
   }
 }
 
@@ -221,7 +254,7 @@ export default
          <div id="PsyChat-NewDiv03">
             <el-button type="primary" @click="pc_newSession()" :disabled="PsyChat_Generating">新建会话</el-button>
             <el-button type="primary" @click="PsyChat_HistoryDialog=true" :disabled="PsyChat_Generating">会话记录</el-button>
-            <el-button type="primary" @click="" :disabled="PsyChat_Generating">选择RAG知识库</el-button>
+            <el-button type="primary" @click="pc_RAGKnowledgeDialogVisible=true" :disabled="PsyChat_Generating">选择RAG知识库</el-button>
             <el-button type="warning" @click="this.$router.push('/main/PsyChatDM')" :disabled="PsyChat_Generating">大模型讨论机制</el-button>
          </div>
          <div id="PsyChat-NewDiv04">
@@ -260,7 +293,7 @@ export default
 
       </div>
       <div id="PsyChat-Div06">
-        <div id="PsyChat-Div07" v-loading="PsyChat_Generating" element-loading-background="rgba(0, 0, 0, 0.75)">
+        <div id="PsyChat-Div07" v-loading="PsyChat_Generating" element-loading-background="rgba(80, 80, 90, 0.75)">
           <input id="PsyChat-InputBox01" placeholder="请输入疾病诊疗相关问题" v-model="PsyChat_Context" @keyup.enter="PsyChat_Send()" />
           <div id="PsyChat-SendButtonDiv" @click="PsyChat_Send()">
             <el-icon><Promotion /></el-icon>&nbsp;<span id="PsyChat-Span02">发送</span>
@@ -301,6 +334,32 @@ export default
               </div>
         </el-scrollbar>
       </el-drawer>
+
+      <el-dialog title="RAG知识库选择（只提供您收藏的知识实体）" v-model="pc_RAGKnowledgeDialogVisible">
+        <div style="font-weight: bold; padding: 1.2rem; border-radius: 9px; background-color: rgb(220,220,220); font-size: larger; color: black;">
+            您选择的RAG知识库名称：
+            <span style="color: rgb(0, 0, 140);">{{ pc_keName }}</span>；
+            知识库ID：
+            <span style="color: rgb(0, 0, 140);">{{ pc_keId === -1 ? '不使用RAG' : pc_keId }}</span>
+        </div>
+        <el-scrollbar height="18rem">
+          <div :class="['pc_RAGKnowledgeItem', { active: pc_keId == -1 }]" @click="pc_keId = -1;pc_keName = '不使用RAG'">
+            <b>关闭RAG模式</b>
+          </div>
+          <div v-for="item in pc_RAGKnowledgeList" :class="['pc_RAGKnowledgeItem', { active: pc_keId == item.keId }]" @click="pc_keId = item.keId;pc_keName = item.keName;">
+            <div style="display: flex; align-items: center;">
+              <el-icon><Management /></el-icon><span style="font-weight: bold;">
+                知识实体：
+              </span>
+              {{ item.keName }}
+            </div>
+          </div>
+        </el-scrollbar>
+        <div style="text-align: right;">
+          <el-button @click="pc_RAGKnowledgeDialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="pc_RAGKnowledgeDialogVisible = false">确定</el-button>
+        </div>
+      </el-dialog>
 
       
      <!-- <div id="PsyChat-NewDiv01">
@@ -615,6 +674,31 @@ export default
   width: 2rem;
   height: 2rem;
   margin-right: 0.5rem;
+}
+.pc_RAGKnowledgeItem
+{
+  margin-top: 0.65rem;
+  margin-bottom: 0.65rem;
+  padding-left: 0.9rem;
+  padding-top: 0.65rem;
+  padding-bottom: 0.65rem;
+  border-radius: 9px;
+  border: 2px solid rgba(96, 96, 236, 0.32);
+}
+.pc_RAGKnowledgeItem:hover
+{
+  background-color: rgba(96, 96, 236, 0.16);
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+  font-weight: bold;
+}
+.pc_RAGKnowledgeItem:active
+{
+  background-color: rgba(96, 96, 236, 0.32);
+}
+.pc_RAGKnowledgeItem.active
+{
+  background-color: rgba(96, 96, 236, 0.32);
 }
 @media screen and (max-width: 40rem)
 {

@@ -1759,7 +1759,7 @@ def get_user_favorites(cursor):
 @getCursor(conn_pool)
 def search_knowledge_pieces(cursor):
     '''
-    - API功能：使用TF-IDF搜索知识实体片段
+    - API功能：使用搜索算法搜索知识实体片段
     - 负责人：杜宇（与Copilot人机协作编辑）
     - 输入参数：
       - `keId`（`int`，知识实体ID）

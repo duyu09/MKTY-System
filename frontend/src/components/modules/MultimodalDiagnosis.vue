@@ -241,8 +241,8 @@ export default
           <div style="flex: 1;display: flex;" v-loading="md_analyzing" element-loading-text="正在分析，请稍候" element-loading-background="rgba(0, 0, 0, 0.75)">
             <div style="width: 100%;height: 100%;">
               <el-card style="max-height: 100%;height: 100%;">
-                <div style="color: darkblue; font-weight: bold;">
-                  <el-icon><Document /></el-icon>待分析的诊断内容表
+                <div style="color: darkblue; font-weight: bold; display: flex; align-items: center;">
+                  <el-icon><Document /></el-icon><span>待分析的诊断内容表</span>
                 </div>
                 <el-scrollbar height="calc(99vh - 21rem)">
                 <el-table :data="text_table">
@@ -260,8 +260,8 @@ export default
               </el-card>
             </div>
             <div style="width: 100%; background-color: rgb(200,200,200); padding: 1rem; margin-left: 1rem; border-radius: 10px;">
-            <div style="color: darkblue; font-weight: bold;">
-              <el-icon><Setting /></el-icon>待分析诊断内容设置
+            <div style="color: darkblue; font-weight: bold; display: flex; align-items: center;">
+              <el-icon><Setting /></el-icon><span>待分析诊断内容设置</span>
             </div>
             <div style="margin-left: 1rem;">
               <div style="font-family: HPHS;margin: 0.5rem;">

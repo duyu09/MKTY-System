@@ -621,6 +621,7 @@ export default
 .Aims-Class-Div11:hover
 {
   background-color: rgba(240,240,240,1);
+  transition: background-color 0.22s ease-in-out;
 }
 .Aims-Class-Div12
 {

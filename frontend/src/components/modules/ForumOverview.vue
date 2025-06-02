@@ -333,6 +333,7 @@ export default
 .ForumOverview-TableItem:hover
 {
   background-color: rgb(243,243,243);
+  transition: background-color 0.3s ease;
 }
 .ForumOverview-TableItemLeft
 {
@@ -360,7 +361,7 @@ export default
 }
 .ForumOverview-TableItemName:hover
 {
-  color: blue;
+  color: rgb(0, 0, 208);
   font-style: italic;
   cursor: pointer;
 }
