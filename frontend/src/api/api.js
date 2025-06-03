@@ -20,6 +20,9 @@ export
     
     // 知识库管理相关API
     createKnowledgeEntity, searchKnowledgeEntities, downloadKnowledgeEntity, favoriteKnowledgeEntity, getUserFavorites, searchKnowledgePieces,
+    
+    // 病历管理相关API
+    getMedicalRecords, getMedicalRecord, createMedicalRecord, updateMedicalRecord,
 
     setUserInformation, updataInformation, setAvatar, addFlag, showFlag, deleteFlag, showOrg, deleteOrg, creatForum, createOrg, releaseItem, showForum, showItem, deleteItem, showPsy, signIn, readSignInContext, readStudyRoom, startStudy, readStudyStatus, dredgePsy, skillTest, upvote, upload, showFile, downloadFile, getMusicList
 }
@@ -776,6 +779,56 @@ function searchKnowledgePieces(keId, queryText, topK = 3) {
         keId: keId,
         queryText: queryText,
         topK: topK
+    }, {
+        headers: {
+            'Authorization': getToken()
+        }
+    });
+}
+
+// 病历管理相关API
+
+// 获取用户相关的病历列表
+function getMedicalRecords() {
+    return axios.post(baseURL + '/getMedicalRecords', {}, {
+        headers: {
+            'Authorization': getToken()
+        }
+    });
+}
+
+// 获取指定病历详情
+function getMedicalRecord(medrecId) {
+    return axios.post(baseURL + '/getMedicalRecord', {
+        medrecId: medrecId
+    }, {
+        headers: {
+            'Authorization': getToken()
+        }
+    });
+}
+
+// 创建病历（仅医师可用）
+function createMedicalRecord(medrecPatientId, medrecAbstract, medrecState, medrecContent) {
+    return axios.post(baseURL + '/createMedicalRecord', {
+        medrecPatientId: medrecPatientId,
+        medrecAbstract: medrecAbstract,
+        medrecState: medrecState,
+        medrecContent: medrecContent
+    }, {
+        headers: {
+            'Authorization': getToken()
+        }
+    });
+}
+
+// 更新病历（仅负责医师可用）
+function updateMedicalRecord(medrecId, medrecAbstract, medrecState, medrecContent) {
+    return axios.post(baseURL + '/updateMedicalRecord', {
+        medrecId: medrecId,
+        medrecAbstract: medrecAbstract,
+        medrecState: medrecState,
+        medrecContent: medrecContent
     }, {
         headers: {
             'Authorization': getToken()

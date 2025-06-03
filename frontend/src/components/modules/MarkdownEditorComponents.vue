@@ -15,8 +15,8 @@
     <!-- Editor and Preview -->
     <div class="editor-preview">
       <textarea
-        v-model="content"
-        @input="updatePreview"
+        v-model="markdownContent"
+        @input="updateValue"
         class="editor"
         placeholder="请输入 Markdown..."
       ></textarea>
@@ -37,33 +37,47 @@ export default defineComponent({
   name: 'MarkdownEditor',
   props: {
     modelValue: {
-      type: String,
-      default: ''
+      type: Object,
+      default: () => ({
+        html: '',
+        md: ''
+      }),
+      validator: (value) => {
+        return typeof value === 'object' && 'html' in value && 'md' in value;
+      }
     }
   },
   emits: ['update:modelValue'],
   setup(props, { emit }) {
-    const content = ref('');
+    const markdownContent = ref(props.modelValue.md || '');
 
     const renderedHtml = computed(() => {
-      return marked.parse(content.value);
+      return marked.parse(markdownContent.value);
     });
 
     const sanitizedHtml = computed(() => {
       return DOMPurify.sanitize(renderedHtml.value);
     });
 
-    watch(sanitizedHtml, (val) => {
-      emit('update:modelValue', val);
-    });
+    function updateValue() {
+      const value = {
+        html: DOMPurify.sanitize(renderedHtml.value),
+        md: markdownContent.value
+      };
+      emit('update:modelValue', value);
+    }
 
-    function updatePreview() {}
+    watch(() => props.modelValue, (newVal) => {
+      if (newVal.md !== markdownContent.value) {
+        markdownContent.value = newVal.md;
+      }
+    }, { deep: true });
 
     function applyFormat(type) {
       const textarea = document.querySelector('textarea');
       const start = textarea.selectionStart;
       const end = textarea.selectionEnd;
-      const selected = content.value.slice(start, end);
+      const selected = markdownContent.value.slice(start, end);
       let insert;
       switch (type) {
         case 'bold':
@@ -100,19 +114,20 @@ export default defineComponent({
             .join('\n');
           break;
       }
-      content.value =
-        content.value.slice(0, start) + insert + content.value.slice(end);
+      markdownContent.value =
+        markdownContent.value.slice(0, start) + insert + markdownContent.value.slice(end);
       nextTick(() => {
         textarea.setSelectionRange(start, start + insert.length);
         textarea.focus();
+        updateValue();
       });
     }
 
     return {
-      content,
+      markdownContent,
       sanitizedHtml,
       applyFormat,
-      updatePreview
+      updateValue
     };
   }
 });

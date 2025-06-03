@@ -54,12 +54,20 @@ const router = createRouter({
           component: () => import('@/components/modules/Forum.vue'),
         },
         {
-          path: 'Resources',
-          name: 'Resources',
+          path: 'MedicalRecordOverview',
+          name: 'MedicalRecordOverview',
           meta: {
-            title: 'ILP大平台资源中心'
+            title: '病历概览 - 明康慧医系统'
           },
-          component: () => import('@/components/modules/Resources.vue'),
+          component: () => import('@/components/modules/MedicalRecordOverview.vue'),
+        },
+        {
+          path: 'MedicalRecordInner',
+          name: 'MedicalRecordInner',
+          meta: {
+            title: '病历详情 - 明康慧医系统'
+          },
+          component: () => import('@/components/modules/MedicalRecordInner.vue'),
         },
         {
           path: 'ForumInner',
