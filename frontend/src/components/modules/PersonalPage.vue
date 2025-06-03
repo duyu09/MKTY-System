@@ -789,7 +789,7 @@ export default
                   {{ item.mailItemContent }}
                 </div>
                 <div style="text-align: right;">
-                  <span style="font-size: small;">{{ this.conTime(item.mailItemSendTime * 1000) }}</span>
+                  <span style="font-size: small;">🕗{{ this.conTime(item.mailItemSendTime * 1000) }}</span>
                 </div>
                 <el-divider style="margin: 10px;"></el-divider>           
               </div>
@@ -824,7 +824,7 @@ export default
                   {{ item.mailItemContent }}
                 </div>
                 <div style="text-align: right;">
-                  <span style="font-size: small;">{{ this.conTime(item.mailItemSendTime * 1000) }}</span>&nbsp;
+                  <span style="font-size: small;">🕗{{ this.conTime(item.mailItemSendTime * 1000) }}</span>&nbsp;
                   <el-popconfirm title="您确定删除吗？" @confirm="deleteMailItem(item.mailItemId)" @cancel="">
                     <template #reference>
                       <el-icon size="small" color="red" style="cursor: pointer; font-weight: bold;">
