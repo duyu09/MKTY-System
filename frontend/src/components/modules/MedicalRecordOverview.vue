@@ -1,3 +1,8 @@
+<!-- Copyright (c) 2023~2025 DuYu (202103180009@stu.qlu.edu.cn, https://github.com/duyu09/MKTY-System), Faculty of Computer Science and Technology, Qilu University of Technology (Shandong Academy of Sciences) -->
+<!-- 该文件为“明康慧医MKTY”智慧医疗系统病历概览组件Vue文件。该文件为MKTY系统的重要组成部分。 -->
+<!-- 创建日期：2025年06月01日 -->
+<!-- 修改日期：2025年06月04日 -->
+<!-- 该文件为使用Copilot人机协作完成 -->
 <template>
 <div style="display: flex; justify-content: center; width: 100%; background-image: url('/images/medrec_bg.jpg'); background-size: cover;">
   <div class="medical-record-overview">
@@ -53,11 +58,11 @@
             
             <div class="record-info">
               <div class="info-item">
-                <i class="icon-patient"></i>
+                <span class="icon-patient"></span>
                 <span>患者：{{ record.patientName }}</span>
               </div>
               <div class="info-item">
-                <i class="icon-doctor"></i>
+                <span class="icon-doctor"></span>
                 <span>医师：{{ record.doctorName }}</span>
               </div>
             </div>
@@ -568,7 +573,7 @@ export default {
 }
 
 .icon-view::before {
-  content: '👁️';
+  /* content: '👁️'; */
   margin-right: 8px;
 }
 

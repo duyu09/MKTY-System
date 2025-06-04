@@ -1,3 +1,8 @@
+<!-- Copyright (c) 2023~2025 DuYu (202103180009@stu.qlu.edu.cn, https://github.com/duyu09/MKTY-System), Faculty of Computer Science and Technology, Qilu University of Technology (Shandong Academy of Sciences) -->
+<!-- 该文件为“明康慧医MKTY”智慧医疗系统病历详细内容显示组件Vue文件。该文件为MKTY系统的重要组成部分。 -->
+<!-- 创建日期：2025年06月01日 -->
+<!-- 修改日期：2025年06月04日 -->
+<!-- 该文件为使用Copilot人机协作完成 -->
 <template>
 <div style="display: flex; justify-content: center; width: 100%; background-image: url('/images/medrec_bg.jpg'); background-size: cover;">
   <div class="medical-record-inner">
@@ -68,12 +73,12 @@
       </div>
 
       <!-- 功能按钮 -->
-      <div class="action-buttons">
-        <button class="ai-btn diagnosis-btn">
+      <div class="action-buttons" style="margin-bottom: 3rem;">
+        <button class="ai-btn diagnosis-btn" @click="mri_aiAncillaryAnalysisDiagnosis()">
           <span class="icon-ai"></span>
           智能诊断
         </button>
-        <button class="ai-btn medication-btn">
+        <button class="ai-btn medication-btn" @click="mri_aiAncillaryAnalysisRecommendations()">
           <span class="icon-medicine"></span>
           药物推荐
         </button>
@@ -130,14 +135,45 @@
     </div>
   </div>
 </div>
+
+  <el-dialog title="明康慧医大模型智能分析诊断与药物推荐（结论仅供参考）" v-model="mri_aiAncillaryAnalysisDialogVisible" width="60%" style="height: 66vh;">
+    <el-scrollbar max-height="50vh">
+    <el-card style="background-color: rgb(230, 230, 230);">
+    <div style="color: black; font-size: 1.05rem; font-weight: bold;">
+      基于<span class="rainbow_text" style="font-weight: 900;">MKTY-3B-Chat</span>大模型，
+      系统针对该病历作分析，提供初步诊断和药物推荐，供您参考。
+    </div>
+    </el-card>
+    <div v-loading="mri_aiAncillaryAnalysisLoading" element-loading-text="AI正在思考中..." element-loading-background="rgba(40, 40, 40, 0.75)">
+    <el-card style="margin-top: 0.75rem; height: 100%;">
+    <template #header>
+      <div class="card-header" style="color: black; font-size: medium; font-weight: bold;">
+        <span>{{ mri_aiAncillaryAnalysisTitle }}&nbsp;分析结果</span>
+      </div>
+    </template>
+    <div>
+      <div v-html="mri_aiAncillaryAnalysisResultRendered"></div>
+    </div>
+    </el-card>
+    <div style="margin-top: 0.75rem; display: flex; justify-content: flex-end;">
+      <el-button type="primary" @click="mri_aiAncillaryAnalysisDiagnosis()">
+        💡&nbsp;大模型分析
+      </el-button>
+    </div>
+    </div>
+    </el-scrollbar>
+  </el-dialog>
+
 </template>
 
 <script>
-import { getMedicalRecord, updateMedicalRecord, getUserInfo, getCookie } from '@/api/api'
-import { errHandle, successHandle, msgHandle } from '@/utils/tools'
-import { marked } from 'marked'
-import DOMPurify from 'dompurify'
-import MarkdownEditorComponents from '@/components/modules/MarkdownEditorComponents.vue'
+import { getMedicalRecord, updateMedicalRecord, getUserInfo, getCookie, llmInferenceGetStatus, llmInferenceSubmitTask } from '@/api/api.js';
+import { errHandle, successHandle, msgHandle } from '@/utils/tools.js';
+import { marked } from 'marked';
+import DOMPurify from 'dompurify';
+import MarkdownEditorComponents from '@/components/modules/MarkdownEditorComponents.vue';
+import "@/assets/css/colorful_div.css";
+import "@/assets/css/rainbow_text.css";
 
 export default {
   name: 'MedicalRecordInner',
@@ -150,16 +186,22 @@ export default {
       medicalRecord: null,
       hasPermission: true,
       userType: 0,
-      userId: null,      canEdit: false,
+      userId: null,      
+      canEdit: false,
       showEditModal: false,
-      saving: false,      editForm: {
+      saving: false,      
+      editForm: {
         medrecAbstract: '',
         medrecState: '0',
         medrecContent: {
           html: '',
           md: ''
         }
-      }
+      },
+      mri_aiAncillaryAnalysisDialogVisible: false,
+      mri_aiAncillaryAnalysisLoading: false,
+      mri_aiAncillaryAnalysisResultRendered: '',
+      mri_aiAncillaryAnalysisTitle: '',  // 智能诊断或药物推荐
     }
   },
 
@@ -216,7 +258,8 @@ export default {
       } finally {
         this.loading = false
       }
-    },    editRecord() {
+    },
+    editRecord() {
       this.editForm = {
         medrecAbstract: this.medicalRecord.medrecAbstract || '',
         medrecState: this.medicalRecord.medrecState,
@@ -299,7 +342,88 @@ export default {
         hour: '2-digit',
         minute: '2-digit'
       })
+    },
+
+    mri_aiAncillaryAnalysisDiagnosis(){
+      this.mri_aiAncillaryAnalysisTitle = '🤖智能诊断';
+      this.mri_aiAncillaryAnalysisDialogVisible = true;
+      this.mri_aiAncillaryAnalysisLoading = true;
+      this.mri_aiAncillaryAnalysisResultRendered = '';
+      const history_context = [];
+        var prompt = "辅助诊断任务。以下内容是患者的病历，请你深度挖掘病历信息，从医学专业角度和逻辑方面展开论述辅助分析病情，充分阐述理由并给出详细的治疗建议。\n病历内容：";
+        prompt = prompt + this.renderedContent;
+        llmInferenceSubmitTask(history_context, prompt).then((res) => {
+          if(res.data.code != 0) {
+            errHandle("未成功发送数据：" + res.data.msg);
+            this.mri_aiAncillaryAnalysisLoading = false;
+            // this.mri_aiAncillaryAnalysisDialogVisible = false;
+            return;
+          }
+          const task_id = res.data.taskId;
+          const mri_aiIntervalId = setInterval(() => {
+            llmInferenceGetStatus(task_id).then((res2) => {
+              if(res2.data.code != 0) {
+                clearInterval(mri_aiIntervalId);
+                errHandle("未成功获取响应：" + res2.data.msg);
+                this.mri_aiAncillaryAnalysisLoading = false;
+                // this.mri_aiAncillaryAnalysisDialogVisible = false;
+                return;
+              }
+              if (res2.data.taskStatus == 0){
+                clearInterval(mri_aiIntervalId);
+                const task_result = res2.data.taskResult;
+                this.mri_aiAncillaryAnalysisResultRendered = task_result;
+                this.mri_aiAncillaryAnalysisLoading = false;
+              }
+            });
+          }, 3500);
+        }).catch((error) => {
+          errHandle("AI分析执行失败：" + error);
+          this.mri_aiAncillaryAnalysisLoading = false;
+          // this.mri_aiAncillaryAnalysisDialogVisible = false;
+        });
+    },
+
+    mri_aiAncillaryAnalysisRecommendations(){
+      this.mri_aiAncillaryAnalysisTitle = '💊药物推荐';
+      this.mri_aiAncillaryAnalysisDialogVisible = true;
+      this.mri_aiAncillaryAnalysisLoading = true;
+      this.mri_aiAncillaryAnalysisResultRendered = '';
+      const history_context = [];
+        var prompt = "医药推荐任务。以下内容是患者的病历，请你深度挖掘病历信息，从医学专业角度和逻辑方面，辅助医师给出详细的推荐药物清单和治疗建议。病历内容：";
+        prompt = prompt + this.renderedContent;
+        llmInferenceSubmitTask(history_context, prompt).then((res) => {
+          if(res.data.code != 0) {
+            errHandle("未成功发送数据：" + res.data.msg);
+            this.mri_aiAncillaryAnalysisLoading = false;
+            // this.mri_aiAncillaryAnalysisDialogVisible = false;
+            return;
+          }
+          const task_id = res.data.taskId;
+          const mri_aiIntervalId = setInterval(() => {
+            llmInferenceGetStatus(task_id).then((res2) => {
+              if(res2.data.code != 0) {
+                clearInterval(mri_aiIntervalId);
+                errHandle("未成功获取响应：" + res2.data.msg);
+                this.mri_aiAncillaryAnalysisLoading = false;
+                // this.mri_aiAncillaryAnalysisDialogVisible = false;
+                return;
+              }
+              if (res2.data.taskStatus == 0){
+                clearInterval(mri_aiIntervalId);
+                const task_result = res2.data.taskResult;
+                this.mri_aiAncillaryAnalysisResultRendered = task_result;
+                this.mri_aiAncillaryAnalysisLoading = false;
+              }
+            });
+          }, 3500);
+        }).catch((error) => {
+          errHandle("AI分析执行失败：" + error);
+          this.mri_aiAncillaryAnalysisLoading = false;
+          // this.mri_aiAncillaryAnalysisDialogVisible = false;
+        });
     }
+
   }
 }
 </script>

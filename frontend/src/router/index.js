@@ -1,3 +1,5 @@
+// Copyright (c) 2023~2025 DuYu (202103180009@stu.qlu.edu.cn, https://github.com/duyu09/MKTY-System), Faculty of Computer Science and Technology, Qilu University of Technology (Shandong Academy of Sciences)
+// 该文件为“明康慧医MKTY”智慧医疗系统前端路由配置文件。该文件为MKTY系统的重要组成部分。
 import { createRouter, createWebHistory } from 'vue-router';
 
 const router = createRouter({
@@ -25,7 +27,7 @@ const router = createRouter({
           path: 'PersonalPage',
           name: 'PersonalPage',
           meta: {
-            title: '明康慧医智慧医疗系统 - 用户信息'
+            title: '用户信息 - 明康慧医智慧医疗系统'
           },
           component: () => import('@/components/modules/PersonalPage.vue'),
         },
@@ -33,7 +35,7 @@ const router = createRouter({
           path: 'PsyChat',
           name: 'PsyChat',
           meta: {
-            title: '明康慧医 - 智慧医疗问答'
+            title: '智慧医疗问答 - 明康慧医智慧医疗系统'
           },
           component: () => import('@/components/modules/PsyChat.vue'),
         },
@@ -41,7 +43,7 @@ const router = createRouter({
           path: 'PsyChatDM',
           name: 'PsyChatDM',
           meta: {
-            title: '明康慧医 - AI智能体讨论解答疑问'
+            title: 'AI智能体讨论解答疑问 - 明康慧医智慧医疗系统'
           },
           component: () => import('@/components/modules/PsyChatDM.vue'),
         },
@@ -49,7 +51,7 @@ const router = createRouter({
           path: 'Forum',
           name: 'Forum',
           meta: {
-            title: 'MKTY专属医学与诊疗论坛平台'
+            title: 'MKTY专属医学与诊疗论坛平台 - 明康慧医智慧医疗系统'
           },
           component: () => import('@/components/modules/Forum.vue'),
         },
@@ -57,7 +59,7 @@ const router = createRouter({
           path: 'MedicalRecordOverview',
           name: 'MedicalRecordOverview',
           meta: {
-            title: '病历概览 - 明康慧医系统'
+            title: '病历概览 - 明康慧医智慧医疗系统'
           },
           component: () => import('@/components/modules/MedicalRecordOverview.vue'),
         },
@@ -65,7 +67,7 @@ const router = createRouter({
           path: 'MedicalRecordInner',
           name: 'MedicalRecordInner',
           meta: {
-            title: '病历详情 - 明康慧医系统'
+            title: '病历详情 - 明康慧医智慧医疗系统'
           },
           component: () => import('@/components/modules/MedicalRecordInner.vue'),
         },
@@ -73,7 +75,7 @@ const router = createRouter({
           path: 'ForumInner',
           name: 'ForumInner',
           meta: {
-            title: 'MKTY专属医学与诊疗论坛平台'
+            title: 'MKTY专属医学与诊疗论坛平台 - 明康慧医智慧医疗系统'
           },
           component: () => import('@/components/modules/ForumInner.vue'),
         },
@@ -81,7 +83,7 @@ const router = createRouter({
           path: 'ImportantList',
           name: 'ImportantList',
           meta: {
-            title: '重要事项清单 - 明康慧医系统'
+            title: '重要事项清单 - 明康慧医智慧医疗系统'
           },
           component: () => import('@/components/modules/ImportantList.vue'),
         },
@@ -89,7 +91,7 @@ const router = createRouter({
           path: 'KnowledgeOverview',
           name: 'KnowledgeOverview',
           meta: {
-            title: '知识库管理 - 明康慧医系统'
+            title: '知识库管理 - 明康慧医智慧医疗系统'
           },
           component: () => import('@/components/modules/KnowledgeOverview.vue'),
         },
@@ -108,7 +110,7 @@ const router = createRouter({
       path:'/Login',
       name:'Login',
       meta: {
-        title: '明康慧医智慧医疗系统 - 用户登录'
+        title: '用户登录 - 明康慧医智慧医疗系统'
       },
       component: () => import('@/components/modules/Login.vue'),
     },
@@ -116,7 +118,7 @@ const router = createRouter({
       path:'/LoginMobile',
       name:'LoginMobile',
       meta: {
-        title: '明康慧医智慧医疗系统 - 用户登录'
+        title: '用户登录 - 明康慧医智慧医疗系统'
       },
       component: () => import('@/components/modules/LoginMobile.vue'),
     },
@@ -124,7 +126,7 @@ const router = createRouter({
       path:'/Register',
       name:'Register',
       meta: {
-        title: '明康慧医智慧医疗系统 - 用户注册'
+        title: '用户注册 - 明康慧医智慧医疗系统'
       },
       component: () => import('@/components/modules/Register.vue'),
     },
