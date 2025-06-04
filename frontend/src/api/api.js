@@ -2,7 +2,7 @@
  - Copyright (c) 2023~2025 DuYu (202103180009@stu.qlu.edu.cn, https://github.com/duyu09/MKTY-System), Faculty of Computer Science and Technology, Qilu University of Technology (Shandong Academy of Sciences)
  - 该文件为“明康慧医MKTY”智慧医疗系统API JS文件。该文件为MKTY系统的重要组成部分。
  - 创建日期：2025年02月22日
- - 修改日期：2025年04月06日
+ - 修改日期：2025年06月05日
 */
 import axios from "axios";
 import Cookies from 'js-cookie';
@@ -17,11 +17,8 @@ export
     saveLlmSession, getLlmSession, getLlmSessionList, deleteLlmSession, addForum, getForumList, deleteForum, 
     modifyForumType, sendPost, getPostList, getPostContent, praisePost, deletePost, getForumInfo, exportChatToPDF, sendEmail,
     tsbbModelSubmitTask, tsbbInferenceGetStatus, 
-    
-    // 知识库管理相关API
-    createKnowledgeEntity, searchKnowledgeEntities, downloadKnowledgeEntity, favoriteKnowledgeEntity, getUserFavorites, searchKnowledgePieces,
-
-    setUserInformation, updataInformation, setAvatar, addFlag, showFlag, deleteFlag, showOrg, deleteOrg, creatForum, createOrg, releaseItem, showForum, showItem, deleteItem, showPsy, signIn, readSignInContext, readStudyRoom, startStudy, readStudyStatus, dredgePsy, skillTest, upvote, upload, showFile, downloadFile, getMusicList
+    createKnowledgeEntity, searchKnowledgeEntities, downloadKnowledgeEntity, favoriteKnowledgeEntity, getUserFavorites, searchKnowledgePieces,  // 知识库管理相关API
+    getMedicalRecords, getMedicalRecord, createMedicalRecord, updateMedicalRecord,  // 病历管理相关API
 }
 
 function convertBlobToBase64(blob) {
@@ -435,295 +432,7 @@ function tsbbInferenceGetStatus(taskId)
     },{headers: {'Authorization': getToken()}});
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-//04.注册用户基本信息
-function setUserInformation(userName,userNickname,userSex,userSchool,userMajor,userSelfIntroduction,userPassword,userAvatar) {
-    return axios.post(baseURL+'/setUserInformation',{
-        "userName": userName,
-        "userNickname": userNickname,
-        "userSex": userSex,
-        "userSchool": userSchool,
-        "userMajor": userMajor,
-        "userSelfIntroduction": userSelfIntroduction,
-        "userPassword": userPassword,
-        "userAvatar": userAvatar,
-        "userRegisterTime": Date.now()
-    });
-    
-}
-
-//04-02.修改用户的基本信息
-function updataInformation(userId,userName,userNickname,userSex,userSchool,userMajor,userSelfIntroduction,userPassword)
-{
-    return axios.post(baseURL+'/updataInformation',{
-        "userId":userId,
-        "userName": userName,
-        "userNickname": userNickname,
-        "userSex": userSex,
-        "userSchool": userSchool,
-        "userMajor": userMajor,
-        "userSelfIntroduction": userSelfIntroduction,
-        "userPassword": userPassword
-    },{headers:{'Authorization':getToken()}});
-}
-
-//05.设置用户头像
-function setAvatar(userId,imgData) {
-    return axios.post(baseURL+'/setAvatar',{
-        "userId":userId,
-        "imgData":imgData
-    },{headers:{'Authorization':getToken()}})
-}
-
-
-//08.添加目标
-function addFlag(userId,context) {
-    return axios.post(baseURL+'/addFlag',{
-        "userId":userId,
-        "context":context
-    },{headers:{'Authorization':getToken()}})
-}
-
-//09.展示目标
-function showFlag(userId,aimUserId)
-{
-    return axios.post(baseURL+'/showFlag',{
-        'userId':userId,
-        'aimUserId':aimUserId
-    },{headers:{'Authorization':getToken()}})
-}
-
-//10.删除目标
-function deleteFlag(userId,id)
-{
-    return axios.post(baseURL+'/deleteFlag',{
-        'userId':userId,
-        'id':id
-    },{headers:{'Authorization':getToken()}})
-}
-
-//11.12.13
-
-//14.学生组织列表
-function showOrg(userId)
-{
-    return axios.post(baseURL+'/showOrg',{
-        'userId':userId
-    },{headers:{'Authorization':getToken()}})
-}
-
-//15.删除组织
-function deleteOrg(userId,Id)
-{
-    return axios.post(baseURL+'/deleteOrg',{
-        'userId':userId,
-        'Id':Id
-    },{headers:{'Authorization':getToken()}})
-}
-
-//16.创建论坛
-function creatForum(userId,name,attrib)
-{
-    return axios.post(baseURL+'/creatForum',{
-        'userId':userId,
-        'name':name,
-        'attrib':attrib
-    },{headers:{'Authorization':getToken()}});
-}
-
-//16-02.创建组织
-function createOrg(userId,orgAttrib,orgName,orgDescription,orgRecruitment)
-{
-    return axios.post(baseURL+'/creatOrg',{
-        'userId':userId,
-        "orgAttrib": orgAttrib,
-        "orgName": orgName,
-        "orgDescription": orgDescription,
-        "orgRecruitment":orgRecruitment,
-        "orgAddTime":Date.now()
-    },{headers:{'Authorization':getToken()}});
-}
-
-//17.发布帖子或纳新信息
-function releaseItem(userId,forumId,context)
-{
-    return axios.post(baseURL+'/releaseItem',{
-        'userId':userId,
-        'forumId':forumId,
-        'context':context,
-    },{headers:{'Authorization':getToken()}})
-}
-
-//18.展示论坛列表
-function showForum(userId)
-{
-    return axios.post(baseURL+'/showForum',{
-        'userId':userId
-    },{headers:{'Authorization':getToken()}})
-}
-
-//19.帖子与纳新项目表
-function showItem(forumId)
-{
-    return axios.post(baseURL+'/showItem',{
-        "forumId":forumId,
-    },{headers:{'Authorization':getToken()}})
-}
-
-//20.删除帖子或纳新信息
-function deleteItem(userId,Id)
-{
-    return axios.post(baseURL+'/deleteItem',{
-        'userId':userId,
-        'Id':Id
-    },{headers:{'Authorization':getToken()}})
-}
-
-//21.心理焦虑疏导模块
-// function () {
-//
-// }
-
-//22.心理疏导使用记录
-function showPsy(userId)
-{
-    return axios.post(baseURL+'/showPsy',{
-        'userId':userId
-    },{headers:{'Authorization':getToken()}})
-}
-
-//23.略
-
-//24.用户签到
-function signIn(userId,context)
-{
-    return axios.post(baseURL+'/signIn',{
-        'userId':userId,
-        'context':context
-    },{headers:{'Authorization':getToken()}})
-}
-
-//25.读取签到状态
-function readSignInContext(userId)
-{
-    return axios.post(baseURL+'/readSignInContext',{
-        'userId':userId
-    },{headers:{'Authorization':getToken()}})
-}
-
-//26.读取自习楼状况
-function readStudyRoom(userId,floor)
-{
-    axios.post(baseURL+'/readStudyRoom',{
-        'userId':userId,
-        'floor':floor
-    },{headers:{'Authorization':getToken()}})
-}
-
-//27.开始自习
-function startStudy(floor,site,startTime,context,encourage,length)
-{
-    return axios.post(baseURL+'/startStudy',{
-        "floor": floor,
-        "site": site,
-        "startTime": startTime,
-        "context": context,
-        "encourage": encourage,
-        "length": length
-    },{headers:{'Authorization':getToken()}})
-}
-
-//28.读取自习状态或强制结束自习
-function readStudyStatus(userId,operation)
-{
-    return axios.post(baseURL+'/readStudyStatus',{
-        "userId":userId,
-        "operation":operation
-    },{headers:{'Authorization':getToken()}});
-}
-
-//psy小智同学机器人
-function dredgePsy(userId,inputContext)
-{
-    return axios.post(baseURL+'/dredgePsy',{
-        "inputContext":inputContext
-    },{headers:{'Authorization':getToken()}});
-}
-
-//技术与能力检测模块
-function skillTest(userId,workMode,expectSalary,expectCity,expectJob,inputContext)
-{
-    return axios.post(baseURL+'/skillTest',{
-        "userId":userId,
-        "workMode":workMode,
-        "expectSalary":expectSalary,
-        "expectCity":expectCity,
-        "expectJob":expectJob,
-        "inputContext":inputContext
-    },{headers:{'Authorization':getToken()}});
-}
-
-//评论点赞
-function upvote(userId,id)
-{
-    return axios.post(baseURL+'/upvote',{
-        "userId":userId,
-        "id":id
-    },{headers:{'Authorization':getToken()}})
-}
-
-//上传资源
-function upload(formData)
-{
-    return axios.post(baseURL+'/upload',formData,
-        {headers:{'Authorization':getToken(),'content-type':'multipart/form-data'}});
-}
-
-//获取资源列表
-function showFile(userId)
-{
-    return axios.post(baseURL+'/showFile',{
-        "userId":userId
-    },{headers:{'Authorization':getToken()}});
-
-}
-
-//下载资源
-function downloadFile(id)
-{
-    window.location=baseURL+'/download?id='+id;
-}
-
-//从AutumnFish获取音乐信息JSON
-function getMusicList(context)
-{
-    return axios.get('https://autumnfish.cn/search?keywords='+context);
-}
-
-
-
-
-
-
-
-
-
-
-// 知识库管理相关API函数
-
-// 创建知识实体
+// 39. 创建知识实体
 function createKnowledgeEntity(keName, keAbstract, fileContent, fileType) {
     return axios.post(baseURL + '/knowledge/create', {
         keName: keName,
@@ -733,7 +442,7 @@ function createKnowledgeEntity(keName, keAbstract, fileContent, fileType) {
     }, {headers: {'Authorization': getToken()}});
 }
 
-// 搜索知识实体
+// 40. 搜索知识实体
 function searchKnowledgeEntities(keyword) {
     return axios.post(baseURL + '/knowledge/search', {
         keyword: keyword
@@ -744,13 +453,13 @@ function searchKnowledgeEntities(keyword) {
     });
 }
 
-// 下载知识实体文件
+// 41. 下载知识实体文件
 function downloadKnowledgeEntity(keId) {
     const token = getToken();
     window.open(baseURL + '/knowledge/download/' + keId + '?token=' + token, '_blank');
 }
 
-// 收藏知识实体
+// 42. 收藏知识实体
 function favoriteKnowledgeEntity(keId) {
     return axios.post(baseURL + '/knowledge/favorite', {
         keId: keId
@@ -761,7 +470,7 @@ function favoriteKnowledgeEntity(keId) {
     });
 }
 
-// 获取用户收藏的知识实体
+// 43. 获取用户收藏的知识实体
 function getUserFavorites() {
     return axios.get(baseURL + '/knowledge/favorites', {
         headers: {
@@ -770,12 +479,60 @@ function getUserFavorites() {
     });
 }
 
-// 搜索知识实体片段
+// 44. 搜索知识实体片段
 function searchKnowledgePieces(keId, queryText, topK = 3) {
     return axios.post(baseURL + '/knowledge/search_pieces', {
         keId: keId,
         queryText: queryText,
         topK: topK
+    }, {
+        headers: {
+            'Authorization': getToken()
+        }
+    });
+}
+
+// 45. 获取用户相关的病历列表
+function getMedicalRecords() {
+    return axios.post(baseURL + '/getMedicalRecords', {}, {
+        headers: {
+            'Authorization': getToken()
+        }
+    });
+}
+
+// 46. 获取指定病历详情
+function getMedicalRecord(medrecId) {
+    return axios.post(baseURL + '/getMedicalRecord', {
+        medrecId: medrecId
+    }, {
+        headers: {
+            'Authorization': getToken()
+        }
+    });
+}
+
+// 47. 创建病历（仅医师可用）
+function createMedicalRecord(medrecPatientId, medrecAbstract, medrecState, medrecContent) {
+    return axios.post(baseURL + '/createMedicalRecord', {
+        medrecPatientId: medrecPatientId,
+        medrecAbstract: medrecAbstract,
+        medrecState: medrecState,
+        medrecContent: medrecContent
+    }, {
+        headers: {
+            'Authorization': getToken()
+        }
+    });
+}
+
+// 48. 更新病历（仅负责医师可用）
+function updateMedicalRecord(medrecId, medrecAbstract, medrecState, medrecContent) {
+    return axios.post(baseURL + '/updateMedicalRecord', {
+        medrecId: medrecId,
+        medrecAbstract: medrecAbstract,
+        medrecState: medrecState,
+        medrecContent: medrecContent
     }, {
         headers: {
             'Authorization': getToken()

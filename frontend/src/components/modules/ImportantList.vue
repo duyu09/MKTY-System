@@ -65,7 +65,7 @@ export default
       il_itemTimeStatus:"",  // 时间状态（“已到时间”、“未到时间”、“已超时”）
       il_sendEmailDialogVisible:false,  // 发送邮件对话框
       il_email_title:"",  // 邮件标题
-      il_email_content:"",  // 邮件内容
+      il_email_content:{ "html": "", "md": "" },  // 邮件内容
       il_email_receiver:"",  // 邮件接收人
     }
   },
@@ -298,7 +298,7 @@ export default
       },
       il_sendEmail()
       {
-        const content = "<html>" + this.il_email_content + "</html>"
+        const content = "<html>" + this.il_email_content.html + "</html>"
         sendEmail(content, this.il_email_receiver, this.il_email_title).then((res) => {
           if (res.data.code == 0) {
             successHandle("邮件发送成功！");
@@ -362,8 +362,8 @@ export default
                   <div class="Medical-ItemDiv">事项类型:<br>【{{ item.listItemTimeMode }}】</div>
                   <div class="Medical-ItemDiv" v-if="item.listItemPriority_number==0">优先级:<br>【{{ item.listItemPriority }}】</div>
                   <div class="Medical-ItemDiv" style="font-weight: bold; color: red;" v-if="item.listItemPriority_number==1">优先级:<br>【{{ item.listItemPriority }}】</div>
-                  <div class="Medical-ItemDiv" v-if="item.listItemTimeMode_number == 0" style="background-color: transparent;">{{ item.listItemStartTime }} ~ {{ item.listItemEndTime }}</div>
-                  <div class="Medical-ItemDiv" v-else-if="item.listItemTimeMode_number == 1" style="background-color: transparent;">时间：每周<b>{{ item.listItemTimeWeek }}</b></div>
+                  <div class="Medical-ItemDiv" v-if="item.listItemTimeMode_number == 0" style="background-color: transparent;">🕗{{ item.listItemStartTime }} ~ {{ item.listItemEndTime }}</div>
+                  <div class="Medical-ItemDiv" v-else-if="item.listItemTimeMode_number == 1" style="background-color: transparent;">🕗时间：每周<b>{{ item.listItemTimeWeek }}</b></div>
                 </div>
                 <span class="Aims-Class-Span03">
                   <span class="Aims-Class-Span04" @click="il_finishItem(item.listItemId)"><el-icon><Finished /></el-icon>&nbsp;标记完成</span>&nbsp;
@@ -423,7 +423,7 @@ export default
               </div>
               <div class="PsyChat-Div07 colorful-div-common">
                 <div class="PsyChat-SendButtonDiv" @click="il_aiAncillaryAnalysis()">
-                  <el-icon><Opportunity /></el-icon>&nbsp;<span class="PsyChat-Span02">AI辅助分析</span>
+                  🤖&nbsp;<span class="PsyChat-Span02">AI辅助分析</span>
                 </div>
               </div>
             </div>

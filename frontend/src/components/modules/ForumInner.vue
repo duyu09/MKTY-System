@@ -472,12 +472,14 @@ export default
               &nbsp;{{ item.postTextContent }}
             </div>
             <div class="ForumInner-Class-Div17">
-              <el-icon><Star /></el-icon>点赞量&nbsp;{{ item.postPraiseNumber }}&nbsp;&nbsp;
-              <el-icon><Clock /></el-icon>{{ item.postCreateTime }}
+              <el-icon><Star /></el-icon>点赞量&nbsp;
+              <span style="color: grey; font-weight: bold;">{{ item.postPraiseNumber }}</span>&nbsp;&nbsp;
+              <el-icon><Clock /></el-icon><span style="color: grey;">{{ item.postCreateTime }}</span>
               <span class="ForumInner-Class-Span03">
-                <span>第{{ item.floor }}层&nbsp;</span>
-                <span @click="praise(item)" class="ForumInner-Upvote-Btn"><el-icon><Pointer /></el-icon>点赞</span>&nbsp;&nbsp;
-                <span @click="reply(item.userName);" class="ForumInner-Reply-Btn"><el-icon><ChatLineRound /></el-icon>回复</span>&nbsp;&nbsp;
+                <!-- <span>第{{ item.floor }}层&nbsp;</span> -->
+                <span>操作：</span>
+                <span @click="praise(item)" class="ForumInner-Upvote-Btn" style="text-decoration: underline;"><el-icon><Pointer /></el-icon>点赞</span>&nbsp;&nbsp;
+                <span @click="reply(item.userName);" class="ForumInner-Reply-Btn" style="text-decoration: underline;"><el-icon><ChatLineRound /></el-icon>回复</span>&nbsp;&nbsp;
                 <el-popconfirm title="您确定删除吗？" @confirm="deletePost(item.postId);" @cancel="" v-if="item.postPosterId==this.fo_userId">
                   <template #reference>
                     <span>

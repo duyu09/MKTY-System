@@ -81,7 +81,7 @@ export default
             <el-icon><ChatDotSquare /></el-icon>
             诊疗论坛
           </div>
-          <div class="MainView-MenuItem" @click="() => this.$router.push('/main/StartStudy')">
+          <div class="MainView-MenuItem" @click="() => this.$router.push('/main/MedicalRecordOverview')">
             <el-icon><Management /></el-icon>
             病历管理
           </div>

@@ -1828,9 +1828,242 @@ def search_knowledge_pieces(cursor):
                 })
         
         return jsonify({'code': 0, 'msg': '搜索成功', 'results': results})
-        
+
     except Exception as e:
         return jsonify({'code': 1, 'msg': '搜索失败：' + str(e)})
+
+
+# 病历管理相关API
+@app.route('/api/getMedicalRecords', methods=['POST'])
+@jwt_required()
+@getCursor(conn_pool)
+def get_medical_records(cursor):
+    '''
+    - API功能：获取用户相关的病历列表
+    - 负责人：杜宇
+    - 请求参数：无
+    - 响应参数：code, msg, medicalRecords
+      - `code`: 执行状态（`int`，`0`=获取成功，`1`=获取失败）
+      - `msg`: 自然语言提示信息（`str`）
+      - `medicalRecords`: 病历列表（`list`，包含病历信息）
+    '''
+    try:
+        user_id = get_jwt_identity()
+        
+        # 获取用户类型
+        cursor.execute(f"SELECT userType FROM userinfo WHERE userId='{user_id}'")
+        user_result = cursor.fetchall()
+        if not user_result:
+            return jsonify({'code': 1, 'msg': '用户不存在'})
+        
+        user_type = int(user_result[0]['userType'])
+        
+        # 根据用户类型获取相应的病历
+        if user_type == 1:  # 医师
+            cursor.execute(f"SELECT * FROM medicalrecord WHERE medrecDoctorId='{user_id}' ORDER BY medrecCreateTime DESC")
+        else:  # 患者
+            cursor.execute(f"SELECT * FROM medicalrecord WHERE medrecPatientId='{user_id}' ORDER BY medrecCreateTime DESC")
+        
+        records = cursor.fetchall()
+        
+        # 获取每个病历的相关用户信息
+        medical_records = []
+        for record in records:
+            # 获取患者信息
+            cursor.execute(f"SELECT userName FROM userinfo WHERE userId='{record['medrecPatientId']}'")
+            patient_info = cursor.fetchone()
+            patient_name = patient_info['userName'] if patient_info else '未知患者'
+            
+            # 获取医师信息
+            cursor.execute(f"SELECT userName FROM userinfo WHERE userId='{record['medrecDoctorId']}'")
+            doctor_info = cursor.fetchone()
+            doctor_name = doctor_info['userName'] if doctor_info else '未知医师'
+            
+            medical_records.append({
+                'medrecId': record['medrecId'],
+                'medrecCreateTime': record['medrecCreateTime'],
+                'medrecModifyTime': record['medrecModifyTime'],
+                'medrecPatientId': record['medrecPatientId'],
+                'medrecDoctorId': record['medrecDoctorId'],
+                'medrecAbstract': record['medrecAbstract'],
+                'medrecState': record['medrecState'],
+                'patientName': patient_name,
+                'doctorName': doctor_name
+            })
+        
+        return jsonify({'code': 0, 'msg': '获取成功', 'medicalRecords': medical_records})
+        
+    except Exception as e:
+        return jsonify({'code': 1, 'msg': '获取失败：' + str(e)})
+
+
+@app.route('/api/getMedicalRecord', methods=['POST'])
+@jwt_required()
+@getCursor(conn_pool)
+def get_medical_record(cursor):
+    '''
+    - API功能：获取指定病历详情
+    - 负责人：杜宇
+    - 请求参数：medrecId
+      - `medrecId`: 病历ID（`int`）
+    - 响应参数：code, msg, medicalRecord
+      - `code`: 执行状态（`int`，`0`=获取成功，`1`=获取失败）
+      - `msg`: 自然语言提示信息（`str`）
+      - `medicalRecord`: 病历详情（`dict`）
+    '''
+    try:
+        user_id = get_jwt_identity()
+        user_data = request.json
+        medrec_id = user_data.get('medrecId')
+        
+        if medrec_id is None:
+            return jsonify({'code': 1, 'msg': '病历ID不可读取'})
+        
+        # 获取病历信息
+        cursor.execute(f"SELECT * FROM medicalrecord WHERE medrecId='{medrec_id}'")
+        record = cursor.fetchone()
+        
+        if not record:
+            return jsonify({'code': 1, 'msg': '病历不存在'})
+          # 检查权限：只有患者本人和负责医师可以查看
+        if user_id != record['medrecPatientId'] and user_id != record['medrecDoctorId']:
+            return jsonify({'code': 2, 'msg': '您无权查看此病历'})
+        
+        # 获取患者信息
+        cursor.execute(f"SELECT userName FROM userinfo WHERE userId='{record['medrecPatientId']}'")
+        patient_info = cursor.fetchone()
+        patient_name = patient_info['userName'] if patient_info else '未知患者'
+        
+        # 获取医师信息
+        cursor.execute(f"SELECT userName FROM userinfo WHERE userId='{record['medrecDoctorId']}'")
+        doctor_info = cursor.fetchone()
+        doctor_name = doctor_info['userName'] if doctor_info else '未知医师'
+        
+        medical_record = {
+            'medrecId': record['medrecId'],
+            'medrecCreateTime': record['medrecCreateTime'],
+            'medrecModifyTime': record['medrecModifyTime'],
+            'medrecPatientId': record['medrecPatientId'],
+            'medrecDoctorId': record['medrecDoctorId'],
+            'medrecAbstract': record['medrecAbstract'],
+            'medrecState': record['medrecState'],
+            'medrecContent': record['medrecContent'],
+            'patientName': patient_name,
+            'doctorName': doctor_name
+        }
+        
+        return jsonify({'code': 0, 'msg': '获取成功', 'medicalRecord': medical_record})
+        
+    except Exception as e:
+        return jsonify({'code': 1, 'msg': '获取失败：' + str(e)})
+
+
+@app.route('/api/createMedicalRecord', methods=['POST'])
+@jwt_required()
+@getCursor(conn_pool)
+def create_medical_record(cursor):
+    '''
+    - API功能：创建病历（仅医师可用）
+    - 负责人：杜宇
+    - 请求参数：medrecPatientId, medrecAbstract, medrecState, medrecContent
+      - `medrecPatientId`: 患者ID（`int`）
+      - `medrecAbstract`: 病历概要（`str`）
+      - `medrecState`: 病历状态（`str`）
+      - `medrecContent`: 病历内容（`str`，Markdown格式）
+    - 响应参数：code, msg, medrecId
+      - `code`: 执行状态（`int`，`0`=创建成功，`1`=创建失败）
+      - `msg`: 自然语言提示信息（`str`）
+      - `medrecId`: 新创建的病历ID（`int`）
+    '''
+    try:
+        user_id = get_jwt_identity()
+        user_data = request.json
+        
+        # 检查用户是否为医师
+        cursor.execute(f"SELECT userType FROM userinfo WHERE userId='{user_id}'")
+        user_result = cursor.fetchone()
+        if not user_result or int(user_result['userType']) != 1:
+            return jsonify({'code': 1, 'msg': '只有医师可以创建病历'})
+        
+        medrec_patient_id = user_data.get('medrecPatientId')
+        medrec_abstract = user_data.get('medrecAbstract')
+        medrec_state = user_data.get('medrecState')
+        medrec_content = user_data.get('medrecContent')
+        
+        if not all([medrec_patient_id, medrec_abstract, medrec_state, medrec_content]):
+            return jsonify({'code': 1, 'msg': '请填写完整的病历信息'})
+        
+        # 检查患者是否存在
+        cursor.execute(f"SELECT userId FROM userinfo WHERE userId='{medrec_patient_id}' AND userType='0'")
+        patient_result = cursor.fetchone()
+        if not patient_result:
+            return jsonify({'code': 1, 'msg': '指定的患者不存在'})
+        
+        create_time = util_current_time()
+        
+        # 插入新病历
+        cursor.execute(f"""
+            INSERT INTO medicalrecord (medrecCreateTime, medrecModifyTime, medrecPatientId, medrecDoctorId, medrecAbstract, medrecState, medrecContent)
+            VALUES ('{create_time}', '{create_time}', '{medrec_patient_id}', '{user_id}', '{medrec_abstract}', '{medrec_state}', '{medrec_content}')
+        """)
+        
+        # 获取新创建的病历ID
+        cursor.execute("SELECT LAST_INSERT_ID() as medrecId")
+        result = cursor.fetchone()
+        medrec_id = result['medrecId']
+        
+        return jsonify({'code': 0, 'msg': '病历创建成功', 'medrecId': medrec_id})
+        
+    except Exception as e:
+        return jsonify({'code': 1, 'msg': '创建失败：' + str(e)})
+
+
+@app.route('/api/updateMedicalRecord', methods=['POST'])
+@jwt_required()
+@getCursor(conn_pool)
+def update_medical_record(cursor):
+    '''
+    - API功能：更新病历（仅负责医师可用）
+    - 负责人：杜宇
+    - 请求参数：medrecId, medrecAbstract, medrecState, medrecContent
+      - `medrecId`: 病历ID（`int`）
+      - `medrecAbstract`: 病历概要（`str`）
+      - `medrecState`: 病历状态（`str`）
+      - `medrecContent`: 病历内容（`str`，Markdown格式）
+    - 响应参数：code, msg
+      - `code`: 执行状态（`int`，`0`=更新成功，`1`=更新失败）
+      - `msg`: 自然语言提示信息（`str`）
+    '''
+    try:
+        user_id = get_jwt_identity()
+        user_data = request.json
+        
+        medrec_id = user_data.get('medrecId')
+        medrec_abstract = user_data.get('medrecAbstract')
+        medrec_state = user_data.get('medrecState')
+        medrec_content = user_data.get('medrecContent')
+        
+        if not all([medrec_id, medrec_abstract, medrec_state, medrec_content]):
+            return jsonify({'code': 1, 'msg': '请填写完整的病历信息'})
+        
+        # 检查病历是否存在以及权限
+        cursor.execute(f"SELECT medrecDoctorId FROM medicalrecord WHERE medrecId='{medrec_id}'")
+        record_result = cursor.fetchone()
+        if not record_result:
+            return jsonify({'code': 1, 'msg': '病历不存在'})
+        
+        if user_id != record_result['medrecDoctorId']:
+            return jsonify({'code': 1, 'msg': '只有负责医师可以修改病历'})
+        
+        modify_time = util_current_time()
+        
+        # 更新病历
+        cursor.execute(f"UPDATE medicalrecord SET medrecModifyTime='{modify_time}', medrecAbstract='{medrec_abstract}', medrecState='{medrec_state}', medrecContent='{medrec_content}' WHERE medrecId='{medrec_id}' ")
+        
+        return jsonify({'code': 0, 'msg': '病历更新成功'})
+        
+    except Exception as e:
+        return jsonify({'code': 1, 'msg': '更新失败：' + str(e)})
 
 
 if __name__ == '__main__':

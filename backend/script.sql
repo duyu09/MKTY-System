@@ -2,7 +2,7 @@
 -- 该文件为“明康慧医MKTY”智慧医疗系统的数据库DDL文件（SQL建表语句）。该文件为MKTY系统的重要组成部分。
 -- 该文件由DataGrip IDE生成
 -- 创建日期：2025/01/21
--- 修改日期：2025/04/14
+-- 修改日期：2025/06/03
 
 -- 创建数据库 mkty
 CREATE DATABASE IF NOT EXISTS mkty;
@@ -145,55 +145,24 @@ create table medicalrecord
 	medrecCreateTime text not null comment '病历创建时间，Unix时间戳，精确到秒，服务器时间。',
 	medrecModifyTime text not null comment '病历修改时间，Unix时间戳，精确到秒，服务器时间。',
 	medrecPatientId bigint not null comment '病历所属患者ID。',
-	medrecMainDoctorId bigint not null comment '病历主要负责人（医师）ID。',
-	medrecMinorDoctorId bigint null comment '病历其他负责人（医师）ID。',
+	medrecDoctorId bigint not null comment '病历负责人（医师）ID。',
 	medrecAbstract text null comment '病历概要，简洁描述病历。',
 	medrecState text not null comment '病历状态: 0 - 正常生效，1 - 痊愈无效，2 - 慢性病优先级降低。',
-	medrecRight text not null comment '病历权限: 0 - 仅患者与医师可见，1 - 公开可检索。',
-	medrecEigenVector json null comment '病历特征值，存储病历的TF-IDF与BigBird特征。',
-	medrecResList json null comment '病历资源列表，存储病历中上传的资源ID。',
+	medrecContent text not null comment '病历内容，Markdown格式。',
 	constraint medicalrecord_ibfk_1
 		foreign key (medrecPatientId) references userinfo (userId)
 			on delete cascade,
 	constraint medicalrecord_ibfk_2
-		foreign key (medrecMainDoctorId) references userinfo (userId)
-			on delete cascade,
-	constraint medicalrecord_ibfk_3
-		foreign key (medrecMinorDoctorId) references userinfo (userId)
+		foreign key (medrecDoctorId) references userinfo (userId)
 			on delete cascade
 )
 comment '电子病历表' charset=utf8mb3;
 
 create index medrecMainDoctorId
-	on medicalrecord (medrecMainDoctorId);
-
-create index medrecMinorDoctorId
-	on medicalrecord (medrecMinorDoctorId);
+	on medicalrecord (medrecDoctorId);
 
 create index medrecPatientId
 	on medicalrecord (medrecPatientId);
-
-create table resource
-(
-	resourceId bigint auto_increment comment '资源ID，唯一标识资源。'
-		primary key,
-	resourcePath text not null comment '资源存储路径，相对于服务器存储根目录。',
-	resourceParentType text not null comment '资源归属类型: 0 - 病历，1 - 知识库。',
-	resourceParentId bigint not null comment '资源归属ID，病历ID或知识库ID。',
-	resourcePermission tinyint(1) not null comment '资源权限: True - 仅限病历患者与医师可见，False - 公开。',
-	resourceType text not null comment '资源类型，如 audio/mp3。',
-	resourceEigenVector json null comment '资源特征值，存储CLIP图像特征。',
-	constraint resource_ibfk_1
-		foreign key (resourceParentId) references medicalrecord (medrecId)
-			on delete cascade,
-	constraint resource_ibfk_2
-		foreign key (resourceParentId) references knowledgeentity (keId)
-			on delete cascade
-)
-comment '资源表' charset=utf8mb3;
-
-create index resourceParentId
-	on resource (resourceParentId);
 
 create table usercollectionke
 (

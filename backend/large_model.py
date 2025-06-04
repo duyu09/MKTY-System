@@ -34,6 +34,8 @@ def predict(message: dict, model, tokenizer, max_new_tokens=2000):
       - `max_new_tokens`（`int`，生成的最大新token数，默认为2000）
     - 返回参数：`str`（生成的语句）
     '''
+    if MODE == "dev":
+        info_print("接收到调用明康慧医大模型请求。")
     prompt = message["prompt"]  # str
     context = message["context"]  # list[dict]
     context.append({"role": "user", "content": prompt})  # 加入当前会话

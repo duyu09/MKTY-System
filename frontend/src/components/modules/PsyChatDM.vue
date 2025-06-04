@@ -391,7 +391,7 @@ export default
                 </div>
                 <div style="text-align: right;">
                   <span style="font-size: small;">
-                    <el-icon><Clock /></el-icon>{{ pc_conTime(item.sessionSaveTime * 1000) }}
+                    🕗{{ pc_conTime(item.sessionSaveTime * 1000) }}
                   </span>&nbsp;
                   <el-popconfirm title="您确定删除吗？" @confirm="pc_deleteSession(item.sessionId)" @cancel="">
                     <template #reference>

@@ -311,7 +311,7 @@ export default
                 </div>
                 <div style="text-align: right;">
                   <span style="font-size: small;">
-                    <el-icon><Clock /></el-icon>{{ pc_conTime(item.sessionSaveTime * 1000) }}
+                    🕗{{ pc_conTime(item.sessionSaveTime * 1000) }}
                     &nbsp;
                     <span style="font-size: small; color: blue; cursor: pointer; font-weight: bold;" @click="pc_exportChatToPDF(item.sessionId);">
                       <el-icon color="blue" size="small">
@@ -694,11 +694,12 @@ export default
 }
 .pc_RAGKnowledgeItem:active
 {
-  background-color: rgba(96, 96, 236, 0.32);
+  background: linear-gradient(135deg, #d1d9ff 0%, #d2a8ff 100%);
 }
 .pc_RAGKnowledgeItem.active
 {
-  background-color: rgba(96, 96, 236, 0.32);
+  /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
+  background: linear-gradient(135deg, #d1d9ff 0%, #d2a8ff 100%);
 }
 @media screen and (max-width: 40rem)
 {
