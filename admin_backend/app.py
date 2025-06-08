@@ -57,29 +57,23 @@ class MedicalRecord(db.Model):
     medrecCreateTime = db.Column(db.Text, nullable=False)
     medrecModifyTime = db.Column(db.Text, nullable=False)
     medrecPatientId = db.Column(db.BigInteger, db.ForeignKey('userinfo.userId'), nullable=False)
-    medrecMainDoctorId = db.Column(db.BigInteger, db.ForeignKey('userinfo.userId'), nullable=False)
-    medrecMinorDoctorId = db.Column(db.BigInteger, db.ForeignKey('userinfo.userId'))
+    medrecDoctorId = db.Column(db.BigInteger, db.ForeignKey('userinfo.userId'), nullable=False)
     medrecAbstract = db.Column(db.Text)
     medrecState = db.Column(db.Text, nullable=False)
-    medrecRight = db.Column(db.Text, nullable=False)
-    medrecEigenVector = db.Column(db.JSON)
-    medrecResList = db.Column(db.JSON)
+    medrecContent = db.Column(db.Text, nullable=False)
 
     patient = db.relationship('UserInfo', foreign_keys=[medrecPatientId])
-    main_doctor = db.relationship('UserInfo', foreign_keys=[medrecMainDoctorId])
-    minor_doctor = db.relationship('UserInfo', foreign_keys=[medrecMinorDoctorId])
+    doctor = db.relationship('UserInfo', foreign_keys=[medrecDoctorId])
 
 # 知识实体模型
 class KnowledgeEntity(db.Model):
     __tablename__ = 'knowledgeentity'
     keId = db.Column(db.BigInteger, primary_key=True, autoincrement=True)
+    keGUID = db.Column(db.Text, nullable=False)
     keFileType = db.Column(db.Text, nullable=False)
     keName = db.Column(db.Text, nullable=False)
     keCreateTime = db.Column(db.Text, nullable=False)
     keAbstract = db.Column(db.Text)
-    isKeMultimodal = db.Column(db.Boolean, nullable=False)
-    keTextEigenVectors = db.Column(db.JSON)
-    keResList = db.Column(db.JSON)
 
 # 论坛模型
 class ForumSummary(db.Model):
@@ -257,14 +251,12 @@ def get_medical_records():
         'medrecCreateTime': record.medrecCreateTime,
         'medrecModifyTime': record.medrecModifyTime,
         'medrecPatientId': record.medrecPatientId,
-        'medrecMainDoctorId': record.medrecMainDoctorId,
-        'medrecMinorDoctorId': record.medrecMinorDoctorId,
+        'medrecDoctorId': record.medrecDoctorId,
         'medrecAbstract': record.medrecAbstract,
         'medrecState': record.medrecState,
-        'medrecRight': record.medrecRight,
+        'medrecContent': record.medrecContent,
         'patientName': record.patient.userName if record.patient else None,
-        'mainDoctorName': record.main_doctor.userName if record.main_doctor else None,
-        'minorDoctorName': record.minor_doctor.userName if record.minor_doctor else None
+        'doctorName': record.doctor.userName if record.doctor else None
     } for record in records])
 
 @app.route('/api/medical-records/<int:record_id>', methods=['GET'])
@@ -275,16 +267,12 @@ def get_medical_record(record_id):
         'medrecCreateTime': record.medrecCreateTime,
         'medrecModifyTime': record.medrecModifyTime,
         'medrecPatientId': record.medrecPatientId,
-        'medrecMainDoctorId': record.medrecMainDoctorId,
-        'medrecMinorDoctorId': record.medrecMinorDoctorId,
+        'medrecDoctorId': record.medrecDoctorId,
         'medrecAbstract': record.medrecAbstract,
         'medrecState': record.medrecState,
-        'medrecRight': record.medrecRight,
-        'medrecEigenVector': record.medrecEigenVector,
-        'medrecResList': record.medrecResList,
+        'medrecContent': record.medrecContent,
         'patientName': record.patient.userName if record.patient else None,
-        'mainDoctorName': record.main_doctor.userName if record.main_doctor else None,
-        'minorDoctorName': record.minor_doctor.userName if record.minor_doctor else None
+        'doctorName': record.doctor.userName if record.doctor else None
     })
 
 @app.route('/api/medical-records', methods=['POST'])
@@ -295,13 +283,10 @@ def create_medical_record():
         medrecCreateTime=current_time,
         medrecModifyTime=current_time,
         medrecPatientId=data['medrecPatientId'],
-        medrecMainDoctorId=data['medrecMainDoctorId'],
-        medrecMinorDoctorId=data.get('medrecMinorDoctorId'),
+        medrecDoctorId=data['medrecDoctorId'],
         medrecAbstract=data.get('medrecAbstract'),
         medrecState=data['medrecState'],
-        medrecRight=data['medrecRight'],
-        medrecEigenVector=data.get('medrecEigenVector'),
-        medrecResList=data.get('medrecResList')
+        medrecContent=data['medrecContent']
     )
     db.session.add(new_record)
     db.session.commit()
@@ -333,13 +318,11 @@ def get_knowledge_entities():
     entities = KnowledgeEntity.query.all()
     return jsonify([{
         'keId': entity.keId,
+        'keGUID': entity.keGUID,
         'keFileType': entity.keFileType,
         'keName': entity.keName,
         'keCreateTime': entity.keCreateTime,
-        'keAbstract': entity.keAbstract,
-        'isKeMultimodal': entity.isKeMultimodal,
-        'keTextEigenVectors': entity.keTextEigenVectors,
-        'keResList': entity.keResList
+        'keAbstract': entity.keAbstract
     } for entity in entities])
 
 @app.route('/api/knowledge/<int:entity_id>', methods=['GET'])
@@ -347,26 +330,23 @@ def get_knowledge_entity(entity_id):
     entity = KnowledgeEntity.query.get_or_404(entity_id)
     return jsonify({
         'keId': entity.keId,
+        'keGUID': entity.keGUID,
         'keFileType': entity.keFileType,
         'keName': entity.keName,
         'keCreateTime': entity.keCreateTime,
-        'keAbstract': entity.keAbstract,
-        'isKeMultimodal': entity.isKeMultimodal,
-        'keTextEigenVectors': entity.keTextEigenVectors,
-        'keResList': entity.keResList
+        'keAbstract': entity.keAbstract
     })
 
 @app.route('/api/knowledge', methods=['POST'])
 def create_knowledge_entity():
     data = request.json
+    import uuid
     new_entity = KnowledgeEntity(
+        keGUID=data.get('keGUID', str(uuid.uuid4())),
         keFileType=data['keFileType'],
         keName=data['keName'],
         keCreateTime=str(int(datetime.now().timestamp())),
-        keAbstract=data.get('keAbstract'),
-        isKeMultimodal=data['isKeMultimodal'],
-        keTextEigenVectors=data.get('keTextEigenVectors'),
-        keResList=data.get('keResList')
+        keAbstract=data.get('keAbstract')
     )
     db.session.add(new_entity)
     db.session.commit()
