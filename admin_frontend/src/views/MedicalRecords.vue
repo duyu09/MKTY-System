@@ -3,24 +3,17 @@
     <div class="header">
       <h2>病历管理</h2>
       <el-button type="primary" @click="showAddDialog">添加病历</el-button>
-    </div>
-
-    <el-table :data="records" style="width: 100%" v-loading="loading">
+    </div>    <el-table :data="records" style="width: 100%" v-loading="loading">
       <el-table-column prop="medrecId" label="ID" width="80"></el-table-column>
       <el-table-column prop="patientName" label="患者" width="120"></el-table-column>
-      <el-table-column prop="mainDoctorName" label="主治医师" width="120"></el-table-column>
-      <el-table-column prop="minorDoctorName" label="其他医师" width="120"></el-table-column>
+      <el-table-column prop="doctorName" label="负责医师" width="120"></el-table-column>
       <el-table-column prop="medrecAbstract" label="病历概要"></el-table-column>
       <el-table-column prop="medrecState" label="状态" width="100">
         <template #default="scope">
           {{ getStateText(scope.row.medrecState) }}
         </template>
       </el-table-column>
-      <el-table-column prop="medrecRight" label="权限" width="100">
-        <template #default="scope">
-          {{ getRightText(scope.row.medrecRight) }}
-        </template>
-      </el-table-column>
+      <el-table-column prop="medrecContent" label="病历内容" width="200" show-overflow-tooltip></el-table-column>
       <el-table-column label="操作" width="200">
         <template #default="scope">
           <el-button size="small" @click="handleEdit(scope.row)">编辑</el-button>
@@ -41,19 +34,8 @@
               :value="user.userId">
             </el-option>
           </el-select>
-        </el-form-item>
-        <el-form-item label="主治医师">
-          <el-select v-model="form.medrecMainDoctorId" filterable placeholder="请选择主治医师">
-            <el-option
-              v-for="user in doctors"
-              :key="user.userId"
-              :label="user.userName"
-              :value="user.userId">
-            </el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="其他医师">
-          <el-select v-model="form.medrecMinorDoctorId" filterable placeholder="请选择其他医师">
+        </el-form-item>        <el-form-item label="负责医师">
+          <el-select v-model="form.medrecDoctorId" filterable placeholder="请选择负责医师">
             <el-option
               v-for="user in doctors"
               :key="user.userId"
@@ -63,19 +45,15 @@
           </el-select>
         </el-form-item>
         <el-form-item label="病历概要">
-          <el-input type="textarea" v-model="form.medrecAbstract" rows="4"></el-input>
+          <el-input type="textarea" v-model="form.medrecAbstract" rows="3"></el-input>
         </el-form-item>
-        <el-form-item label="病历状态">
+        <el-form-item label="病历内容">
+          <el-input type="textarea" v-model="form.medrecContent" rows="5" placeholder="请输入病历详细内容（支持Markdown格式）"></el-input>
+        </el-form-item>        <el-form-item label="病历状态">
           <el-select v-model="form.medrecState">
             <el-option label="正常生效" value="0"></el-option>
             <el-option label="痊愈无效" value="1"></el-option>
             <el-option label="慢性病优先级降低" value="2"></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="病历权限">
-          <el-select v-model="form.medrecRight">
-            <el-option label="仅患者与医师可见" value="0"></el-option>
-            <el-option label="公开可检索" value="1"></el-option>
           </el-select>
         </el-form-item>
       </el-form>
@@ -101,16 +79,12 @@ export default {
       doctors: [],
       loading: false,
       dialogVisible: false,
-      dialogTitle: '添加病历',
-      form: {
+      dialogTitle: '添加病历',      form: {
         medrecPatientId: '',
-        medrecMainDoctorId: '',
-        medrecMinorDoctorId: '',
+        medrecDoctorId: '',
         medrecAbstract: '',
         medrecState: '0',
-        medrecRight: '0',
-        medrecEigenVector: null,
-        medrecResList: null
+        medrecContent: ''
       },
       isEdit: false,
       currentRecordId: null
@@ -142,42 +116,35 @@ export default {
         this.$message.error('获取用户列表失败')
         console.error(error)
       }
-    },
-    getStateText(state) {
+    },    getStateText(state) {
       const states = {
         '0': '正常生效',
         '1': '痊愈无效',
         '2': '慢性病优先级降低'
       }
       return states[state] || '未知'
-    },
-    getRightText(right) {
-      const rights = {
-        '0': '仅患者与医师可见',
-        '1': '公开可检索'
-      }
-      return rights[right] || '未知'
-    },
-    showAddDialog() {
+    },showAddDialog() {
       this.dialogTitle = '添加病历'
       this.isEdit = false
       this.form = {
         medrecPatientId: '',
-        medrecMainDoctorId: '',
-        medrecMinorDoctorId: '',
+        medrecDoctorId: '',
         medrecAbstract: '',
         medrecState: '0',
-        medrecRight: '0',
-        medrecEigenVector: null,
-        medrecResList: null
+        medrecContent: ''
       }
       this.dialogVisible = true
-    },
-    handleEdit(row) {
+    },    handleEdit(row) {
       this.dialogTitle = '编辑病历'
       this.isEdit = true
       this.currentRecordId = row.medrecId
-      this.form = { ...row }
+      this.form = {
+        medrecPatientId: row.medrecPatientId,
+        medrecDoctorId: row.medrecDoctorId,
+        medrecAbstract: row.medrecAbstract,
+        medrecState: row.medrecState,
+        medrecContent: row.medrecContent
+      }
       this.dialogVisible = true
     },
     async handleDelete(row) {
