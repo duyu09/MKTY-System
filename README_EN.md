@@ -385,8 +385,7 @@ This project serves as the graduation thesis for the 2025 batch of undergraduate
 
 ### 👤 Project Author & Copyright Notice
 
-- **Du Yu** (Chinese Simplified: _杜宇_; Vietnamese: _Đỗ Vũ_; Email: <202103180009@stu.qlu.edu.cn> and <qluduyu09@163.com>), undergraduate student at Faculty of Computer Science and Technology, Qilu University of Technology (Shandong Academy of Sciences)
-- Participator: **Guo Changlin** (Chinese Simplified: _郭长霖_; Vietnamese: _Quách Trường Lâm_; Email: <202311143014@stu.qlu.edu.cn> and <changlin539@163.com>), student at Faculty of Computer Science and Technology, Qilu University of Technology (Shandong Academy of Sciences). The code he worked on was clearly marked in the comments.
+- **Du Yu** (Chinese Simplified: _杜宇_; Vietnamese: _Đỗ Vũ_; Email: <202103180009@stu.qlu.edu.cn> and <qluduyu09@163.com>), undergraduate student at Faculty of Computer Science and Technology, Qilu University of Technology (Shandong Academy of Sciences).
 
 ### 🏫 Thesis Advisors
 
