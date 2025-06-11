@@ -7,7 +7,6 @@ import { Promotion, Avatar, Delete, ChatDotSquare, Setting, CaretRight, Loading,
 import { marked }  from "marked";
 import DOMPurify from "dompurify";
 import 'highlight.js/styles/rainbow.css';
-import hljs from 'highlight.js';
 import { errHandle, successHandle, convertTime } from "@/utils/tools";
 import { getCookie, getUserAvatar, llmInferenceGetStatus, llmInferenceSubmitTask, saveLlmSession, 
   getLlmSessionList, getLlmSession, deleteLlmSession, tsbbModelSubmitTask, tsbbInferenceGetStatus } from "@/api/api";

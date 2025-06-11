@@ -183,8 +183,7 @@ jQuery('.login-reg-panel input[type="radio"]').on('change', function() {
       <div class="register-show">
         <h2>注册账号</h2>
         <p style="font-family: penxingshu,serif;font-size: larger;">
-          我的青春不迷茫<br>智能学习大平台<br>AI新科技<br>助力每一位学生的成长<br>你的大学生涯<br>将不再迷茫！<br>
-          相约大平台，收获美好大学时光!
+          明康慧医<br>智慧医疗大平台<br>AI新科技<br>助力减轻医师负担<br>使患者安心！<br>
         </p>
         <div class="form-check" id="conf_check02">
           <input type="checkbox" class="form-check-input" id="conf01" checked required>

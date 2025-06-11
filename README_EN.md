@@ -97,6 +97,97 @@ This project utilizes the following libraries, components, and open-source techn
 
 <img src="./image/Loss_Figure.svg" alt="Loss Curve" style="width:85%;" />
 
+<details>
+
+<summary><b>Click here to expand the MKTY large model inference demo code</b></summary>
+
+#### Model Loading and Text Generation Function Definition
+
+```python
+from transformers import AutoModelForCausalLM, AutoTokenizer
+
+def load_model_and_tokenizer(model_name):
+    model = AutoModelForCausalLM.from_pretrained(
+        model_name,
+        torch_dtype="auto",
+        device_map="auto"
+    )
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    return model, tokenizer
+
+
+def generate_response(prompt, messages, model, tokenizer, max_new_tokens=2000):
+    messages.append({"role": "user", "content": prompt})
+    text = tokenizer.apply_chat_template(
+        messages,
+        tokenize=False,
+        add_generation_prompt=True
+    )
+    model_inputs = tokenizer([text], return_tensors="pt").to(model.device)
+    generated_ids = model.generate(
+        **model_inputs,
+        max_new_tokens=max_new_tokens
+    )
+    generated_ids = [
+        output_ids[len(input_ids):] for input_ids, output_ids in zip(model_inputs.input_ids, generated_ids)
+    ]
+    response = tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
+    messages.append({"role": "assistant", "content": response})
+    return response
+
+```
+
+#### Standard Q&A mode
+
+```python
+if __name__ == "__main__":
+    model_name = r"MKTY-3B-Chat"
+    messages = []
+    model, tokenizer = load_model_and_tokenizer(model_name)
+    while True:
+        prompt = input("User> ")
+        if prompt == "exit":
+            break
+        response = generate_response(prompt, messages, model, tokenizer)
+        print("MKTY>", response)
+```
+
+#### Large Language Model Discussion Mechanism (LLMDM)
+
+```python
+if __name__ == "__main__":
+    model_name = "MKTY-3B-Chat"
+    discuss_rounds = 3
+    agent_number = 3
+    model, tokenizer = load_model_and_tokenizer(model_name)
+    messages_arr = [[] for _ in range(agent_number)]
+    while True:
+        prompt = input("User> ")
+        if prompt == "exit":
+            break
+        moderator_opinion = "暂无"
+        for i in range(discuss_rounds):
+            responses_arr = []
+            prompt_per_round = "- 问题：\n" + prompt + "\n - 上轮讨论主持人意见：\n" + moderator_opinion + "\n - 请你结合主持人意见，对上述医疗或医学专业的问题发表详细观点，可以质疑并说明理由。\n"
+            for j in range(agent_number):
+                messages = messages_arr[j]
+                response = generate_response(prompt_per_round, messages, model, tokenizer)
+                responses_arr.append(response)
+                print(f"第{i + 1}轮讨论，LLM {j + 1}观点>\n", response)
+                print("-------------------")
+            moderator_prompt = "- 问题：\n" + prompt + "\n\n"
+            for res_index in range(len(responses_arr)):
+                moderator_prompt = moderator_prompt + f"- LLM {res_index + 1}观点：\n" + responses_arr[res_index] + "\n\n"
+            moderator_prompt = moderator_prompt + "对于给定的医疗相关问题，请综合各LLM观点，结合自身知识，得出你自己的判断，尽可能详尽，全部都分析到位，还要充分说明理由。\n"
+            moderator_opinion = generate_response(moderator_prompt, [], model, tokenizer)
+            print(f"第{i + 1}轮讨论，主持人的意见>\n", moderator_opinion)
+            print("-------------------")
+            clear_history(messages_arr)
+
+```
+
+</details>
+
 ### In-depth Agent Analysis
 
 &nbsp;&nbsp;&nbsp;&nbsp;The "in-depth agent analysis" functionality is based on a custom-designed mechanism known as **Large Language Model Discussion Mechanism** `LLMDM`. It involves three hyperparameters: number of agents, number of discussion rounds, and convergence threshold. Identical models (MKTY-3B-Chat) with different contextual histories are treated as distinct agents.
@@ -304,17 +395,42 @@ Note: Same version considerations apply as with the large model setup.
 
 `\backend\modest_model.py`, `\backend\modest_model_util.py`, and the BioMedCLIP model directory.
 
-#### (4) Database Initialization
+#### (4) BigBird and Time Series Prediction Model
+
+##### Environment Installation
+
+```bash
+pip install -r requirements-bb.txt
+```
+
+##### Code Files
+
+`\backend\tsbb_model.py`, `\backend\tsbb_model_util.py`.
+
+#### (5) Database Initialization
 
 &nbsp;&nbsp;&nbsp;&nbsp;The system uses a `MySQL` database. Version 8.0+ is required for JSON data support. Refer to the [MySQL official site](https://dev.mysql.com/doc/) for installation instructions. Use the SQL script `\backend\script.sql` to initialize the database schema.
 
-#### (5) Frontend Setup
+#### (6) Frontend Setup
 
 &nbsp;&nbsp;&nbsp;&nbsp;The frontend is built and run using `Vite` and recommends `Node.js v22.12.0+` and the `yarn` package manager. See the [Node.js website](https://nodejs.org/) and [Yarn website](https://yarnpkg.com/). Frontend source directory: `\frontend`.
 
-#### (6) Admin Panel
+#### (7) Admin Panel
 
 &nbsp;&nbsp;&nbsp;&nbsp;The admin panel uses `Python Flask` for the backend and `Vue` + `Vue-cli` for the frontend. Recommended environments are `Python 3.9+` and `Node v22.12.0+`. Admin frontend directory: `\admin_frontend`; Admin backend directory: `\admin_backend`.
+
+Backend Frontend Dependency Installation:
+
+```bash
+cd \admin_frontend
+yarn install
+```
+
+Backend Backend Dependency Installation:
+
+```bash
+pip install -r requirements-admin.txt
+```
 
 ### 4. Running the System
 
@@ -389,8 +505,8 @@ This project serves as the graduation thesis for the 2025 batch of undergraduate
 
 ### 🏫 Thesis Advisors
 
-- Academic Mentor: **Jiang Wenfeng** (Chinese Simplified: _姜文峰_; Vietnamese: _Khương Văn Phong_), Lecturer, Faculty of Computer Science and Technology, Qilu University of Technology (Shandong Academy of Sciences)
-- Enterprise Mentor: **Li Jun** (Chinese Simplified: _李君_; Vietnamese: _Lý Quân_), Shandong Strong (Shichuang) Software Training College, Ambow Education Group ([NYSE: AMBO](https://www.nyse.com/quote/XASE:AMBO))
+- Academic Mentor: **Jiang Wenfeng** (Chinese Simplified: _姜文峰_; Vietnamese: _Khương Văn Phong_), Associate professor, Faculty of Computer Science and Technology, Qilu University of Technology (Shandong Academy of Sciences)
+- Enterprise Mentor: **Li Jun** (Chinese Simplified: _李君_; Vietnamese: _Lý Quân_), Senior software engineer, Shandong Strong (Shichuang) Software Training College, Ambow Education Group ([NYSE: AMBO](https://www.nyse.com/quote/XASE:AMBO))
 
 ### ⚖️ Open Source License
 
