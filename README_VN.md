@@ -89,6 +89,97 @@ Dự án sử dụng các thư viện, thành phần và dự án mã nguồn m�
 
 <img src="./image/Loss_Figure.svg" alt="Biểu đồ mất mát" style="width:85%;" />
 
+<details>
+
+<summary><b>Nhấp vào đây để mở rộng mã Demo suy luận mô hình lớn MKTY</b></summary>
+
+#### Định nghĩa chức năng tải mô hình và sinh văn bản
+
+```python
+from transformers import AutoModelForCausalLM, AutoTokenizer
+
+def load_model_and_tokenizer(model_name):
+    model = AutoModelForCausalLM.from_pretrained(
+        model_name,
+        torch_dtype="auto",
+        device_map="auto"
+    )
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    return model, tokenizer
+
+
+def generate_response(prompt, messages, model, tokenizer, max_new_tokens=2000):
+    messages.append({"role": "user", "content": prompt})
+    text = tokenizer.apply_chat_template(
+        messages,
+        tokenize=False,
+        add_generation_prompt=True
+    )
+    model_inputs = tokenizer([text], return_tensors="pt").to(model.device)
+    generated_ids = model.generate(
+        **model_inputs,
+        max_new_tokens=max_new_tokens
+    )
+    generated_ids = [
+        output_ids[len(input_ids):] for input_ids, output_ids in zip(model_inputs.input_ids, generated_ids)
+    ]
+    response = tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
+    messages.append({"role": "assistant", "content": response})
+    return response
+
+```
+
+#### Chế độ hỏi đáp thông thường
+
+```python
+if __name__ == "__main__":
+    model_name = r"MKTY-3B-Chat"
+    messages = []
+    model, tokenizer = load_model_and_tokenizer(model_name)
+    while True:
+        prompt = input("User> ")
+        if prompt == "exit":
+            break
+        response = generate_response(prompt, messages, model, tokenizer)
+        print("MKTY>", response)
+```
+
+#### Cơ chế thảo luận mô hình lớn (LLMDM)
+
+```python
+if __name__ == "__main__":
+    model_name = "MKTY-3B-Chat"
+    discuss_rounds = 3
+    agent_number = 3
+    model, tokenizer = load_model_and_tokenizer(model_name)
+    messages_arr = [[] for _ in range(agent_number)]
+    while True:
+        prompt = input("User> ")
+        if prompt == "exit":
+            break
+        moderator_opinion = "暂无"
+        for i in range(discuss_rounds):
+            responses_arr = []
+            prompt_per_round = "- 问题：\n" + prompt + "\n - 上轮讨论主持人意见：\n" + moderator_opinion + "\n - 请你结合主持人意见，对上述医疗或医学专业的问题发表详细观点，可以质疑并说明理由。\n"
+            for j in range(agent_number):
+                messages = messages_arr[j]
+                response = generate_response(prompt_per_round, messages, model, tokenizer)
+                responses_arr.append(response)
+                print(f"第{i + 1}轮讨论，LLM {j + 1}观点>\n", response)
+                print("-------------------")
+            moderator_prompt = "- 问题：\n" + prompt + "\n\n"
+            for res_index in range(len(responses_arr)):
+                moderator_prompt = moderator_prompt + f"- LLM {res_index + 1}观点：\n" + responses_arr[res_index] + "\n\n"
+            moderator_prompt = moderator_prompt + "对于给定的医疗相关问题，请综合各LLM观点，结合自身知识，得出你自己的判断，尽可能详尽，全部都分析到位，还要充分说明理由。\n"
+            moderator_opinion = generate_response(moderator_prompt, [], model, tokenizer)
+            print(f"第{i + 1}轮讨论，主持人的意见>\n", moderator_opinion)
+            print("-------------------")
+            clear_history(messages_arr)
+
+```
+
+</details>
+
 ### Phân Tích Chuyên Sâu Về Tác Nhân Thông Minh
 
 &nbsp;&nbsp;&nbsp;&nbsp;Chức năng phân tích chuyên sâu dựa trên cơ chế thảo luận mô hình lớn do tôi tự phát triển, gọi là `LLMDM`. Cơ chế này có ba siêu tham số: số lượng tác nhân, số vòng thảo luận, và ngưỡng hội tụ. Các tác nhân sử dụng cùng một mô hình MKTY-3B-Chat nhưng với ngữ cảnh khác nhau. Trong vòng đầu tiên, nhiều ngữ cảnh được thiết lập để mô phỏng nhiều tác nhân, mỗi tác nhân đưa ra ý kiến riêng, và một "chủ tọa" không có lịch sử hội thoại sẽ tổng kết lại. Từ vòng sau, các tác nhân sử dụng bản tóm tắt trước đó kết hợp câu hỏi gốc để tiếp tục thảo luận. Chu trình này lặp lại cho đến khi đạt số vòng tối đa.
@@ -284,17 +375,42 @@ Lưu ý: Phiên bản `torch` và `transformers` phụ thuộc vào phần cứn
 
 `\backend\modest_model.py`, `\backend\modest_model_util.py`, cùng với thư mục mô hình BioMedCLIP đã sao chép.
 
-#### (4) Thiết Lập Cơ Sở Dữ Liệu
+#### (4) Mô hình BigBird và Dự đoán Chuỗi Thời gian
+
+##### Cài đặt Môi trường
+
+```bash
+pip install -r requirements-bb.txt
+```
+
+##### Tệp Mã nguồn
+
+`\backend\tsbb_model.py`, `\backend\tsbb_model_util.py`.
+
+#### (5) Thiết Lập Cơ Sở Dữ Liệu
 
 &nbsp;&nbsp;&nbsp;&nbsp;Hệ thống này phụ thuộc vào cơ sở dữ liệu `MySQL`, yêu cầu phiên bản `8.0+` để hỗ trợ lưu trữ và truy vấn dữ liệu `JSON`. Vui lòng tham khảo [MySQL chính thức](https://dev.mysql.com/doc/) để cài đặt. Kịch bản SQL định nghĩa dữ liệu (DDL): `\backend\script.sql`, vui lòng thực thi để tạo cơ sở dữ liệu.
 
-#### (5) Mã Frontend
+#### (6) Mã Frontend
 
 &nbsp;&nbsp;&nbsp;&nbsp;Frontend của hệ thống sử dụng công cụ đóng gói `Vite` để phát triển, gỡ lỗi và đóng gói. Khuyến nghị sử dụng môi trường `Node v22.12.0+` và trình quản lý gói `yarn`. Tham khảo [Node.js chính thức](https://nodejs.org/) và [Yarn chính thức](https://yarnpkg.com/). Thư mục mã frontend: `\frontend`
 
-#### (6) Hệ Thống Quản Trị Hậu Trường
+#### (7) Hệ Thống Quản Trị Hậu Trường
 
 &nbsp;&nbsp;&nbsp;&nbsp;Hệ thống quản trị hậu trường sử dụng `Python Flask` cho backend, và `Vue` + `Vue-cli` cho frontend. Khuyến nghị sử dụng `Python 3.9+` và `Node v22.12.0+`. Mã frontend của hậu quản trị nằm tại: `\admin_frontend`, mã backend nằm tại: `\admin_backend`.
+
+Cài đặt Phụ thuộc cho Giao diện Quản trị:
+
+```bash
+cd \admin_frontend
+yarn install
+```
+
+Cài đặt Phụ thuộc cho Hệ thống Quản trị:
+
+```bash
+pip install -r requirements-admin.txt
+```
 
 ### 4. Triển Khai và Chạy
 
@@ -368,8 +484,9 @@ Dự án này là đồ án tốt nghiệp của tôi tại Đại học Công n
 - **Đỗ Vũ** (Tiếng Trung Giản Thể: _杜宇_; Tiếng Anh: _Du Yu_; Email: <202103180009@stu.qlu.edu.cn> và <qluduyu09@163.com>), sinh viên tốt nghiệp năm 2025, Học bộ Khoa học và Kỹ thuật Máy tính, Đại học Công nghiệp Tề Lỗ (_Qilu_) (Viện Khoa học tỉnh Sơn Đông).
 
 ### 🏫 **Giáo Viên Hướng Dẫn Đồ Án**
-- Giáo viên trường: **Khương Văn Phong** (Tiếng Trung Giản Thể: _姜文峰_; Tiếng Anh: _Jiang Wenfeng_), giảng viên Học bộ Khoa học và Kỹ thuật Máy tính, Đại học Công nghiệp Tề Lỗ (_Qilu_) (Viện Khoa học tỉnh Sơn Đông).
-- Giáo viên xí nghiệp: **Lý Quân** (Tiếng Trung Giản Thể: _李君_; Tiếng Anh: _Li Jun_), Học viện Thực huấn Phần mềm Sư Sáng Sơn Đông, Tập đoàn Khoa kỹ Giáo dục Ambow (_An Bác_, [NYSE: AMBO](https://www.nyse.com/quote/XASE:AMBO)).
+
+- Giáo viên trường: **Khương Văn Phong** (Tiếng Trung Giản Thể: _姜文峰_; Tiếng Anh: _Jiang Wenfeng_), Phó giáo sư Học bộ Khoa học và Kỹ thuật Máy tính, Đại học Công nghiệp Tề Lỗ (_Qilu_) (Viện Khoa học tỉnh Sơn Đông).
+- Giáo viên xí nghiệp: **Lý Quân** (Tiếng Trung Giản Thể: _李君_; Tiếng Anh: _Li Jun_), Kỹ sư Phần mềm Cao cấp, Học viện Thực huấn Phần mềm Sư Sáng Sơn Đông, Tập đoàn Khoa kỹ Giáo dục Ambow (_An Bác_, [NYSE: AMBO](https://www.nyse.com/quote/XASE:AMBO)).
 
 ### ⚖️ Giấy Phép Mã Nguồn Mở
 

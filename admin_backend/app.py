@@ -14,14 +14,15 @@ ADMIN_PASSWORD = "admin123"
 JWT_SECRET = "your-secret-key"  # 用于JWT加密的密钥
 
 # 配置CORS
-CORS(app, resources={
-    r"/*": {
-        "origins": ["http://localhost:8080"],
-        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-        "allow_headers": ["Content-Type", "Authorization"],
-        "supports_credentials": True
-    }
-})
+# CORS(app, resources={
+#     r"/*": {
+#         "origins": ["http://localhost:8080"],
+#         "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+#         "allow_headers": ["Content-Type", "Authorization"],
+#         "supports_credentials": True
+#     }
+# })
+CORS(app)
 
 # 数据库配置
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost/mkty_02'

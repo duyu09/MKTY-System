@@ -5,7 +5,7 @@
 </p>
 <br>
 
-# 明康慧医——基于LLM与多模态人工智能的健康管理与辅助诊疗系统设计与实现
+# 明康慧医——基于LLM与多模态人工智能的健康管理与辅助诊疗系统的设计与实现
 
 ## 🌍 文档语言
 
@@ -20,7 +20,7 @@
 
 > 请注意，本文档的英文与越南文版本均使用LLM翻译自中文版本，有人工校对但差错难免，若出现英文或越南文版本内容与中文版本的不一致时，以中文为准。
 
-**项目全称：** 明康慧医（英语：_Minh Khoe Tue Y_；越南语：_Minh Khỏe Tuệ Y_；喃字：_明劸慧醫_）——基于LLM与多模态人工智能的健康管理与辅助诊疗系统设计与实现 ( **简称:** 明康慧医智慧医疗系统 )
+**项目全称：** 明康慧医（英语：_Minh Khoe Tue Y_；越南语：_Minh Khỏe Tuệ Y_；喃字：_明劸慧醫_）——基于LLM与多模态人工智能的健康管理与辅助诊疗系统的设计与实现 ( **简称:** 明康慧医智慧医疗系统 )
 
 ## 📖 项目介绍
 
@@ -86,6 +86,97 @@
 &nbsp;&nbsp;&nbsp;&nbsp;感谢上述开源数据集的提供者为本研究提供的帮助。另外，下方的损失值图展示了大模型在增量训练微调过程中交叉熵损失下降的过程。增量训练时设置了3个多epoch，每个epoch需遍历训练6000个批次的数据，共训练20000个批次，下图可以直观的看出损失。
 
 <img src="./image/Loss_Figure.svg" alt="损失值图" style="width:85%;" />
+
+<details>
+
+<summary><b>单击此处展开MKTY大模型推理Demo代码</b></summary>
+
+#### 模型加载及文本生成函数定义
+
+```python
+from transformers import AutoModelForCausalLM, AutoTokenizer
+
+def load_model_and_tokenizer(model_name):
+    model = AutoModelForCausalLM.from_pretrained(
+        model_name,
+        torch_dtype="auto",
+        device_map="auto"
+    )
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    return model, tokenizer
+
+
+def generate_response(prompt, messages, model, tokenizer, max_new_tokens=2000):
+    messages.append({"role": "user", "content": prompt})
+    text = tokenizer.apply_chat_template(
+        messages,
+        tokenize=False,
+        add_generation_prompt=True
+    )
+    model_inputs = tokenizer([text], return_tensors="pt").to(model.device)
+    generated_ids = model.generate(
+        **model_inputs,
+        max_new_tokens=max_new_tokens
+    )
+    generated_ids = [
+        output_ids[len(input_ids):] for input_ids, output_ids in zip(model_inputs.input_ids, generated_ids)
+    ]
+    response = tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
+    messages.append({"role": "assistant", "content": response})
+    return response
+
+```
+
+#### 普通问答模式
+
+```python
+if __name__ == "__main__":
+    model_name = r"MKTY-3B-Chat"
+    messages = []
+    model, tokenizer = load_model_and_tokenizer(model_name)
+    while True:
+        prompt = input("User> ")
+        if prompt == "exit":
+            break
+        response = generate_response(prompt, messages, model, tokenizer)
+        print("MKTY>", response)
+```
+
+#### 大模型讨论机制(LLMDM)
+
+```python
+if __name__ == "__main__":
+    model_name = "MKTY-3B-Chat"
+    discuss_rounds = 3
+    agent_number = 3
+    model, tokenizer = load_model_and_tokenizer(model_name)
+    messages_arr = [[] for _ in range(agent_number)]
+    while True:
+        prompt = input("User> ")
+        if prompt == "exit":
+            break
+        moderator_opinion = "暂无"
+        for i in range(discuss_rounds):
+            responses_arr = []
+            prompt_per_round = "- 问题：\n" + prompt + "\n - 上轮讨论主持人意见：\n" + moderator_opinion + "\n - 请你结合主持人意见，对上述医疗或医学专业的问题发表详细观点，可以质疑并说明理由。\n"
+            for j in range(agent_number):
+                messages = messages_arr[j]
+                response = generate_response(prompt_per_round, messages, model, tokenizer)
+                responses_arr.append(response)
+                print(f"第{i + 1}轮讨论，LLM {j + 1}观点>\n", response)
+                print("-------------------")
+            moderator_prompt = "- 问题：\n" + prompt + "\n\n"
+            for res_index in range(len(responses_arr)):
+                moderator_prompt = moderator_prompt + f"- LLM {res_index + 1}观点：\n" + responses_arr[res_index] + "\n\n"
+            moderator_prompt = moderator_prompt + "对于给定的医疗相关问题，请综合各LLM观点，结合自身知识，得出你自己的判断，尽可能详尽，全部都分析到位，还要充分说明理由。\n"
+            moderator_opinion = generate_response(moderator_prompt, [], model, tokenizer)
+            print(f"第{i + 1}轮讨论，主持人的意见>\n", moderator_opinion)
+            print("-------------------")
+            clear_history(messages_arr)
+
+```
+
+</details>
 
 ### 智能体深度分析
 
@@ -282,17 +373,42 @@ pip install -r requirements-mm.txt
 
 `\backend\modest_model.py`、`\backend\modest_model_util.py`，以及您克隆的BioMedCLIP模型目录。
 
-#### （4）数据库建立
+#### （4）BigBird与时序预测模型
+
+##### 环境安装
+
+```bash
+pip install -r requirements-bb.txt
+```
+
+##### 代码文件
+
+`\backend\tsbb_model.py`、`\backend\tsbb_model_util.py`。
+
+#### （5）数据库建立
 
 &nbsp;&nbsp;&nbsp;&nbsp;本系统依赖`MySQL`数据库，由于涉及JSON的存取，故须8.0及以上的版本。数据库的安装此处不再赘述，具体安装步骤请参考[MySQL官方网站](https://dev.mysql.com/doc/)。数据定义语言（建库SQL脚本）：`\backend\script.sql`，请执行之以建库。
 
-#### （5）前端代码
+#### （6）前端代码
 
 &nbsp;&nbsp;&nbsp;&nbsp;本系统前端使用`Vite`打包工具进行开发时调试、运行和打包，并建议使用`Node v22.12.0+`环境和`yarn`包管理器，具体请分别参考[Node.js官方网站](https://nodejs.org/)和[Yarn官方网站](https://yarnpkg.com/)。前端代码目录：`\frontend`
 
-#### （6）后台管理系统
+#### （7）后台管理系统
 
 &nbsp;&nbsp;&nbsp;&nbsp;本系统后台管理系统（后管端）也是基于`Python Flask`框架与`Vue`+`Vue-cli`进行开发，建议使用`Python 3.9+`与`Node v22.12.0+`环境。后管端前端代码目录：`\admin_frontend`，后管端后端代码目录：`\admin_backend`。
+
+后管端前端依赖安装
+
+```bash
+cd \admin_frontend
+yarn install
+```
+
+后管端后端依赖安装
+
+```bash
+pip install -r requirements-admin.txt
+```
 
 ### 4. 部署运行
 
@@ -367,8 +483,8 @@ python -m http.server 8092
 
 ### 🏫 毕业设计指导教师
 
-- 校方老师：**姜文峰** (英语：_Jiang Wenfeng_；越南语：_Khương Văn Phong_)，齐鲁工业大学（山东省科学院）计算机科学与技术学部 讲师
-- 企业方老师：**李君** (英语：_Li Jun_；越南语：_Lý Quân_)，安博教育科技集团([NYSE: AMBO](https://www.nyse.com/quote/XASE:AMBO)) 山东师创软件实训学院
+- 校方老师：**姜文峰** (英语：_Jiang Wenfeng_；越南语：_Khương Văn Phong_)，齐鲁工业大学（山东省科学院）计算机科学与技术学部 副教授
+- 企业方老师：**李君** (英语：_Li Jun_；越南语：_Lý Quân_)，安博教育科技集团([NYSE: AMBO](https://www.nyse.com/quote/XASE:AMBO)) 山东师创软件实训学院 高级软件工程师
 
 ### ⚖️ 开源协议
 

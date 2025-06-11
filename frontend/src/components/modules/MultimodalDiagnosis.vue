@@ -1,3 +1,7 @@
+<!-- Copyright (c) 2023~2025 DuYu (202103180009@stu.qlu.edu.cn, https://github.com/duyu09/MKTY-System), Faculty of Computer Science and Technology, Qilu University of Technology (Shandong Academy of Sciences) -->
+<!-- 该文件为“明康慧医MKTY”智慧医疗系统多模态辅助诊断功能模块Vue文件。该文件为MKTY系统的重要组成部分。 -->
+<!-- 创建日期：2025年02月01日 -->
+<!-- 修改日期：2025年03月09日 -->
 <script>
 import { Star, Opportunity, Promotion, Document, Setting } from "@element-plus/icons-vue";
 import 'element-plus/dist/index.css';
