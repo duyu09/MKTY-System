@@ -307,27 +307,34 @@ git clone https://github.com/duyu09/MKTY-System.git
 
 #### (2) Tải Về Trọng Số Mô Hình
 
-* (1) Kho Mô Hình MKTY-3B-Chat Mô Hình Ngôn Ngữ Quy Mô Lớn: `6.19 GB`
+- **(1) Kho Mô Hình MKTY-3B-Chat Mô Hình Ngôn Ngữ Quy Mô Lớn: `6.19 GB`**
 
 ```bash
 git lfs install
 git clone https://huggingface.co/Duyu/MKTY-3B-Chat
 ```
 
-* (2) Kho Mô Hình BioMedCLIP: `790 MB`
+- **(2) Kho Mô Hình BioMedCLIP: `790 MB`**
 
 ```bash
 git lfs install
 git clone https://huggingface.co/microsoft/BiomedCLIP-PubMedBERT_256-vit_base_patch16_224
 ```
 
-* (3) Kho Mô Hình MarianMT: `1.18 GB`
+- **(3) Kho Mô Hình MarianMT: `1.18 GB`**
 
 &nbsp;&nbsp;&nbsp;&nbsp;Không cần sao chép riêng biệt. Khi mô-đun mô hình nhỏ khởi chạy lần đầu, thư viện `transformers` sẽ tự động tải mô hình từ `Hugging Face` về thư mục bộ nhớ đệm của hệ thống. Khi triển khai, đảm bảo không gian ổ đĩa đủ lớn. Xét tới việc máy chủ có thể nằm trong khu vực Trung Quốc đại lục, các tệp mã liên quan đã thêm câu lệnh thiết lập biến môi trường để chuyển hướng [https://huggingface.co/](https://huggingface.co/) sang máy chủ gương nội địa [https://hf-mirror.com/](https://hf-mirror.com/). Nếu máy chủ của bạn không ở trong phạm vi mạng của Trung Quốc đại lục, hãy xóa các câu lệnh liên quan.
 
-* (4) Mô Hình Dự Đoán Chuỗi Thời Gian Y Học Tích Hợp Văn Bản MKTY
+- **(4) Mô Hình Dự Đoán Chuỗi Thời Gian Y Học Tích Hợp Văn Bản MKTY**
 
 Hiện tại chưa mở khóa mô hình tiền huấn luyện. Kích thước trọng số mô hình không vượt quá `10 MB`.
+
+- **(5) Kho Mô Hình BigBird: `2.32 GB`**
+
+```bash
+git lfs install
+git clone https://huggingface.co/google/bigbird-pegasus-large-pubmed
+```
 
 ### 3. Thiết Lập Môi Trường
 

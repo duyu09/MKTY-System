@@ -327,6 +327,13 @@ git clone https://huggingface.co/microsoft/BiomedCLIP-PubMedBERT_256-vit_base_pa
 
 暂不开放预训练模型。模型权重大小不超过`10 MB`。
 
+- （5）BigBird模型仓库大小：`2.32 GB`
+
+```bash
+git lfs install
+git clone https://huggingface.co/google/bigbird-pegasus-large-pubmed
+```
+
 ### 3. 环境搭建
 
 &nbsp;&nbsp;&nbsp;&nbsp;针对不同服务，环境依赖也不同。本系统业务逻辑后端及智能服务后端均依赖`Python 3.9+`环境以及`RabbitMQ`消息队列，`RabbitMQ`又依赖`Erlang`语言环境。安装`Python`及`RabbitMQ`的方法此处不再赘述，请访问[Python官方网站](https://www.python.org/downloads/)以及[RabbitMQ官方网站](https://www.rabbitmq.com/download.html)。另外，部署时建议建立虚拟环境。
