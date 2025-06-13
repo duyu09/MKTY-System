@@ -324,7 +324,7 @@ git clone https://github.com/duyu09/MKTY-System.git
 
 #### (2) Download Model Weights
 
-* **(1) MKTY-3B-Chat Large-scale Language Model**
+- **(1) MKTY-3B-Chat Large-scale Language Model**
   Repository size: `6.19 GB`
 
 ```bash
@@ -332,7 +332,7 @@ git lfs install
 git clone https://huggingface.co/Duyu/MKTY-3B-Chat
 ```
 
-* **(2) BioMedCLIP Model**
+- **(2) BioMedCLIP Model**
   Repository size: `790 MB`
 
 ```bash
@@ -340,14 +340,22 @@ git lfs install
 git clone https://huggingface.co/microsoft/BiomedCLIP-PubMedBERT_256-vit_base_patch16_224
 ```
 
-* **(3) MarianMT Model**
+- **(3) MarianMT Model**
   Repository size: `1.18 GB`
 
 &nbsp;&nbsp;&nbsp;&nbsp;This repository does not require manual cloning. It will be automatically downloaded by the `transformers` library during the first launch of the small-scale model module. Ensure sufficient disk space for the cache. Considering that servers may be located in Mainland China, environment variables are preset in the relevant scripts to redirect [https://huggingface.co/](https://huggingface.co/) to the mirror site [https://hf-mirror.com/](https://hf-mirror.com/). If your server is outside Mainland China, please remove those lines of code.
 
-* **(4) MKTY Fusion Text Medical Time-Series Prediction Model**
+- **(4) MKTY Fusion Text Medical Time-Series Prediction Model**
 
 Pretrained weights are not currently available. The model size is under `10 MB`.
+
+- **(5) BigBird Model**
+  Repository size: `2.32 GB`
+
+```bash
+git lfs install
+git clone https://huggingface.co/google/bigbird-pegasus-large-pubmed
+```
 
 ### 3. Environment Setup
 
