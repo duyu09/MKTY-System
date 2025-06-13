@@ -409,7 +409,7 @@ pip install -r requirements-bb.txt
 
 #### (5) Database Initialization
 
-&nbsp;&nbsp;&nbsp;&nbsp;The system uses a `MySQL` database. Version 8.0+ is required for JSON data support. Refer to the [MySQL official site](https://dev.mysql.com/doc/) for installation instructions. Use the SQL script `\backend\script.sql` to initialize the database schema.
+&nbsp;&nbsp;&nbsp;&nbsp;The system uses a `MySQL` database. Version 8.0+ is required for JSON data support. Refer to the [MySQL official site](https://dev.mysql.com/doc/) for installation instructions. Use the SQL script `\backend\script.sql` to initialize the database schema. This project also provides sample data, you can execute `backend\demo_data.sql` script to import the sample data and start the project quickly, demo username: `test`, password: `123`.
 
 #### (6) Frontend Setup
 
