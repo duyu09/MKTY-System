@@ -389,7 +389,7 @@ pip install -r requirements-bb.txt
 
 #### (5) Thiết Lập Cơ Sở Dữ Liệu
 
-&nbsp;&nbsp;&nbsp;&nbsp;Hệ thống này phụ thuộc vào cơ sở dữ liệu `MySQL`, yêu cầu phiên bản `8.0+` để hỗ trợ lưu trữ và truy vấn dữ liệu `JSON`. Vui lòng tham khảo [MySQL chính thức](https://dev.mysql.com/doc/) để cài đặt. Kịch bản SQL định nghĩa dữ liệu (DDL): `\backend\script.sql`, vui lòng thực thi để tạo cơ sở dữ liệu.
+&nbsp;&nbsp;&nbsp;&nbsp;Hệ thống này phụ thuộc vào cơ sở dữ liệu `MySQL`, yêu cầu phiên bản `8.0+` để hỗ trợ lưu trữ và truy vấn dữ liệu `JSON`. Vui lòng tham khảo [MySQL chính thức](https://dev.mysql.com/doc/) để cài đặt. Kịch bản SQL định nghĩa dữ liệu (DDL): `\backend\script.sql`, vui lòng thực thi để tạo cơ sở dữ liệu. Dự án này cũng cung cấp dữ liệu mẫu, bạn có thể thực thi kịch bản `backend\demo_data.sql` để nhập dữ liệu mẫu và khởi động dự án một cách nhanh chóng, ví dụ về tên người dùng: `test`, mật khẩu: `123`.
 
 #### (6) Mã Frontend
 

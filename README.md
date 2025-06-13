@@ -387,7 +387,7 @@ pip install -r requirements-bb.txt
 
 #### （5）数据库建立
 
-&nbsp;&nbsp;&nbsp;&nbsp;本系统依赖`MySQL`数据库，由于涉及JSON的存取，故须8.0及以上的版本。数据库的安装此处不再赘述，具体安装步骤请参考[MySQL官方网站](https://dev.mysql.com/doc/)。数据定义语言（建库SQL脚本）：`\backend\script.sql`，请执行之以建库。
+&nbsp;&nbsp;&nbsp;&nbsp;本系统依赖`MySQL`数据库，由于涉及JSON的存取，故须8.0及以上的版本。数据库的安装此处不再赘述，具体安装步骤请参考[MySQL官方网站](https://dev.mysql.com/doc/)。数据定义语言（建库SQL脚本）：`\backend\script.sql`，请执行之以建库。本项目还提供了示例数据，您可以执行`\backend\demo_data.sql`脚本来导入示例数据，快速启动项目，示例用户名：`test`，密码：`123`。
 
 #### （6）前端代码
 
@@ -577,7 +577,7 @@ python -m http.server 8092
 
 ## 📊 访客统计
 
-<div><b>Number of Total Visits (All of Duyu09's GitHub Projects): </b><br><img src="https://profile-counter.glitch.me/duyu09/count.svg" /></div> 
+<div><b>Number of Total Visits (All of Duyu09's GitHub Projects): </b><br><img src="https://profile-counter.glitch.me/duyu09/count.svg" /></div>
 
 <div><b>Number of Total Visits (MKTY): </b>
 <br><img src="https://profile-counter.glitch.me/duyu09-MKTY-SYSTEM/count.svg" /></div> 
