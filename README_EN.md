@@ -494,6 +494,23 @@ The table below presents selected frontend UI displays. Please enlarge images fo
 
 ## 🎓 Project Authors
 
+This project serves as the graduation thesis for the 2025 batch of undergraduate students in the Faculty of Computer Science and Technology, Qilu University of Technology (Shandong Academy of Sciences).
+
+### 👤 Project Author & Copyright Notice
+
+- **Du Yu** (Chinese Simplified: _杜宇_; Vietnamese: _Đỗ Vũ_; Email: <202103180009@stu.qlu.edu.cn> and <qluduyu09@163.com>), undergraduate student at Faculty of Computer Science and Technology, Qilu University of Technology (Shandong Academy of Sciences).
+
+### 🏫 Thesis Advisors
+
+- Academic Mentor: **Jiang Wenfeng** (Chinese Simplified: _姜文峰_; Vietnamese: _Khương Văn Phong_), Associate professor, Faculty of Computer Science and Technology, Qilu University of Technology (Shandong Academy of Sciences)
+- Enterprise Mentor: **Li Jun** (Chinese Simplified: _李君_; Vietnamese: _Lý Quân_), Senior software engineer, Shandong Strong (Shichuang) Software Training College, Ambow Education Group ([NYSE: AMBO](https://www.nyse.com/quote/XASE:AMBO))
+
+<img src="./image/MKTY_PIC.png" alt="MKTY_PIC" style="width: 75%;">
+
+<details>
+
+<summary><b>Art Typography of Minh Khoe Tue Y System</b></summary>
+
 ```
 ██\      ██\     ██\   ██\   ████████\  ██\     ██\
 ███\    ███ |    ██ | ██  |  \__██  __| \██\   ██  |
@@ -505,16 +522,7 @@ The table below presents selected frontend UI displays. Please enlarge images fo
 \__|     \__|\__|\__|  \__|\__| \__|\__|    \__|\__|
 ```
 
-This project serves as the graduation thesis for the 2025 batch of undergraduate students in the Faculty of Computer Science and Technology, Qilu University of Technology (Shandong Academy of Sciences).
-
-### 👤 Project Author & Copyright Notice
-
-- **Du Yu** (Chinese Simplified: _杜宇_; Vietnamese: _Đỗ Vũ_; Email: <202103180009@stu.qlu.edu.cn> and <qluduyu09@163.com>), undergraduate student at Faculty of Computer Science and Technology, Qilu University of Technology (Shandong Academy of Sciences).
-
-### 🏫 Thesis Advisors
-
-- Academic Mentor: **Jiang Wenfeng** (Chinese Simplified: _姜文峰_; Vietnamese: _Khương Văn Phong_), Associate professor, Faculty of Computer Science and Technology, Qilu University of Technology (Shandong Academy of Sciences)
-- Enterprise Mentor: **Li Jun** (Chinese Simplified: _李君_; Vietnamese: _Lý Quân_), Senior software engineer, Shandong Strong (Shichuang) Software Training College, Ambow Education Group ([NYSE: AMBO](https://www.nyse.com/quote/XASE:AMBO))
+</details>
 
 ### ⚖️ Open Source License
 

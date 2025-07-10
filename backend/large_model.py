@@ -15,7 +15,7 @@ mq_connection_parameters = {  # MQ连接参数
 }
 MQ_NAME = 'large_model_inference'  # MQ队列名称
 VERSION = 'v1.0.0'  # 版本号
-MODEL_PATH = r"C:\Users\35834\Desktop\Folder\mkty"  # MKTY-3B-Chat大语言模型路径
+MODEL_PATH = r"./mkty"  # MKTY-3B-Chat大语言模型路径
 MODE = "dev"  # 运行模式，可选值为`dev`、`prod`，默认为`dev`
 
 start_print(VERSION)

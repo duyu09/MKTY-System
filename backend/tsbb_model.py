@@ -15,8 +15,8 @@ MQ_CONNECTION_PARAMETERS = {  # MQ连接参数
 }
 MQ_NAME = 'tsbb_model_inference'  # MQ队列名称
 VERSION = 'v1.0.0'  # 版本号
-BB_MODEL_PATH = r"D:\MKTY\MKTY-System\backend\bigbird-pegasus-large-pubmed"  # bigbird大语言模型路径
-TS_MODEL_PATH = r"D:\MKTY\MKTY-System\backend\timesformer"  # 时间序列模型路径
+BB_MODEL_PATH = r".\backend\bigbird-pegasus-large-pubmed"  # bigbird大语言模型路径
+TS_MODEL_PATH = r".\backend\timesformer"  # 时间序列模型路径
 MODE = "dev"  # 运行模式，可选值为`dev`、`prod`，默认为`dev`
 
 start_print(VERSION)

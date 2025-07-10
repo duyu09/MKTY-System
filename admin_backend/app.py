@@ -19,7 +19,7 @@ app = Flask(__name__)
 # 管理员账号配置
 ADMIN_USERNAME = "admin"
 ADMIN_PASSWORD = "admin123"
-JWT_SECRET = "your-secret-key"  # 用于JWT加密的密钥
+JWT_SECRET = "secret-key"  # 用于JWT加密的密钥
 
 # 配置CORS
 # CORS(app, resources={
