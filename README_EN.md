@@ -600,6 +600,10 @@ The following Additional Terms are hereby incorporated into this License, in acc
 
 ## 🔗 Links
 
+<img src="./image/QLU-Fullname.svg" alt="QLU-Fullname" style="width: 40%;" />
+
+<img src="./image/Faculty-of-Computer-Science-Metallic-Badge.jpg" alt="Faculty-of-Computer-Science-Metallic-Badge" style="width: 9%;" />
+
 - Qilu University of Technology (Shandong Academy of Sciences): [https://www.qlu.edu.cn/](https://www.qlu.edu.cn/)
   
 - Shandong Computer Center (National Supercomputing Center in Jinan, _NSCCJN_): [https://www.nsccjn.cn/](https://www.nsccjn.cn/)
@@ -614,3 +618,11 @@ The following Additional Terms are hereby incorporated into this License, in acc
 
 <div><b>Number of Total Visits (MKTY): </b>
 <br><img src="https://profile-counter.glitch.me/duyu09-MKTY-SYSTEM/count.svg" /></div>
+<br>
+------
+
+#### **GIỮ VỮNG TÂM ĐẦU, KIÊN ĐỊNH CHÍ HƯỚNG**
+
+### **𡨹  凭  心  頭   堅  定  志  向**
+
+<img src="./image/GVTD-KDCH-Metallic.jpg" alt="GVTD-KDCH-Metallic" style="width: 61%;" />

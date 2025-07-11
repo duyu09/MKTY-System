@@ -582,6 +582,10 @@ Hành vi không thực hiện việc ghi chú theo quy định sẽ bị xem là
 
 ## 🔗 Liên Kết Đối Tác
 
+<img src="./image/QLU-Fullname.svg" alt="QLU-Fullname" style="width: 40%;" />
+
+<img src="./image/Faculty-of-Computer-Science-Metallic-Badge.jpg" alt="Faculty-of-Computer-Science-Metallic-Badge" style="width: 9%;" />
+
 - Đại học Công nghiệp Tề Lỗ (_Qilu_) (Viện Khoa học tỉnh Sơn Đông): [https://www.qlu.edu.cn/](https://www.qlu.edu.cn/)
   
 - Trung tâm Tính toán tỉnh Sơn Đông (Trung tâm Tính toán Siêu máy tính Quốc gia Tế Nam, _NSCCJN_): [https://www.nsccjn.cn/](https://www.nsccjn.cn/)
@@ -596,3 +600,11 @@ Hành vi không thực hiện việc ghi chú theo quy định sẽ bị xem là
 
 <div><b>Số lượt truy cập tổng cộng (MKTY): </b>
 <br><img src="https://profile-counter.glitch.me/duyu09-MKTY-SYSTEM/count.svg" /></div>
+<br>
+------
+
+#### **GIỮ VỮNG TÂM ĐẦU, KIÊN ĐỊNH CHÍ HƯỚNG**
+
+### **𡨹  凭  心  頭   堅  定  志  向**
+
+<img src="./image/GVTD-KDCH-Metallic.jpg" alt="GVTD-KDCH-Metallic" style="width: 62%;" />

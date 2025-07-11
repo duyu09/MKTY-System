@@ -471,7 +471,7 @@ python -m http.server 8092
 
 ## 🎓 项目作者及著作权声明
 
-该项目用于2025年齐鲁工业大学（山东省科学院）计算机科学与技术学部毕业设计。
+该项目已用于2025年齐鲁工业大学（山东省科学院）计算机科学与技术学部毕业设计。
 
 ### 👤 项目作者
 
@@ -580,6 +580,10 @@ python -m http.server 8092
 
 ## 🔗 友情链接
 
+<img src="./image/QLU-Fullname.svg" alt="QLU-Fullname" style="width: 40%;" />
+
+<img src="./image/Faculty-of-Computer-Science-Metallic-Badge.jpg" alt="Faculty-of-Computer-Science-Metallic-Badge" style="width: 9%;" />
+
 - 齐鲁工业大学（山东省科学院）: [https://www.qlu.edu.cn/](https://www.qlu.edu.cn/)
   
 - 山东省计算中心（国家超级计算济南中心）: [https://www.nsccjn.cn/](https://www.nsccjn.cn/)
@@ -596,4 +600,11 @@ python -m http.server 8092
 
 <div><b>Number of Total Visits (MKTY): </b>
 <br><img src="https://profile-counter.glitch.me/duyu09-MKTY-SYSTEM/count.svg" /></div> 
+<br>
+------
 
+#### **GIỮ VỮNG TÂM ĐẦU, KIÊN ĐỊNH CHÍ HƯỚNG**
+
+### **𡨹  凭  心  頭   堅  定  志  向**
+
+<img src="./image/GVTD-KDCH-Metallic.jpg" alt="GVTD-KDCH-Metallic" style="width: 61%;" />
