@@ -601,9 +601,10 @@ Hành vi không thực hiện việc ghi chú theo quy định sẽ bị xem là
 <div><b>Số lượt truy cập tổng cộng (MKTY): </b>
 <br><img src="https://profile-counter.glitch.me/duyu09-MKTY-SYSTEM/count.svg" /></div>
 <br>
+
 ------
 
-#### **GIỮ VỮNG TÂM ĐẦU, KIÊN ĐỊNH CHÍ HƯỚNG**
+### **GIỮ VỮNG TÂM ĐẦU, KIÊN ĐỊNH CHÍ HƯỚNG**
 
 ### **𡨹  凭  心  頭   堅  定  志  向**
 
