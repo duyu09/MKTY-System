@@ -600,9 +600,7 @@ The following Additional Terms are hereby incorporated into this License, in acc
 
 ## 🔗 Links
 
-<img src="./image/QLU-Fullname.svg" alt="QLU-Fullname" style="width: 40%;" />
-
-<img src="./image/Faculty-of-Computer-Science-Metallic-Badge.jpg" alt="Faculty-of-Computer-Science-Metallic-Badge" style="width: 9%;" />
+<img src="./image/QLU-Fullname.svg" alt="QLU-Fullname" style="width: 40%;" />&nbsp;<img src="./image/Faculty-of-Computer-Science-Metallic-Badge.jpg" alt="Faculty-of-Computer-Science-Metallic-Badge" style="width: 9%;" />
 
 - Qilu University of Technology (Shandong Academy of Sciences): [https://www.qlu.edu.cn/](https://www.qlu.edu.cn/)
   

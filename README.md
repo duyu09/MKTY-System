@@ -580,9 +580,7 @@ python -m http.server 8092
 
 ## 🔗 友情链接
 
-<img src="./image/QLU-Fullname.svg" alt="QLU-Fullname" style="width: 40%;" />
-
-<img src="./image/Faculty-of-Computer-Science-Metallic-Badge.jpg" alt="Faculty-of-Computer-Science-Metallic-Badge" style="width: 9%;" />
+<img src="./image/QLU-Fullname.svg" alt="QLU-Fullname" style="width: 40%;" />&nbsp;<img src="./image/Faculty-of-Computer-Science-Metallic-Badge.jpg" alt="Faculty-of-Computer-Science-Metallic-Badge" style="width: 9%;" />
 
 - 齐鲁工业大学（山东省科学院）: [https://www.qlu.edu.cn/](https://www.qlu.edu.cn/)
   

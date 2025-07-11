@@ -582,9 +582,7 @@ Hành vi không thực hiện việc ghi chú theo quy định sẽ bị xem là
 
 ## 🔗 Liên Kết Đối Tác
 
-<img src="./image/QLU-Fullname.svg" alt="QLU-Fullname" style="width: 40%;" />
-
-<img src="./image/Faculty-of-Computer-Science-Metallic-Badge.jpg" alt="Faculty-of-Computer-Science-Metallic-Badge" style="width: 9%;" />
+<img src="./image/QLU-Fullname.svg" alt="QLU-Fullname" style="width: 40%;" />&nbsp;<img src="./image/Faculty-of-Computer-Science-Metallic-Badge.jpg" alt="Faculty-of-Computer-Science-Metallic-Badge" style="width: 9%;" />
 
 - Đại học Công nghiệp Tề Lỗ (_Qilu_) (Viện Khoa học tỉnh Sơn Đông): [https://www.qlu.edu.cn/](https://www.qlu.edu.cn/)
   
