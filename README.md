@@ -208,9 +208,7 @@ if __name__ == "__main__":
 
 首先，将输入的医学文本信息 $T$ 通过预训练的`BigBird`文本编码器进行编码，得到文本特征向量 $H_T$：
 
-$$
-H_T = \text{BigBird}(T)
-$$
+$H_T = \text{BigBird}(T)$
 
 其中，`BigBird`的参数是冻结的，不参与后续训练。
 
@@ -218,59 +216,43 @@ $$
 
 输入的医学时间序列数据 $X$ 通过快速傅里叶变换 (`FFT`) 得到频域表示 $X_f$：
 
-$$
-X_f = \text{FFT}(X)
-$$
+$X_f = \text{FFT}(X)$
 
 ##### 3. 序列时域特征提取
 
 时间序列同时输入到`GRU`网络提取时序特征 $H_s$：
 
-$$
-H_s = \text{GRU}(X)
-$$
+$H_s = \text{GRU}(X)$
 
 ##### 4. 交叉注意力机制
 
 将文本编码的结果 $H_T$ 生成 Query ($Q$) 和 Key ($K$)，频域特征 $X_f$ 生成 Value ($V$)：
 
-$$
-Q = W_Q H_T,\quad K = W_K H_T,\quad V = W_V X_f
-$$
+$Q = W_Q H_T,\quad K = W_K H_T,\quad V = W_V X_f$
 
 计算注意力分数：
 
-$$
-A = \text{Softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)
-$$
+$A = \text{Softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)$
 
 得到交叉注意力输出：
 
-$$
-O = A \cdot V
-$$
+$O = A \cdot V$
 
 ##### 5. 门控机制
 
 将交叉注意力输出 $O$ 经过 `Sigmoid` 函数，作为门控因子 $G$：
 
-$$
-G = \text{Sigmoid}(\text{IFFT}(O))
-$$
+$G = \text{Sigmoid}(\text{IFFT}(O))$
 
 ##### 6. 模态融合
 
 门控因子 $G$ 与 `GRU` 输出 $H_s$ 进行加权融合：
 
-$$
-H_f = G \cdot H_s
-$$
+$H_f = G \cdot H_s$
 
 最后，将融合后的特征输入全连接层进行预测：
 
-$$
-\hat{Y} = \text{Dense}(H_f + H_s)
-$$
+$\hat{Y} = \text{Dense}(H_f + H_s)$
 
 ##### 符号说明
 

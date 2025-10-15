@@ -227,9 +227,7 @@ if __name__ == "__main__":
 
 Let medical text input be \$T\$. The pre-trained `BigBird` encoder yields:
 
-$$
-H_T = \text{BigBird}(T)
-$$
+$H_T = \text{BigBird}(T)$
 
 Parameters of `BigBird` are frozen during training.
 
@@ -237,74 +235,58 @@ Parameters of `BigBird` are frozen during training.
 
 Given time series input \$X\$, compute its FFT:
 
-$$
-X_f = \text{FFT}(X)
-$$
+$X_f = \text{FFT}(X)$
 
 ##### 3. Temporal Feature Extraction
 
 Time-domain features are extracted via GRU:
 
-$$
-H_s = \text{GRU}(X)
-$$
+$H_s = \text{GRU}(X)$
 
 ##### 4. Cross-Attention Mechanism
 
 From \$H\_T\$, compute Query (\$Q\$) and Key (\$K\$); from \$X\_f\$, compute Value (\$V\$):
 
-$$
-Q = W_Q H_T,\quad K = W_K H_T,\quad V = W_V X_f
-$$
+$Q = W_Q H_T,\quad K = W_K H_T,\quad V = W_V X_f$
 
 Attention scores:
 
-$$
-A = \text{Softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)
-$$
+$A = \text{Softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)$
 
 Cross-attention output:
 
-$$
-O = A \cdot V
-$$
+$O = A \cdot V$
 
 ##### 5. Gating Mechanism
 
 Apply inverse FFT to \$O\$, then pass through a Sigmoid to obtain gating factor \$G\$:
 
-$$
-G = \text{Sigmoid}(\text{IFFT}(O))
-$$
+$G = \text{Sigmoid}(\text{IFFT}(O))$
 
 ##### 6. Modality Fusion
 
 Fuse \$G\$ and GRU output \$H\_s\$:
 
-$$
-H_f = G \cdot H_s
-$$
+$H_f = G \cdot H_s$
 
 Final prediction:
 
-$$
-\hat{Y} = \text{Dense}(H_f + H_s)
-$$
+$\hat{Y} = \text{Dense}(H_f + H_s)$
 
 ##### Symbol Glossary
 
-* \$T\$: Medical text input
-* \$X\$: Medical time series input
-* \$H\_T\$: Text embedding features
-* \$X\_f\$: Frequency-domain representation of \$X\$
-* \$H\_s\$: Time-domain features from GRU
-* \$Q\$, \$K\$, \$V\$: Cross-attention query, key, value
-* \$A\$: Attention matrix
-* \$O\$: Cross-attention output
-* \$G\$: Gating factor
-* \$H\_f\$: Fused feature representation
-* \$\hat{Y}\$: Final prediction
-* \$W\_Q\$, \$W\_K\$, \$W\_V\$: Learnable projection matrices
+* $T$: Medical text input
+* $X$: Medical time series input
+* $H\_T$: Text embedding features
+* $X\_f$: Frequency-domain representation of $X$
+* $H\_s$: Time-domain features from GRU
+* $Q$, $K$, $V$: Cross-attention query, key, value
+* $A$: Attention matrix
+* $O$: Cross-attention output
+* $G$: Gating factor
+* $H\_f$: Fused feature representation
+* $\hat{Y}$: Final prediction
+* $W\_Q$, $W\_K$, $W\_V$: Learnable projection matrices
 
 </details>
 

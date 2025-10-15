@@ -210,9 +210,7 @@ if __name__ == "__main__":
 
 Đưa văn bản y tế đầu vào $T$ qua bộ mã hóa `BigBird` để thu được đặc trưng văn bản $H_T$:
 
-$$
-H_T = \text{BigBird}(T)
-$$
+$H_T = \text{BigBird}(T)$
 
 Tham số của `BigBird` được cố định, không tham gia huấn luyện.
 
@@ -220,59 +218,43 @@ Tham số của `BigBird` được cố định, không tham gia huấn luyện.
 
 Dữ liệu chuỗi thời gian $X$ được biến đổi sang miền tần số bằng FFT:
 
-$$
-X_f = \text{FFT}(X)
-$$
+$X_f = \text{FFT}(X)$
 
 ##### 3. Trích Xuất Đặc Trưng Thời Gian
 
 Chuỗi $X$ cũng được đưa qua mạng `GRU` để trích xuất đặc trưng thời gian $H_s$:
 
-$$
-H_s = \text{GRU}(X)
-$$
+$H_s = \text{GRU}(X)$
 
 ##### 4. Cơ Chế Chú Ý Chéo
 
 Từ $H_T$ tạo `Query` ($Q$) và `Key` ($K$), từ $X_f$ tạo `Value` ($V$):
 
-$$
-Q = W_Q H_T,\quad K = W_K H_T,\quad V = W_V X_f
-$$
+$Q = W_Q H_T,\quad K = W_K H_T,\quad V = W_V X_f$
 
 Tính ma trận chú ý:
 
-$$
-A = \text{Softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)
-$$
+$A = \text{Softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)$
 
 Tạo đầu ra chú ý chéo:
 
-$$
-O = A \cdot V
-$$
+$O = A \cdot V$
 
 ##### 5. Cơ Chế Cổng
 
 Đầu ra $O$ được đưa qua hàm `Sigmoid` để tạo hệ số cổng $G$:
 
-$$
-G = \text{Sigmoid}(\text{IFFT}(O))
-$$
+$G = \text{Sigmoid}(\text{IFFT}(O))$
 
 ##### 6. Hợp Nhất Mô Hình
 
 Kết hợp $G$ và đầu ra `GRU` $H_s$ theo dạng có trọng số:
 
-$$
-H_f = G \cdot H_s
-$$
+$H_f = G \cdot H_s$
 
 Dự đoán đầu ra cuối cùng:
 
-$$
-\hat{Y} = \text{Dense}(H_f + H_s)
-$$
+$\hat{Y} = \text{Dense}(H_f + H_s)$
 
 ##### Ký Hiệu
 
