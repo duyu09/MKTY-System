@@ -1,5 +1,7 @@
 ## 文档概述
 
+[**简体中文**](./README.md) | [**English**](./README_EN.md) | [**Tiếng Việt**](./README_VN.md)
+
 **项目名称：** 明康慧医——基于LLM与多模态人工智能的健康管理与辅助诊疗系统的设计与实现（简称: 明康慧医智慧医疗系统）
 
 **英文：** Minh Khoe Tue Y — Design and Implementation of a Health Management and Diagnostic Assistance System Based on LLMs and Multimodal Artificial Intelligence (Abbreviation: MKTY Smart Healthcare System)

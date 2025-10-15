@@ -1,5 +1,7 @@
 ## Tổng Quan Tài Liệu
 
+[**简体中文**](./README.md) | [**English**](./README_EN.md) | [**Tiếng Việt**](./README_VN.md)
+
 **Tên dự án:** Minh Khỏe Tuệ Y — Thiết kế và triển khai hệ thống quản lý sức khỏe và hỗ trợ chẩn đoán y tế dựa trên LLM và trí tuệ nhân tạo đa mô thức (viết tắt: Hệ Thống Y Liệu Trí Tuệ Minh Khỏe Tuệ Y)
 
 **Tiếng Anh:** Minh Khoe Tue Y — Design and Implementation of a Health Management and Diagnostic Assistance System Based on LLMs and Multimodal Artificial Intelligence (Abbreviation: MKTY Smart Healthcare System)

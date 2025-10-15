@@ -1,5 +1,7 @@
 ## Document Overview
 
+[**简体中文**](./README.md) | [**English**](./README_EN.md) | [**Tiếng Việt**](./README_VN.md)
+
 **Project Title:** *Minh Khoe Tue Y — Design and Implementation of a Health Management and Diagnostic Assistance System Based on LLMs and Multimodal Artificial Intelligence*
 (*Abbreviation: MKTY Smart Healthcare System*)
 
