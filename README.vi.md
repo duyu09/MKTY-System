@@ -574,13 +574,7 @@ Hành vi không thực hiện việc ghi chú theo quy định sẽ bị xem là
 
 - Trang GitHub của Đỗ Vũ: [https://github.com/duyu09/](https://github.com/duyu09/)
 
-## 📊 Thống Kê Lượt Truy Cập
-
-<div><b>Số lượt truy cập tổng cộng (Tất cả các dự án của Duyu09 trên GitHub): </b><br><img src="https://profile-counter.glitch.me/duyu09/count.svg" /></div>
-
-<div><b>Số lượt truy cập tổng cộng (MKTY): </b>
-<br><img src="https://profile-counter.glitch.me/duyu09-MKTY-SYSTEM/count.svg" /></div>
-<br>
+- Trang chủ của Đỗ Vũ tại nhóm nghiên cứu: [https://faculty.lzjtu.edu.cn/chenmei/zh_CN/xsxx/2554/content/1837.htm](https://faculty.lzjtu.edu.cn/chenmei/zh_CN/xsxx/2554/content/1837.htm)
 
 ------
 

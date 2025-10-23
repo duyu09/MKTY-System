@@ -592,13 +592,7 @@ The following Additional Terms are hereby incorporated into this License, in acc
 
 - DuYu's GitHub Account: [https://github.com/duyu09/](https://github.com/duyu09/)
 
-## 📊 Visitor Statistics
-
-<div><b>Number of Total Visits (All of Duyu09's GitHub Projects): </b><br><img src="https://profile-counter.glitch.me/duyu09/count.svg" /></div>
-
-<div><b>Number of Total Visits (MKTY): </b>
-<br><img src="https://profile-counter.glitch.me/duyu09-MKTY-SYSTEM/count.svg" /></div>
-<br>
+- Du Yu’s Research Group Page: [https://faculty.lzjtu.edu.cn/chenmei/zh_CN/xsxx/2554/content/1837.htm](https://faculty.lzjtu.edu.cn/chenmei/zh_CN/xsxx/2554/content/1837.htm)
 
 ------
 

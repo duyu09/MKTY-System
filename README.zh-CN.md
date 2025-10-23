@@ -574,13 +574,7 @@ python -m http.server 8092
 
 - 杜宇的Hugging Face主页: [https://huggingface.co/Duyu](https://huggingface.co/Duyu)
 
-## 📊 访客统计
-
-<div><b>Number of Total Visits (All of Duyu09's GitHub Projects): </b><br><img src="https://profile-counter.glitch.me/duyu09/count.svg" /></div>
-
-<div><b>Number of Total Visits (MKTY): </b>
-<br><img src="https://profile-counter.glitch.me/duyu09-MKTY-SYSTEM/count.svg" /></div> 
-<br>
+- DuYu在课题组的主页 [https://faculty.lzjtu.edu.cn/chenmei/zh_CN/xsxx/2554/content/1837.htm](https://faculty.lzjtu.edu.cn/chenmei/zh_CN/xsxx/2554/content/1837.htm)
 
 ------
 
