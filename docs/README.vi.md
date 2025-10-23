@@ -1,6 +1,6 @@
 ## Tổng Quan Tài Liệu
 
-[**简体中文**](./README.md) | [**English**](./README_EN.md) | [**Tiếng Việt**](./README_VN.md)
+[**简体中文**](./README.zh-CN.md) | [**English**](./README.md) | [**Tiếng Việt**](./README.vi.md)
 
 **Tên dự án:** Minh Khỏe Tuệ Y — Thiết kế và triển khai hệ thống quản lý sức khỏe và hỗ trợ chẩn đoán y tế dựa trên LLM và trí tuệ nhân tạo đa mô thức (viết tắt: Hệ Thống Y Liệu Trí Tuệ Minh Khỏe Tuệ Y)
 
