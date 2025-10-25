@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "Minh Khoe Tue Y Smart Healthcare System"
+authors:
+  - family-names: "Du"
+    given-names: "Yu"
+    orcid: "https://orcid.org/0009-0003-3740-9627"
+version: "v1.1.2"
+doi: "10.5281/zenodo.17444889"
+date-released: "2025-10-26"
+url: "https://github.com/duyu09/MKTY-System"
+repository-code: "https://github.com/duyu09/MKTY-System"
+license: "Mozilla Public License 2.0 (MPL-2.0) (Modified)"
+keywords:
+  - smart healthcare system
+  - large language model
+  - multimodal AI
+  - medical diagnosis assistance
+software-contributors:
+  - family-names: "Jiang"
+    given-names: "Wenfeng"
+  - family-names: "Li"
+    given-names: "Jun"
+publisher: "Zenodo"

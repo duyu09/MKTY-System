@@ -7,6 +7,8 @@
 
 # 明康慧医——基于LLM与多模态人工智能的健康管理与辅助诊疗系统的设计与实现
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17444889.svg)](https://doi.org/10.5281/zenodo.17444889)
+
 ## 🌍 文档语言
 
 <p style="display: flex;align-items: center;">
@@ -583,3 +585,26 @@ python -m http.server 8092
 ### **𡨹  凭  心  頭   堅  定  志  向**
 
 <img src="./image/GVTD-KDCH-Metallic.jpg" alt="GVTD-KDCH-Metallic" style="width: 61%;" />
+
+------
+
+## 📄 引用
+
+```
+@software{du_2025_17444889,
+  author       = {Du, Yu},
+  title        = {Minh Khoe Tue Y Smart Healthcare System},
+  month        = oct,
+  year         = 2025,
+  publisher    = {Zenodo},
+  version      = {v1.1.2},
+  doi          = {10.5281/zenodo.17444889},
+  url          = {https://doi.org/10.5281/zenodo.17444889},
+  swhid        = {swh:1:dir:a633243bf04e6ba18e2d5ffcf92ea57f73566f43
+                   ;origin=https://doi.org/10.5281/zenodo.17444888;vi
+                   sit=swh:1:snp:37dc91d2c166a07c7dc8ebac0b4be97961b0
+                   267b;anchor=swh:1:rel:a88f82a5ca10d278bcc10734f5cf
+                   a560286a8b47;path=duyu09-MKTY-System-8edd0c9
+                  },
+}
+```
