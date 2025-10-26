@@ -599,7 +599,7 @@ python -m http.server 8092
   publisher    = {Zenodo},
   version      = {v1.1.2},
   doi          = {10.5281/zenodo.17444889},
-  url          = {https://doi.org/10.5281/zenodo.17444889},
+  url          = {https://github.com/duyu09/MKTY-System},
   swhid        = {swh:1:dir:a633243bf04e6ba18e2d5ffcf92ea57f73566f43
                    ;origin=https://doi.org/10.5281/zenodo.17444888;vi
                    sit=swh:1:snp:37dc91d2c166a07c7dc8ebac0b4be97961b0
