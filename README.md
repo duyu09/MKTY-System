@@ -596,13 +596,13 @@ The following Additional Terms are hereby incorporated into this License, in acc
 
 - Du Yu’s Research Group Page: [https://faculty.lzjtu.edu.cn/chenmei/zh_CN/xsxx/2554/content/1837.htm](https://faculty.lzjtu.edu.cn/chenmei/zh_CN/xsxx/2554/content/1837.htm)
 
-------
-
 ### **GIỮ VỮNG TÂM ĐẦU, KIÊN ĐỊNH CHÍ HƯỚNG**
 
 ### **𡨹  凭  心  頭   堅  定  志  向**
 
 <img src="./image/GVTD-KDCH-Metallic.jpg" alt="GVTD-KDCH-Metallic" style="width: 61%;" />
+
+------
 
 ## 📄 Citation
 
@@ -615,7 +615,7 @@ The following Additional Terms are hereby incorporated into this License, in acc
   publisher    = {Zenodo},
   version      = {v1.1.2},
   doi          = {10.5281/zenodo.17444889},
-  url          = {https://doi.org/10.5281/zenodo.17444889},
+  url          = {https://github.com/duyu09/MKTY-System},
   swhid        = {swh:1:dir:a633243bf04e6ba18e2d5ffcf92ea57f73566f43
                    ;origin=https://doi.org/10.5281/zenodo.17444888;vi
                    sit=swh:1:snp:37dc91d2c166a07c7dc8ebac0b4be97961b0
